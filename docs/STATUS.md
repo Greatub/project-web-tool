@@ -10,7 +10,13 @@ Updated: 2026-10-17 (Asia/Shanghai).
 - Controlled Excel v3, protected calculated cells, explicit 21/22-field mappings, group configuration, preview, source revision checks and downloads as new files. Legacy 14-column spreadsheet import remains positionally compatible; source-specific aliases have been removed. Legacy JSON requires a declared three-slot mapping.
 - Public source allowlist and irreversible identifier fingerprints with submission/push hooks. Historical source files, old templates, development images, raw audit records and old Git backups have been removed under explicit user authorization. The public repository was deleted and recreated under the same name, with a new repository identity and clean Git history; only the 13 reviewed files were uploaded.
 
-## Current verification
+## Current change: project selector typography
+
+- Fixed the project selector falling back to the browser's native font size. It now uses ui-control with the same system-font/12 px/400/1.4 tokens as buttons, and ui-select for themed border, color and spacing. Project actions retain their compact 36 px height; dialog inputs keep the 13 px body role.
+- Reviewed the selector/button cascade, filter controls, navigation and dialog input roles. The shared component structural check and all 47 automated checks pass. Source and public-release copies are synchronized.
+- Live computed styles and English/Chinese layouts at 1024/1440 px remain unverified: browser security policy prevents access to the local file page. No visual acceptance is claimed for this change.
+
+## Previous cleanup verification
 
 - 47 automated checks: 17 scheduling/workspace/default-value checks and 30 Excel/group contract checks. Includes fresh English boot, built-in placeholder migration, custom text preservation, both UI languages and legacy mappings.
 - 17 actual ZIP/XML integration checks retain v1/v2 coverage and verify all ten groups through v3 import/export, isolation and recovery.
