@@ -1,0 +1,11 @@
+{
+  "name": "project-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "test": "node tests/public/core.cjs && node tests/public/excel.cjs",
+    "privacy": "node scripts/privacy-check.cjs",
+    "release": "node scripts/release.cjs",
+    "prepare-hooks": "node -e \"const fs=require('node:fs'),cp=require('node:child_process');for(const f of ['pre-commit','pre-push'])fs.chmodSync('.githooks/'+f,0o755);cp.execFileSync('git',['config','core.hooksPath','.githooks']);\""
+  }
+}

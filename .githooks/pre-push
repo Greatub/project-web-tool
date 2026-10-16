@@ -1,0 +1,4 @@
+#!/bin/sh
+node scripts/privacy-check.cjs --tracked || exit 1
+node scripts/privacy-check.cjs --history || exit 1
+npm test || exit 1
