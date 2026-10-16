@@ -10,7 +10,13 @@ Updated: 2026-10-17 (Asia/Shanghai).
 - Controlled Excel v3, protected calculated cells, explicit 21/22-field mappings, group configuration, preview, source revision checks and downloads as new files. Legacy 14-column spreadsheet import remains positionally compatible; source-specific aliases have been removed. Legacy JSON requires a declared three-slot mapping.
 - Public source allowlist and irreversible identifier fingerprints with submission/push hooks. Historical source files, old templates, development images, raw audit records and old Git backups have been removed under explicit user authorization. The public repository was deleted and recreated under the same name, with a new repository identity and clean Git history; only the 13 reviewed files were uploaded.
 
-## Current change: project selector typography
+## Current change: stable sidebar icons
+
+- Unified expanded/collapsed pane padding and icon alignment. Heading, view and language buttons keep 44 px height in both states; icon centers remain 28 px from the pane's left edge. Single-line navigation labels prevent language-dependent row growth.
+- Reviewed the CSS box geometry for the toggle, active/inactive view buttons and language button. All 47 automated checks and privacy checks pass. Source and public-release copies are synchronized.
+- Browser rendering and English/Chinese layouts at 1024/1440 px remain unverified because local file pages are blocked by browser security policy. The geometry review does not constitute live visual acceptance.
+
+## Previous change: project selector typography
 
 - Fixed the project selector falling back to the browser's native font size. It now uses ui-control with the same system-font/12 px/400/1.4 tokens as buttons, and ui-select for themed border, color and spacing. Project actions retain their compact 36 px height; dialog inputs keep the 13 px body role.
 - Reviewed the selector/button cascade, filter controls, navigation and dialog input roles. The shared component structural check and all 47 automated checks pass. Source and public-release copies are synchronized.

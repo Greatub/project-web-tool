@@ -804,16 +804,16 @@ table.wbs-table th,table.data-grid th {background:#f0eee8;color:#686c66;font-siz
 
 
 /* Outlook-style navigation: stable expanded folder pane and a 56px icon rail. */
-.toolbar {padding:10px 8px;gap:12px;}
-.sidebar-heading {display:flex;align-items:center;gap:8px;min-height:40px;flex-shrink:0;}
-.sidebar-toggle {display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;flex-shrink:0;padding:8px;background:transparent;border:1px solid transparent;color:var(--secondary);cursor:pointer;}
+.toolbar {padding:10px 6px;gap:12px;}
+.sidebar-heading {display:flex;align-items:center;gap:8px;height:44px;min-height:44px;flex-shrink:0;}
+.sidebar-toggle {display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;flex-shrink:0;padding:10px;background:transparent;border:1px solid transparent;color:var(--secondary);cursor:pointer;}
 .sidebar-toggle:hover {background:var(--bg-dark);border-color:var(--border);}
 .sidebar-toggle svg,.sidebar-icon,.action-icon,.action-chevron {width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
 .sidebar-heading-label {font-size:12px;font-weight:500;color:var(--secondary);white-space:nowrap;}
 .sidebar-content {display:flex;flex-direction:column;gap:20px;min-width:0;}
 .view-tabs {gap:2px;}
-.view-tab {display:flex;align-items:center;gap:10px;padding:10px 8px;min-height:44px;}
-.sidebar-view-label {line-height:1.4;}
+.view-tab {display:flex;align-items:center;justify-content:flex-start;gap:10px;padding:10px;height:44px;min-height:44px;overflow:hidden;}
+.sidebar-view-label {line-height:1.4;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .sidebar-filters {border-top:1px solid var(--border);padding:12px 4px 4px;}
 .sidebar-filters summary {display:flex;align-items:center;gap:8px;min-height:36px;margin-bottom:8px;cursor:pointer;list-style:none;font-size:12px;font-weight:500;color:var(--secondary);}
 .sidebar-filters summary::-webkit-details-marker {display:none;}
@@ -822,9 +822,9 @@ table.wbs-table th,table.data-grid th {background:#f0eee8;color:#686c66;font-siz
 .sidebar-filters:not([open]) summary {margin-bottom:0;}
 .sidebar-filters summary:focus-visible {outline:2px solid var(--focus-ring);outline-offset:2px;}
 .toolbar.is-collapsed {width:56px;min-width:56px;padding:10px 6px;overflow:visible;}
-.is-collapsed .sidebar-heading {justify-content:center;}
+.is-collapsed .sidebar-heading {justify-content:flex-start;}
 .is-collapsed .sidebar-heading-label,.is-collapsed .sidebar-view-label {display:none;}
-.is-collapsed .view-tab {width:44px;min-height:44px;padding:10px;gap:0;justify-content:center;}
+.is-collapsed .view-tab {width:44px;gap:0;}
 .is-collapsed .sidebar-content {gap:0;}
 
 /* Action menu shares the navigation icon and label contract. */
@@ -840,7 +840,7 @@ table.wbs-table th,table.data-grid th {background:#f0eee8;color:#686c66;font-siz
 .sidebar-heading {flex-shrink:0;}
 .sidebar-content {flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;gap:16px;}
 .sidebar-bottom {flex-shrink:0;padding-top:8px;border-top:1px solid var(--border);}
-.sidebar-bottom .btn {display:flex;align-items:center;gap:10px;min-height:40px;width:100%;padding:8px;background:transparent;border:0;color:var(--secondary);font-size:12px;font-weight:400;}
+.sidebar-bottom .btn {display:flex;align-items:center;justify-content:flex-start;gap:10px;height:44px;min-height:44px;width:100%;padding:10px 12px;background:transparent;border:0;color:var(--secondary);font-size:12px;font-weight:400;}
 .sidebar-bottom .btn:hover {background:var(--bg-dark);}
 .action-menu {margin:0;align-self:stretch;position:relative;flex-shrink:0;z-index:110;}
 .action-menu > summary {display:none;}
@@ -858,7 +858,7 @@ table.wbs-table th,table.data-grid th {background:#f0eee8;color:#686c66;font-siz
 .is-collapsed .sidebar-action-group {padding-top:4px;border-top:0;}
 .is-collapsed .sidebar-action-group summary {pointer-events:none;min-height:28px;font-size:11px;color:var(--text-muted);}
 .is-collapsed .sidebar-action-group summary::before {display:none;}
-.is-collapsed .sidebar-bottom .btn {width:44px;height:44px;padding:10px;justify-content:center;gap:0;}
+.is-collapsed .sidebar-bottom .btn {width:44px;gap:0;}
 .main-column .top-header {flex-shrink:0;}
 @media(max-width:1200px){.main-column .top-header{flex-wrap:wrap;gap:8px;}.main-column .kpi-strip{flex-wrap:wrap;}}
 /* Support groups, shared by detail and summary bars; hierarchy retains bar geometry. */
