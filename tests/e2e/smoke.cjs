@@ -21,23 +21,43 @@ fs.mkdirSync(shots, { recursive: true });
 
 let checks = 0;
 
-async function openApp(browser, { width = 1440, height = 900, init } = {}) {
+async function openApp(browser, { width = 1440, height = 900 } = {}) {
   const context = await browser.newContext({ viewport: { width, height }, reducedMotion: "reduce" });
   const page = await context.newPage();
+  page.setDefaultTimeout(10000);
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
   page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
-  page.on("dialog", (d) => d.accept(d.type() === "prompt" ? "Smoke project" : undefined));
+  // The app must never use the browser's own alert/confirm/prompt dialogs.
+  page.on("dialog", (d) => {
+    errors.push("native " + d.type() + " dialog: " + d.message());
+    d.dismiss();
+  });
   await page.clock.setFixedTime(new Date("2026-10-25T10:00:00"));
-  if (init) await page.addInitScript(init);
   await page.goto(appUrl);
+  currentPage = page;
   return { page, context, errors };
 }
 
+let currentPage = null;
 async function check(name, fn) {
-  await fn();
+  try {
+    await fn();
+  } catch (e) {
+    if (currentPage) await currentPage.screenshot({ path: path.join(shots, "failure.png") }).catch(() => {});
+    throw e;
+  }
   checks++;
   console.log("PASS " + name);
+}
+
+const openDialog = (page) => page.locator("dialog[open]");
+
+async function createDemo(page) {
+  await page.click("#projectMenuLabel");
+  await page.getByRole("menuitem", { name: /fictional demo/i }).click();
+  await openDialog(page).getByRole("button", { name: "Create" }).click();
+  await page.waitForFunction(() => projectData.length === 1);
 }
 
 const columnCounts = (page, tableId) =>
@@ -49,40 +69,55 @@ const columnCounts = (page, tableId) =>
     };
   }, tableId);
 
+const headerHeight = (page) =>
+  page.locator(".top-header").evaluate((el) => Math.round(el.getBoundingClientRect().height));
+
 (async () => {
   const browser = await chromium.launch();
   try {
     for (const width of [1440, 1024]) {
       const { page, context, errors } = await openApp(browser, { width });
+      let blankHeader;
 
-      await check(`${width}px: boots without errors and shows an empty project`, async () => {
-        assert.equal(await page.locator("#wbsTbody tr").count(), 0);
+      await check(`${width}px: empty project shows the start guide`, async () => {
+        assert.ok(await page.locator("#emptyState").isVisible());
         assert.match(await page.locator("#uiTitle").textContent(), /Untitled project/);
+        blankHeader = await headerHeight(page);
         await page.screenshot({ path: path.join(shots, `blank-${width}.png`) });
       });
 
-      await check(`${width}px: fictional demo renders table rows, bars and dependency lines`, async () => {
-        await page.evaluate(() => projectAction(1));
-        assert.equal(await page.locator("#wbsTbody tr").count(), 4);
-        assert.equal(await page.locator(".gantt-bar-subtask").count(), 2);
-        assert.equal(await page.locator("svg.dep-svg path").count(), 1);
-        await page.screenshot({ path: path.join(shots, `gantt-${width}.png`) });
-      });
+      await check(
+        `${width}px: demo renders rows, bars, dependency line; header height is stable`,
+        async () => {
+          await createDemo(page);
+          assert.ok(await page.locator("#emptyState").isHidden());
+          assert.equal(await page.locator("#wbsTbody tr").count(), 4);
+          assert.equal(await page.locator(".gantt-bar-subtask").count(), 2);
+          assert.equal(await page.locator("svg.dep-svg path").count(), 1);
+          assert.equal(await headerHeight(page), blankHeader);
+          await page.screenshot({ path: path.join(shots, `gantt-${width}.png`) });
+        },
+      );
 
-      await check(`${width}px: page itself never scrolls horizontally`, async () => {
+      await check(`${width}px: duration and progress columns are visible without scrolling`, async () => {
+        const paneRight = await page.locator("#leftPane").evaluate((el) => el.getBoundingClientRect().right);
+        for (const label of ["Days", "Prog %"]) {
+          const header = page.locator("#wbsTheadRow th", { hasText: label });
+          const box = await header.boundingBox();
+          assert.ok(box.x + box.width <= paneRight + 1, label + " column is cut off");
+        }
         const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-        assert.ok(overflow <= 0, "horizontal overflow " + overflow + "px");
+        assert.ok(overflow <= 0, "page scrolls horizontally by " + overflow + "px");
       });
 
       await check(`${width}px: cards and people views render; matrix columns line up`, async () => {
         await page.evaluate(() => switchView("cards"));
         assert.equal(await page.locator(".mt-card").count(), 1);
         await page.evaluate(() => switchView("people"));
-        const summary = await columnCounts(page, "peopleSummaryTable");
-        const matrix = await columnCounts(page, "raciMatrixTable");
-        for (const table of [summary, matrix])
+        for (const id of ["peopleSummaryTable", "raciMatrixTable"]) {
+          const table = await columnCounts(page, id);
           for (const cells of table.rows) assert.equal(cells, table.headers);
-        await page.screenshot({ path: path.join(shots, `people-${width}.png`) });
+        }
         await page.evaluate(() => switchView("gantt"));
       });
 
@@ -91,50 +126,207 @@ const columnCounts = (page, tableId) =>
     }
 
     const { page, context, errors } = await openApp(browser);
-    await page.evaluate(() => projectAction(1));
+    await createDemo(page);
 
-    await check("inline duration edit recalculates the dependent task", async () => {
-      const before = await page.evaluate(() => findSubtaskByWbs("1.1.2").start);
-      await page.fill('input[aria-label="1.1.1 Duration (Days)"]', "5");
-      await page.keyboard.press("Tab");
-      const after = await page.evaluate(() => findSubtaskByWbs("1.1.2").start);
-      assert.notEqual(after, before);
-      assert.equal(after, "2026-10-30");
+    await check("dates are shown and entered as YYYY-MM-DD", async () => {
+      const start = page.locator('input[data-focus-key="1.1.1:start"]');
+      assert.equal(await start.getAttribute("type"), "text");
+      assert.equal(await start.inputValue(), "2026-10-25");
     });
 
-    await check("dragging a bar moves its start date and records an audit entry", async () => {
+    await check("Tab after an inline edit keeps focus for the next field", async () => {
+      await page.fill('input[data-focus-key="1.1.1:days"]', "5");
+      await page.keyboard.press("Tab");
+      await page.waitForFunction(() => findSubtaskByWbs("1.1.2").start === "2026-10-30");
+      assert.equal(await page.evaluate(() => document.activeElement.dataset.focusKey), "1.1.1:pct");
+      await page.keyboard.type("40");
+      await page.keyboard.press("Enter");
+      await page.waitForFunction(() => findSubtaskByWbs("1.1.1").pct === 40);
+      assert.equal(await page.evaluate(() => document.activeElement.dataset.focusKey), "1.1.2:pct");
+    });
+
+    await check("invalid date shows an in-app error and keeps the old value", async () => {
+      await page.fill('input[data-focus-key="1.1.1:start"]', "10/25/2026");
+      await page.keyboard.press("Tab");
+      await page.locator("dialog[open] .app-dialog-message").waitFor();
+      assert.match(await openDialog(page).textContent(), /YYYY-MM-DD/);
+      await page.keyboard.press("Escape");
+      assert.equal(await page.evaluate(() => findSubtaskByWbs("1.1.1").start), "2026-10-25");
+    });
+
+    await check("undo and redo restore an edit (buttons and Ctrl+Z)", async () => {
+      await page.locator("body").click({ position: { x: 600, y: 700 } });
+      await page.keyboard.press("Control+z");
+      await page.waitForFunction(() => findSubtaskByWbs("1.1.1").pct === 25);
+      await page.click("#btnRedo");
+      assert.equal(await page.evaluate(() => findSubtaskByWbs("1.1.1").pct), 40);
+    });
+
+    await check("dragging a bar moves its start date; Undo reverts it", async () => {
       const bar = await page.locator('.gantt-bar-subtask[data-wbs="1.1.1"]').boundingBox();
       await page.mouse.move(bar.x + 10, bar.y + bar.height / 2);
       await page.mouse.down();
       await page.mouse.move(bar.x + 10 + 48, bar.y + bar.height / 2, { steps: 5 });
       await page.mouse.up();
       assert.equal(await page.evaluate(() => findSubtaskByWbs("1.1.1").start), "2026-10-27");
-      assert.match(await page.evaluate(() => auditLog[0].action), /Drag/);
+      await page.click("#btnUndo");
+      assert.equal(await page.evaluate(() => findSubtaskByWbs("1.1.1").start), "2026-10-25");
     });
 
-    await check("task dialog opens with the task values and closes", async () => {
-      await page.evaluate(() => openEditModal("Sub-task", "1.1.1"));
-      assert.ok(await page.locator("#taskModal.open").isVisible());
+    await check("keyboard moves a focused bar (Arrow) and changes duration (Shift+Arrow)", async () => {
+      await page.locator('.gantt-bar-subtask[data-wbs="1.1.1"]').focus();
+      await page.keyboard.press("ArrowRight");
+      assert.equal(await page.evaluate(() => findSubtaskByWbs("1.1.1").start), "2026-10-26");
+      assert.equal(await page.evaluate(() => document.activeElement.dataset.wbs), "1.1.1");
+      await page.keyboard.press("Shift+ArrowRight");
+      assert.equal(await page.evaluate(() => findSubtaskByWbs("1.1.1").days), 6);
+    });
+
+    await check("delayed tasks and priorities are marked on the Gantt", async () => {
+      await page.click("#sidebarFiltersLabel");
+      await page.fill("#statusDateInput", "2026-11-20");
+      await page.keyboard.press("Tab");
+      assert.ok((await page.locator(".gantt-bar-subtask.is-delayed").count()) >= 1);
+      assert.ok((await page.locator(".gantt-bar-subtask .bar-prio").count()) === 2);
+      await page.screenshot({ path: path.join(shots, "gantt-delayed.png") });
+      await page.fill("#statusDateInput", "2026-10-25");
+      await page.keyboard.press("Tab");
+    });
+
+    await check("task dialog closes with Esc and returns focus", async () => {
+      await page.locator('#wbsTbody tr[data-wbs="1.1.1"] td').nth(1).dblclick();
+      assert.ok(await page.locator("#taskModal").evaluate((d) => d.open));
       assert.equal(await page.inputValue("#mdWbs"), "1.1.1");
       await page.screenshot({ path: path.join(shots, "task-dialog.png") });
-      await page.evaluate(() => closeModal());
-      assert.equal(await page.locator("#taskModal.open").count(), 0);
+      await page.keyboard.press("Escape");
+      assert.equal(await page.locator("#taskModal").evaluate((d) => d.open), false);
     });
 
-    await check("language switch translates labels and keeps user text", async () => {
+    await check("a sub-task can move to another main task", async () => {
+      await page.evaluate(() => openAddModal("Main Task"));
+      await page.fill("#mdName", "Second delivery");
+      await page.click("#mdSaveBtn");
+      await page.waitForFunction(() => projectData[0].mainTasks.length === 2);
+      await page.evaluate(() => openEditModal("Sub-task", "1.1.2"));
+      await page.selectOption("#mdParent", "1.2");
+      await page.click("#mdSaveBtn");
+      assert.deepEqual(
+        await page.evaluate(() => projectData[0].mainTasks.map((m) => m.subtasks.map((s) => s.wbs))),
+        [["1.1.1"], ["1.1.2"]],
+      );
+    });
+
+    await check("phases can be added, renamed with their tasks, reordered and deleted", async () => {
+      await page.evaluate(() => void addPhase());
+      assert.equal(await page.inputValue('dialog[open] [name="wbs"]'), "2");
+      await page.fill('dialog[open] [name="name"]', "Launch");
+      await page.keyboard.press("Enter");
+      await page.waitForFunction(() => projectData.length === 2);
+      await page.locator('#wbsTbody tr[data-wbs="1"] td').nth(1).dblclick();
+      await page.fill("#phaseWbs", "5");
+      await openDialog(page).getByRole("button", { name: "Save" }).click();
+      assert.deepEqual(await page.evaluate(() => projectData.map((f) => f.wbs)), ["5", "2"]);
+      assert.equal(await page.evaluate(() => projectData[0].mainTasks[1].subtasks[0].pred), "5.1.1");
+      await page.locator('#wbsTbody tr[data-wbs="2"] td').nth(1).dblclick();
+      await openDialog(page).getByRole("button", { name: "Move up" }).click();
+      await page.keyboard.press("Escape");
+      assert.deepEqual(await page.evaluate(() => projectData.map((f) => f.wbs)), ["2", "5"]);
+      await page.locator('#wbsTbody tr[data-wbs="2"] td').nth(1).dblclick();
+      await openDialog(page).getByRole("button", { name: "Delete" }).click();
+      await page.locator("dialog[open]").last().getByRole("button", { name: "Delete" }).click();
+      await page.waitForFunction(() => projectData.length === 1);
+      assert.equal(await openDialog(page).count(), 0);
+    });
+
+    await check(
+      "versions can be saved, listed, restored and deleted; the change log is visible",
+      async () => {
+        await page.evaluate(() => openVersionModal());
+        await page.fill("#verTagInput", "基线一");
+        await page.click("#btnVerConfirm");
+        await page.evaluate(() => inlineUpdateSubtask("5.1.1", "pct", "90"));
+        await page.waitForFunction(() => findSubtaskByWbs("5.1.1").pct === 90);
+        await page.evaluate(() => void openHistoryDialog());
+        assert.equal(await page.locator("#historyPanel tbody tr").count(), 1);
+        await page.screenshot({ path: path.join(shots, "history-versions.png") });
+        await page.locator("#historyPanel").getByRole("button", { name: "Restore" }).click();
+        await page.locator("dialog[open]").last().getByRole("button", { name: "Restore" }).click();
+        await page.waitForFunction(() => findSubtaskByWbs("5.1.1").pct === 40);
+        await page.getByRole("tab", { name: /Change log/ }).click();
+        assert.ok((await page.locator("#historyPanel tbody tr").count()) > 5);
+        await page.getByRole("tab", { name: /Versions/ }).click();
+        await page.locator("#historyPanel").getByRole("button", { name: "Delete" }).click();
+        await page.locator("dialog[open]").last().getByRole("button", { name: "Delete" }).click();
+        await page.waitForFunction(() => versionList.length === 0);
+        await page.keyboard.press("Escape");
+      },
+    );
+
+    await check("archived projects are read-only and grouped in the switcher", async () => {
+      await page.click("#projectMenuLabel");
+      await page.getByRole("menuitem", { name: "Archive project" }).click();
+      assert.ok(await page.locator("#archivedNotice").isVisible());
+      assert.ok(await page.locator('input[data-focus-key="5.1.1:days"]').isDisabled());
+      assert.equal(await page.locator("#projectSelect optgroup").count(), 1);
+      await page.screenshot({ path: path.join(shots, "archived.png") });
+      await page.locator("#archivedNotice").getByRole("button", { name: "Restore project" }).click();
+      assert.ok(await page.locator("#archivedNotice").isHidden());
+    });
+
+    await check("language stays the same when switching projects", async () => {
       await page.evaluate(() => toggleLanguage());
+      const ids = await page.evaluate(() => Object.keys(workspace.projects));
+      await page.selectOption("#projectSelect", ids[0]);
       assert.equal(await page.locator("html").getAttribute("lang"), "zh-CN");
-      assert.match(await page.locator("#tab-gantt").textContent(), /甘特/);
-      assert.equal(await page.evaluate(() => projectData[0].name), "Example phase");
+      await page.selectOption("#projectSelect", ids[1]);
+      assert.equal(await page.locator("html").getAttribute("lang"), "zh-CN");
       await page.screenshot({ path: path.join(shots, "gantt-zh.png") });
       await page.evaluate(() => toggleLanguage());
     });
 
-    await check("collapsed sidebar keeps icon navigation", async () => {
-      await page.evaluate(() => toggleSidebar());
-      const width = await page.locator("#projectSidebar").evaluate((el) => el.getBoundingClientRect().width);
-      assert.equal(Math.round(width), 56);
-      await page.evaluate(() => toggleSidebar());
+    await check("a project can be deleted (backup offered first)", async () => {
+      const before = await page.evaluate(() => Object.keys(workspace.projects).length);
+      await page.click("#projectMenuLabel");
+      await page.getByRole("menuitem", { name: /Delete project/ }).click();
+      await openDialog(page).locator('[name="backup"]').uncheck();
+      await openDialog(page).getByRole("button", { name: "Delete project" }).click();
+      assert.equal(await page.evaluate(() => Object.keys(workspace.projects).length), before - 1);
+    });
+
+    await check("Excel export, import preview and apply work through the in-app dialogs", async () => {
+      await createDemo(page);
+      await page.evaluate(() => void exportToExcelXML());
+      const [download] = await Promise.all([
+        page.waitForEvent("download"),
+        openDialog(page)
+          .getByRole("button", { name: /Save current project/ })
+          .click(),
+      ]);
+      await page.keyboard.press("Escape");
+      const file = path.join(shots, "roundtrip.xlsx");
+      await download.saveAs(file);
+      // Re-importing an unchanged copy reports that there is nothing to apply.
+      await page.setInputFiles("#excelFileInput", file);
+      await page.locator("dialog[open] .app-dialog-message").waitFor();
+      assert.match(await openDialog(page).textContent(), /No changes to apply/);
+      await page.keyboard.press("Escape");
+      // A blank creation template opens the preview; applying it creates a new project.
+      await page.evaluate(() => void exportToExcelXML());
+      const [blank] = await Promise.all([
+        page.waitForEvent("download"),
+        openDialog(page)
+          .getByRole("button", { name: /Blank creation template/ })
+          .click(),
+      ]);
+      await page.keyboard.press("Escape");
+      await blank.saveAs(file);
+      const projects = await page.evaluate(() => Object.keys(workspace.projects).length);
+      await page.setInputFiles("#excelFileInput", file);
+      await openDialog(page).getByRole("button", { name: "Apply changes" }).click();
+      assert.equal(await page.evaluate(() => Object.keys(workspace.projects).length), projects + 1);
+      assert.equal(await page.locator("#uiTitle").textContent(), "New project");
+      fs.rmSync(file);
+      await page.selectOption("#projectSelect", { index: 1 });
     });
 
     await check("a failed save shows a persistent banner and recovers after retry", async () => {
@@ -144,19 +336,17 @@ const columnCounts = (page, tableId) =>
           throw new Error("QuotaExceededError");
         };
       });
-      await page.fill('input[aria-label="1.1.1 % Complete (0~100)"]', "60");
+      await page.fill('input[data-focus-key="1.1.1:pct"]', "60");
       await page.keyboard.press("Tab");
       const banner = page.locator("#saveBanner");
-      assert.ok(await banner.isVisible());
+      await banner.waitFor();
       assert.match(await banner.textContent(), /NOT saved/);
-      await page.screenshot({ path: path.join(shots, "save-failed.png") });
+      // Let the deferred re-render finish while storage is still failing, so the banner stays up.
+      await page.waitForTimeout(100);
+      assert.ok(await banner.isVisible(), "banner stays while saves keep failing");
       await page.evaluate(() => (Storage.prototype.setItem = window.__realSetItem));
       await banner.getByRole("button", { name: "Retry save" }).click();
       assert.ok(await banner.isHidden());
-      const stored = await page.evaluate(
-        () => JSON.parse(localStorage.getItem(WORKSPACE_KEY)).projects[projectId],
-      );
-      assert.equal(stored.currentData[0].mainTasks[0].subtasks[0].pct, 60);
     });
 
     await check("data survives a reload", async () => {

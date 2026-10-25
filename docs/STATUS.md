@@ -10,7 +10,21 @@ Updated: 2026-10-25 (Asia/Shanghai).
 - Controlled Excel v3, protected calculated cells, explicit 21/22-field mappings, group configuration, preview, source revision checks and downloads as new files. Legacy 14-column spreadsheet import remains positionally compatible; source-specific aliases have been removed. Legacy JSON requires a declared three-slot mapping.
 - Public source allowlist and irreversible identifier fingerprints with submission/push hooks. Historical source files, old templates, development images, raw audit records and old Git backups have been removed under explicit user authorization. The public repository was deleted and recreated under the same name, with a new repository identity and clean Git history; only the 13 reviewed files were uploaded.
 
-## Current change: audit #1 fixes (data safety and maintainability)
+## Current change: audit #1 workflow and interface items
+
+- Structure editing: phases can be renamed (child WBS numbers and predecessors follow), reordered and deleted; main tasks and sub-tasks can be reordered and moved to another parent. Empty phases now stay visible in the table (they were hidden before, so a new phase could not be filled). WBS numbers are suggested when adding.
+- Projects: delete from the Project menu (JSON backup offered first; at least one project always remains). Archived projects are read-only, grouped under "Archived" in the switcher and restorable from a notice bar.
+- Versions & change log dialog: list versions, compare one as baseline, restore (undoable) or delete (undoable); browse the recorded change log. Version tags may use any script (for example Chinese).
+- Undo / redo: in-memory steps for task, phase and version changes (Ctrl+Z, Ctrl+Shift+Z / Ctrl+Y, header buttons with the step name); cleared when another project opens.
+- Language is a per-browser preference; switching projects no longer switches the interface language.
+- Empty projects show a three-step guide (Add phase, Import, Fill with fictional demo). Native alert/confirm/prompt are gone: every prompt, confirmation and error uses one shared dialog component built on `<dialog>` (Esc closes, focus moves in and back, errors shown inline).
+- Header: project name first; switcher, Project menu, Undo/Redo and save status on one row; height is the same for empty and filled projects.
+- Table: columns are chosen under Filters & display (combined People column, optional per-group columns and priority); the name column takes the remaining width; defaults fit duration and progress at 1024 and 1440 px; the column choice and split width are remembered. Tree toggles are buttons.
+- Dates are shown and entered as YYYY-MM-DD everywhere, with a calendar button that opens the browser picker. After an inline edit, Tab and Enter keep focus on the next field, including when typing continues before the re-render.
+- Gantt: bars are focusable; arrow keys move by a day, Shift+arrow changes duration, Enter opens the task; drag uses pointer events (touch works). Delayed bars and rows are marked in red, priorities are labelled P1–P3, and bar labels list people from every group.
+- Tests: 67 logic checks (new `tests/public/workflow.cjs`, 11 checks) and a 25-check browser smoke test that also fails if any native dialog appears; the smoke test passed 10 consecutive runs.
+
+## Previous change: audit #1 fixes (data safety and maintainability)
 
 - Storage growth: version snapshots and Excel recovery points now store only user-entered fields; dates, roll-ups and statuses are recalculated when used. Recovery points no longer embed version history or the audit log, and restoring one keeps the current snapshots and audit. Existing workspaces are compacted when loaded. Measured with 800 sub-tasks and 3 recovery points: 4 snapshots took 4.1 MB before (the next save exceeded the browser limit) and now take 1.2 MB; 8 snapshots take 1.8 MB.
 - Save failures: the one-time alert is replaced by a persistent banner with "Export JSON backup" and "Retry save"; it stays until a save succeeds. The header shows storage usage, and a warning banner appears above 80%.
@@ -55,7 +69,21 @@ Updated: 2026-10-25 (Asia/Shanghai).
 
 更新：2026-10-25（Asia/Shanghai）。
 
-### 本次变更：审计 #1 修复（数据安全与可维护性）
+### 本次变更：审计 #1 流程与界面改进
+
+- 结构编辑：阶段可改名（子级 WBS 与前置关系同步）、调整顺序和删除；主任务与子任务可调整顺序、移到其他父级。空阶段现在会显示在表格中（此前会被隐藏，导致新建的阶段无法继续添加内容）。新增时自动建议 WBS 编号。
+- 项目：可从“项目”菜单删除（先提供 JSON 备份，工作区至少保留一个项目）；归档项目只读、在切换框中归入“已归档”，可从提示条恢复。
+- 版本与变更记录对话框：查看版本、设为对比基线、恢复（可撤销）、删除（可撤销），并浏览变更记录；版本号可使用中文等任意文字。
+- 撤销/重做：覆盖任务、阶段和版本操作（Ctrl+Z、Ctrl+Shift+Z / Ctrl+Y、顶部按钮显示步骤名称），切换项目时清空。
+- 界面语言改为浏览器偏好，切换项目不再改变语言。
+- 空项目显示三步引导；不再使用浏览器原生 alert/confirm/prompt，所有提示、确认和报错统一使用基于 `<dialog>` 的对话框（Esc 关闭、焦点进入并返回、错误就地显示）。
+- 页面顶部：项目名称在前，切换框、项目菜单、撤销/重做和保存状态在同一行，空项目与有数据时高度一致。
+- 表格：可在“筛选与显示”中选择列（合并的“人员”列、可选的各组列和优先级列），名称列自动占满剩余宽度，1024 和 1440 宽度下默认可见工期与进度；列选择和分栏宽度会被记住；树形展开按钮改为真正的按钮。
+- 日期统一以 YYYY-MM-DD 显示和输入，并提供日历按钮。表格中修改后按 Tab 或回车，焦点保持在下一个字段（即使在重绘前继续输入）。
+- 甘特图：任务条可用键盘聚焦，方向键按天移动，Shift+方向键调整工期，回车打开任务；拖拽改用 Pointer 事件（支持触控）。延期的任务条和行用红色标出，优先级标为 P1–P3，标签显示所有组的人员。
+- 测试：67 项逻辑检查（新增 `tests/public/workflow.cjs` 11 项）和 25 项浏览器冒烟测试（出现任何原生弹窗即失败），冒烟测试连续 10 次通过。
+
+### 上次变更：审计 #1 修复（数据安全与可维护性）
 
 - 存储增长：版本快照和 Excel 恢复点只保存用户输入的字段，日期、汇总和状态在使用时重新计算；恢复点不再包含版本历史和审计日志，恢复时保留当前快照与审计。已有工作区在加载时自动压缩。实测 800 个子任务、3 个恢复点：4 个快照原占 4.1 MB（再保存一次即超出浏览器上限），现为 1.2 MB；8 个快照为 1.8 MB。
 - 保存失败：一次性弹窗改为常驻横幅，提供“导出 JSON 备份”和“重试保存”，直到保存成功才消失；头部显示存储用量，超过 80% 时显示提醒。
@@ -64,7 +92,7 @@ Updated: 2026-10-25 (Asia/Shanghai).
 - 测试：`npm test` 检查构建是否最新并运行 56 项逻辑检查；`npm run test:e2e` 提供 15 项 Playwright 冒烟测试，CI 同步运行并上传截图。
 - 未改变：排程规则、Excel v3 合约和项目数据模型。本次之前导出的工作簿可能会被提示过期一次，重新导出即可。
 
-### 上次变更：英语优先
+### 更早变更：英语优先
 
 - README 和公开发布约定以英语为主，随后保留完整中文说明。
 - HTML 初始语言标记及初始文案改为英文；继续保留中文切换、已保存的语言偏好和用户原文。Excel 数据表维持英文，中文说明保留在 Instructions_zh。

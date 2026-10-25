@@ -10,15 +10,18 @@ An offline project management web tool. Public source: [Greatub/project-web-tool
 
 Open `src/index.html` in a modern Edge or Chrome browser. No installation, dependencies or server are required. You can also serve `src/` as a static website.
 
-English is the primary language; Simplified Chinese is available from the language button at the bottom of the sidebar. Saved language preferences are respected. Built-in project names, sample tasks and default groups use English in both languages. User-entered project names, task names and people are preserved without translation.
+English is the primary language; Simplified Chinese is available from the language button at the bottom of the sidebar. The language is a preference of this browser and does not change when you switch projects. Built-in project names, sample tasks and default groups use English in both languages. User-entered project names, task names and people are preserved without translation.
 
 Data stays in the current browser. Copying the HTML does not copy your projects: export a JSON bundle regularly for backup. The header shows how much browser storage is used. A red banner appears when a save fails and stays until data is saved again; a yellow banner warns when storage is more than 80% full. There is no login, server sync, collaboration or access isolation.
 
 ### Features and workflow
 
-- Create a blank project or a fictional sample; duplicate, switch, configure or archive projects. Archiving is a reversible marker and still allows viewing and editing.
-- Create a top-level family with **New phase**, then add main tasks and subtasks from the sidebar. Scheduling uses calendar days, finish-to-start dependencies and positive or negative lag.
-- Review weighted progress, the Gantt chart, task cards, people participation and baseline comparisons. Snapshots and audit records stay in the project bundle; they have no separate browsing page.
+- Use the **Project** menu next to the project switcher to create, duplicate, configure, archive or delete projects. Archived projects are read-only, listed under "Archived" in the switcher, and can be restored. Deleting offers a JSON backup first; the workspace always keeps at least one project.
+- An empty project shows a short guide. Start with **Add phase**, then add main tasks and sub-tasks from **Task actions** in the sidebar; WBS numbers are suggested. Double-click a phase or task to edit it: rename (child WBS numbers follow), move up or down, move a task to another parent, or delete it. Scheduling uses calendar days, finish-to-start dependencies and positive or negative lag.
+- Dates are shown and entered as YYYY-MM-DD; the calendar button opens the browser's date picker. In the table, Tab and Enter move to the next field after an edit. On the Gantt chart, drag a bar or focus it and use the arrow keys (Shift+arrow changes duration); delayed bars are outlined in red and priorities are labelled P1–P3.
+- Undo and redo (Ctrl+Z, Ctrl+Shift+Z or the header buttons) cover task, phase and version changes made since the project was opened.
+- **Versions & history** in the sidebar lists saved versions (compare as baseline, restore, delete) and the change log. Choose table columns, including a combined People column and per-group columns, under **Filters & display**; the column choice and the table/Gantt split are remembered in this browser.
+- Review weighted progress, the Gantt chart, task cards, people participation and baseline comparisons. All prompts, confirmations and errors appear in the app's own dialogs.
 - Configure 1–10 groups with names and colors in project settings. The defaults are Group 1–3. Stable IDs preserve people assignments when a group is renamed; clear assignments before removing a group. Personnel aliases are configured in JSON.
 
 ### Excel and JSON exchange
@@ -48,14 +51,16 @@ Node.js 22 or newer is required. The app has no third-party dependencies.
 | `src/app/js/i18n.js` | All interface text and messages (English and Chinese), `t(key, ...args)` |
 | `src/app/js/model.js` | Dates, validation, scheduling, groups, project bundles |
 | `src/app/js/storage.js` | Browser workspace, saving, storage usage and save banner |
+| `src/app/js/dialogs.js` | Shared dialog component, messages, confirmations and form prompts |
 | `src/app/js/exchange.js` | Excel and JSON import/export |
-| `src/app/js/views.js` | Gantt, table, cards, people views and sidebar |
-| `src/app/js/editing.js` | Dialogs, inline edits, dragging, versions, project actions |
+| `src/app/js/views.js` | Gantt, table and columns, cards, people views, header and sidebar |
+| `src/app/js/history.js` | Undo/redo and the versions & change log dialog |
+| `src/app/js/editing.js` | Task and phase editing, inline edits, Gantt drag and keys, project actions |
 | `src/app/js/boot.js` | Event wiring and start-up (must stay last) |
 
 ```sh
 npm run build        # regenerate src/index.html from src/app/
-npm test             # build freshness check + 56 logic checks (no dependencies)
+npm test             # build freshness check + 67 logic checks (no dependencies)
 npm run test:e2e     # browser smoke test; needs: npm install --no-save playwright && npx playwright install chromium
 npm run format       # optional: Prettier formatting for sources and tests
 npm run privacy
@@ -78,9 +83,16 @@ See [Current status](docs/STATUS.md) for scope and verification and [Public rele
 
 通用项目管理 Web 工具。用现代 Edge / Chrome 打开 `src/index.html` 即可离线使用，无需安装依赖。也可将 `src/` 作为静态网站根目录。数据保存在当前浏览器；复制 HTML 不包含用户数据，请定期导出 JSON 版本包。
 
-支持空白项目、虚构示例、复制、切换、归档标记、项目配置、三级任务、FS 自然日排程、正负 Lag、加权进度、甘特图、任务卡片、人员参与统计、中英文、版本快照及基线比较。版本与审计保留在数据包中，没有独立浏览页面。
+支持空白项目、虚构示例、复制、切换、归档、删除、项目配置、三级任务、FS 自然日排程、正负 Lag、加权进度、甘特图、任务卡片、人员参与统计、中英文、版本快照及基线比较。
 
-首次打开为英文界面，默认项目名为 Untitled project；组名和虚构示例的默认数据也统一为英文。界面可切换中文，用户原文保留。使用“新建阶段”建立顶层，再从左侧添加主任务和子任务。项目设置提供 1–10 个自定义组，可增减、改名和选色；默认 Group 1–3，不绑定固定职位。稳定组编号保持人员关联，已分配人员的组必须先清空才能移除。人员别名仍以 JSON 配置。归档是可恢复标记，仍允许查看与编辑。
+- 项目切换框旁的“项目”菜单可新建、复制、设置、归档或删除项目。归档项目为只读，在切换框中归入“已归档”，可随时恢复；删除前可先下载 JSON 备份，工作区始终至少保留一个项目。
+- 空项目会显示简短引导：先“新建阶段”，再在侧栏“任务操作”中添加主任务和子任务，WBS 编号会自动建议。双击阶段或任务即可编辑：改名（子级编号随之更新）、上移/下移、移到其他父级或删除。
+- 日期统一以 YYYY-MM-DD 显示和输入，日历按钮可打开浏览器日期选择器。表格中修改后按 Tab 或回车会移动到下一个字段。甘特图上可拖拽任务条，或选中后用方向键改期（Shift+方向键调整工期）；延期任务条以红框标出，优先级标为 P1–P3。
+- 撤销/重做（Ctrl+Z、Ctrl+Shift+Z 或页面顶部按钮）覆盖打开项目后的任务、阶段和版本操作。
+- 侧栏“版本与记录”列出已保存版本（设为对比基线、恢复、删除）和变更记录。“筛选与显示”中可选择表格列（含合并的“人员”列和各组单独列），列选择和表格/甘特分栏宽度会记在此浏览器中。
+- 所有提示、确认和报错都使用应用内对话框。界面语言是此浏览器的偏好，切换项目时不会改变。
+
+首次打开为英文界面，默认项目名为 Untitled project；组名和虚构示例的默认数据也统一为英文。界面可切换中文，用户原文保留。项目设置提供 1–10 个自定义组，可增减、改名和选色；默认 Group 1–3，不绑定固定职位。稳定组编号保持人员关联，已分配人员的组必须先清空才能移除。人员别名仍以 JSON 配置。
 
 Excel 默认使用受控 v3.0 模板：从“导出 Excel”下载空白创建模板或当前项目副本，只修改浅橙色输入格；导入时先查看逐字段变更及排程重算，确认后整批应用。网页修改后重新导出带时间和随机后缀的新文件，应用没有原文件写入权限。项目不匹配、源版本过期、只读字段被改、缺行、公式或无效值均拒绝导入；保存失败不改变当前数据。更新前保留项目内最近 3 个恢复点，可从导出面板恢复。
 
@@ -96,7 +108,7 @@ Excel 数据表和 Instructions 固定为英文、Arial 9 号；新增 Instructi
 
 ```sh
 npm run build        # 由 src/app/ 重新生成 src/index.html
-npm test             # 构建一致性检查 + 56 项逻辑检查（无依赖）
+npm test             # 构建一致性检查 + 67 项逻辑检查（无依赖）
 npm run test:e2e     # 浏览器冒烟测试；需先 npm install --no-save playwright && npx playwright install chromium
 npm run privacy
 npm run release

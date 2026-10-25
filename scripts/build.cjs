@@ -8,9 +8,17 @@ const root = path.resolve(__dirname, "..");
 const app = path.join(root, "src", "app");
 const output = path.join(root, "src", "index.html");
 // Order matters only for top-level constants that reference each other; boot.js must stay last.
-const SCRIPTS = ["i18n", "model", "storage", "exchange", "views", "editing", "boot"].map(
-  (name) => `js/${name}.js`,
-);
+const SCRIPTS = [
+  "i18n",
+  "model",
+  "storage",
+  "dialogs",
+  "exchange",
+  "views",
+  "history",
+  "editing",
+  "boot",
+].map((name) => `js/${name}.js`);
 const SOURCES = ["shell.html", "styles.css", ...SCRIPTS];
 
 function read(file) {

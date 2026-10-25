@@ -97,6 +97,12 @@ function bigProject(families, mains, subs) {
 
 (async () => {
   run("loadState(); renderAll = () => {}; applyStaticI18n = () => {};");
+  // Dialogs need a real browser; the smoke test covers them. Here they confirm and surface errors.
+  run(`openAppDialog = () => {}; closeAppDialog = () => {};
+    setDialogError = (d, m) => { if (m) throw new Error(m); };
+    askConfirm = async () => true; showMessage = async () => true;
+    renderProjectControls = () => updateSaveBanner();
+    showError = (m) => { throw new Error(m); };`);
 
   await test("compacted copies drop derived fields but recalculate to identical schedules", () => {
     bigProject(2, 3, 5);

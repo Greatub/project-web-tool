@@ -354,17 +354,14 @@ async function handleFileImport(event) {
         b.legacyGroupFields = raw.legacyGroupFields;
         b = migrateBundle(b);
       }
-      if (
-        !confirm(
-          t("msgImportPreviewCreateAnIndependentCopy") +
-            b.metadata.name +
-            "\n" +
-            allItems(b.currentData).length +
-            t("msgTasksVersions") +
-            b.versionHistory.length,
-        )
-      )
-        return;
+      const confirmed = await askConfirm(
+        t("msgImportJsonSummary", b.metadata.name, allItems(b.currentData).length, b.versionHistory.length),
+        {
+          title: t("msgImportJsonTitle"),
+          confirmLabel: t("msgImportAsCopy"),
+        },
+      );
+      if (!confirmed) return;
       // Complete backup download is initiated before applying any migration.
       exportVersionBundle();
       b = copy(b);
@@ -374,7 +371,7 @@ async function handleFileImport(event) {
       await importControlledExcel(file);
     } else throw inputError("msgUseJsonOrXlsx");
   } catch (e) {
-    alert(t("msgImportNotApplied") + e.message);
+    showError(t("msgImportNotApplied") + e.message);
   } finally {
     event.target.value = "";
   }
@@ -863,59 +860,43 @@ function exchangeStyles() {
 }
 
 function previewExcel(plan) {
-  return new Promise((resolve) => {
-    const d = document.createElement("dialog");
-    d.className = "project-dialog exchange-dialog";
-    d.id = "excelPreview";
-    const title = t("msgExcelImportPreview");
-    d.innerHTML =
-      '<h2 class="ui-heading">' +
-      title +
-      "</h2><p>" +
+  const rows = plan.changes
+    .map(
+      (c) =>
+        "<tr>" +
+        [c.wbs, c.field, c.before, c.after].map((v) => "<td>" + escapeHtml(v) + "</td>").join("") +
+        "</tr>",
+    )
+    .join("");
+  return showDialog({
+    title: t("msgExcelImportPreview"),
+    size: "wide",
+    bodyHtml:
+      '<p class="app-dialog-message">' +
       escapeHtml(
         (plan.create ? t("msgCreateProject") : t("msgUpdateProject")) + plan.candidate.metadata.name,
       ) +
       '</p><p class="ui-caption">' +
       escapeHtml(plan.legacy ? t("msgLegacyV10NoProjectIdentity") : t("msgV20EditableFieldsOnlyRecovery")) +
       '</p><p class="ui-caption">' +
-      escapeHtml(projectId) +
-      " · " +
       plan.added +
       t("msgNew") +
       plan.changes.length +
       t("msgFieldChangesIncludingRecalculations") +
-      '</p><div class="exchange-changes"><table><thead><tr>' +
-      [t("msgTask"), t("msgField"), t("msgBefore"), t("msgAfter")].map((t) => "<th>" + t + "</th>").join("") +
-      "</tr></thead><tbody>" +
-      plan.changes
-        .map(
-          (c) =>
-            "<tr>" +
-            [c.wbs, c.field, c.before, c.after].map((v) => "<td>" + escapeHtml(v) + "</td>").join("") +
-            "</tr>",
-        )
+      '</p><div class="exchange-changes"><table class="data-grid"><thead><tr>' +
+      [t("msgTask"), t("msgField"), t("msgBefore"), t("msgAfter")]
+        .map((label) => "<th>" + label + "</th>")
         .join("") +
+      "</tr></thead><tbody>" +
+      rows +
       '</tbody></table></div><p class="ui-caption">' +
       t("msgTheSourceExcelIsNeverWritten") +
-      '</p><div class="dialog-actions"><button class="btn" id="excelCancel">' +
-      t("msgCancel") +
-      '</button><button class="btn btn-primary" id="excelApply">' +
-      t("msgApplyChanges") +
-      "</button></div>";
-    const done = (value) => {
-      d.close();
-      d.remove();
-      resolve(value);
-    };
-    d.querySelector("#excelCancel").onclick = () => done(false);
-    d.querySelector("#excelApply").onclick = () => done(true);
-    d.addEventListener("cancel", (e) => {
-      e.preventDefault();
-      done(false);
-    });
-    document.body.append(d);
-    d.showModal();
-  });
+      "</p>",
+    actions: [
+      { label: t("msgCancel"), value: false },
+      { label: t("msgApplyChanges"), value: true, kind: "primary" },
+    ],
+  }).then((value) => value === true);
 }
 
 // A recovery point stores the project data and settings only. Version history and the audit log are
@@ -935,6 +916,7 @@ function recoveryEntry(b) {
 
 function commitExcelCandidate(plan, guard) {
   if (storageReadBlocked) exchangeFail("msgStorageRecoveryModeBlocksImport");
+  if (!plan.create && projectMeta.archived) exchangeFail("msgProjectArchivedReadOnly");
   if (
     projectId !== guard.projectId ||
     stableJSON(exchangeBase()) !== guard.baseState ||
@@ -975,7 +957,7 @@ async function importControlledExcel(file) {
       payload = await readExchangePayload(files, base),
       plan = prepareExchangeCandidate(payload, base);
     if (!plan.create && !plan.changes.length) {
-      alert(t("msgNoChangesToApply"));
+      showMessage(t("msgNoChangesToApply"));
       return;
     }
     if (!(await previewExcel(plan))) return;
@@ -1002,7 +984,7 @@ async function downloadExchange(mode) {
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     );
   } catch (e) {
-    alert(t("msgExportFailed") + e.message);
+    showError(t("msgExportFailed") + e.message);
   }
 }
 
@@ -1019,13 +1001,13 @@ async function restoreExcelRecovery() {
     recalculateSchedule(b.currentData, b.settings.statusDate);
     validateBundle(b);
     if (b.projectId !== projectId) throw inputError("msgRecoveryProjectMismatch");
-    if (!confirm(t("msgRestoreDataBeforeTheLastExcel"))) return;
+    if (!(await askConfirm(t("msgRestoreDataBeforeTheLastExcel"), { confirmLabel: t("msgRestore") }))) return;
     commitExcelCandidate(
       { candidate: b, create: false, added: 0, changes: exchangeChanges(base.currentData, b.currentData) },
       guard,
     );
   } catch (e) {
-    alert(t("msgRecoveryNotApplied") + e.message);
+    showError(t("msgRecoveryNotApplied") + e.message);
   }
 }
 
@@ -1453,37 +1435,29 @@ function prepareExchangeCandidate(payload, base) {
 }
 
 function exportToExcelXML() {
-  const d = document.createElement("dialog");
-  d.className = "project-dialog exchange-dialog";
-  d.innerHTML =
-    '<h2 class="ui-heading">' +
-    t("msgExcelV3TemplatesAndCopies") +
-    "</h2><p>" +
-    t("msgUpTo10CustomGroupsConfigure") +
-    '</p><div class="exchange-options"><button class="btn btn-primary" data-mode="update">' +
-    t("msgSaveCurrentProjectV3") +
-    '</button><button class="btn" data-mode="create">' +
-    t("msgBlankCreationTemplateV3") +
-    '</button><button class="btn" id="excelRestore" ' +
-    (excelRecoveryPoints.length ? "" : "disabled") +
-    ">" +
-    t("msgRestoreBeforeLastImport") +
-    '</button></div><p class="ui-caption">' +
-    t("msgV1V2ImportsPreserveTheFirst") +
-    '</p><div class="dialog-actions"><button class="btn" id="excelExportClose">' +
-    t("msgClose") +
-    "</button></div>";
-  const close = () => {
-    d.close();
-    d.remove();
-  };
-  d.querySelectorAll("[data-mode]").forEach((b) => (b.onclick = () => downloadExchange(b.dataset.mode)));
-  d.querySelector("#excelRestore").onclick = async () => {
-    close();
-    await restoreExcelRecovery();
-  };
-  d.querySelector("#excelExportClose").onclick = close;
-  d.addEventListener("cancel", () => d.remove());
-  document.body.append(d);
-  d.showModal();
+  return showDialog({
+    title: t("msgExcelV3TemplatesAndCopies"),
+    bodyHtml:
+      '<p class="app-dialog-message">' +
+      t("msgUpTo10CustomGroupsConfigure") +
+      '</p><div class="exchange-options"><button type="button" class="btn btn-primary" data-mode="update">' +
+      t("msgSaveCurrentProjectV3") +
+      '</button><button type="button" class="btn" data-mode="create">' +
+      t("msgBlankCreationTemplateV3") +
+      '</button><button type="button" class="btn" id="excelRestore" ' +
+      (excelRecoveryPoints.length ? "" : "disabled") +
+      ">" +
+      t("msgRestoreBeforeLastImport") +
+      '</button></div><p class="ui-caption">' +
+      t("msgV1V2ImportsPreserveTheFirst") +
+      "</p>",
+    actions: [{ label: t("msgClose"), value: null }],
+    onOpen(d) {
+      d.querySelectorAll("[data-mode]").forEach((b) => (b.onclick = () => downloadExchange(b.dataset.mode)));
+      d.querySelector("#excelRestore").onclick = () => {
+        closeAppDialog(d, null);
+        restoreExcelRecovery();
+      };
+    },
+  });
 }

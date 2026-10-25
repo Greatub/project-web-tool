@@ -143,7 +143,8 @@ function selectBundle(b) {
   auditLog = copy(b.auditLog);
   activeVersionTag = b.activeVersionTag;
   selectedBaselineTag = "NONE";
-  curLang = projectSettings.language;
+  // The interface language is a per-browser preference (see i18n.js); project settings no longer change it.
+  clearUndoHistory();
   document.getElementById("statusDateInput").value = projectSettings.statusDate;
   for (const id of ["fltFamily", "fltPerson", "fltRole"]) document.getElementById(id).value = "ALL";
   document.getElementById("fltBaseline").value = "NONE";
@@ -224,9 +225,32 @@ function switchProject(id) {
     applyStaticI18n();
     renderAll();
   } catch (e) {
-    alert(e.message);
+    showError(e.message);
     renderProjectControls();
   }
+}
+
+// Deletes a project. The workspace always keeps at least one project, so deleting the last one
+// leaves a new blank project in its place.
+function removeProject(id) {
+  if (storageReadBlocked) throw inputError("msgStoragePausedExportABackupAnd");
+  const next = copy(workspace);
+  const removed = next.projects[id];
+  if (!removed) throw inputError("msgProjectNotFound");
+  delete next.projects[id];
+  let remaining = Object.values(next.projects);
+  if (!remaining.length) {
+    const blank = newProject("Untitled project");
+    next.projects[blank.projectId] = blank;
+    remaining = [blank];
+  }
+  const target = remaining.find((b) => !b.metadata.archived) || remaining[0];
+  next.activeProjectId = target.projectId;
+  commitWorkspace(next);
+  selectBundle(copy(target));
+  applyStaticI18n();
+  renderAll();
+  return removed.metadata.name;
 }
 
 function addProject(b) {
