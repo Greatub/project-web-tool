@@ -1,4 +1,64 @@
-# 公开发布与界面约定
+# Public release and interface conventions
+
+[English](#english) · [简体中文](#简体中文)
+
+## English
+
+English is the primary repository and documentation language. Simplified Chinese is the secondary language. The interface starts in English unless a saved language preference applies. User text is preserved in its original language.
+
+### Public release
+
+Only files listed in `PUBLIC_FILES` in `scripts/privacy-check.cjs` may be published. Ignore rules exclude everything by default and allow reviewed files individually; additions require review and an allowlist update. Original sources, historical evidence, Excel cases, exports, screenshots, temporary files, machine configuration and personal context stay local.
+
+Run `npm test`, `npm run privacy` and `npm run release`. Review `public-release/` and initialize the public repository from that independent, scanned copy without the original directory's history. Run `npm run prepare-hooks`: commits scan staged contents, and pushes check tracked files and all local commit history. CI runs after upload and cannot replace local scanning.
+
+The scanner checks the allowlist, credentials, email addresses and local paths. One-way fingerprints block known source identifiers without reconstructing their names in code or tests. Embedded Excel XML is decoded and scanned too. Public source excludes original cases, people and task data. Scanning cannot cover every future input; user JSON and Excel exports are private exchange files and must stay outside the source repository.
+
+### Data and compatibility
+
+A random projectId identifies each project; its name is not a storage key. Tasks, configuration, snapshots and audit records live inside the project bundle. Workspace writes are atomic. Failed writes do not switch the active project. Corrupted storage is preserved and automatic saving pauses. Legacy application storage is not automatically adopted.
+
+Project bundle schemaVersion=2 uses stable group1–group10 task fields and settings.groups for enabled group names and colors. Three neutral groups are enabled by default. Renaming preserves assignments; settings are isolated per project. Legacy schemaVersion=1 bundles migrate tasks, snapshots and recovery points using the three-field order declared by legacyGroupFields or roleLabels. Missing or ambiguous mappings reject import.
+
+Legacy browser workspaces are backed up byte-for-byte; every project is validated before a single write. Failed backup or commit preserves storage and pauses automatic saving. Structural upgrades can invalidate old update workbook digests; re-export after upgrading.
+
+Excel v1.0 retains 14 columns and their meanings: WBS, Level, Task / Sub-task, Predecessor, Lag, Priority, Starting Date, Delivery Date, Days, % Complete, Status and three original personnel-role columns. Display names are configurable; legacy headers are read from the input and validated without embedding source-specific names. New formats require a version marker and explicit mappings.
+
+### Excel v3.0 controlled exchange
+
+Use **Export Excel** for a blank creation template or a current-project copy. Keep the six required sheets and their headers: Project, Plan, NewTasks, Groups, Instructions and Metadata. New exports also include Instructions_zh. Edit only pale orange cells. Save a working copy in Excel before importing it. The app reads the selected file and downloads exports under new filenames; it has no source-file write handle. Sheet protection prevents accidental editing; it is not encryption. External manual overwrites are outside the app's control.
+
+Data sheets and Instructions use English, Arial 9 pt. Instructions_zh is a Chinese translation in DengXian 9 pt. Both are independent of the interface language. Earlier v2 files without the Chinese sheet remain importable. Instructions_zh is read-only and excluded from business-field mappings, but formulas and errors in it still reject import. User project names, task names and people are never automatically translated.
+
+WBS uniquely matches each record to a web task. Parent WBS defines hierarchy rather than row position. Instructions explains all 21 columns and stable group IDs. Progress is stored as 0–1 in Excel and 0–100 internally; dates map to the same ISO calendar day. Delivery dates, statuses, summaries and start dates with predecessors are calculated by the same scheduler and exported as gray read-only values.
+
+| Sheet | Editable inputs and constraints |
+| --- | --- |
+| Project | B2 project name; B3 status date as an Excel date or YYYY-MM-DD. Keep field names unchanged. |
+| Plan | 21 columns. C names are editable. Subtasks also allow D:F, I:J and L:U; G only if the original task has no predecessor. A/B identity, H delivery, K status and other summary fields are read-only. Keep every original row. |
+| NewTasks | 21 columns plus V Parent WBS; 200 prepared rows. WBS must be unique text. Level is Family / Main Task / Sub-task. Families have no parent, main tasks belong to families, and subtasks belong to main tasks. Row order is flexible. Summary rows accept only A:C/V. Subtasks leave H/K blank and G blank when a predecessor exists. |
+| Groups | Fixed group1–group10 IDs are read-only. Enabled is Yes/No; Name and Color are editable. Enable 1–10 groups, with unique names of 1–60 characters and #RRGGBB colors. Disabled groups must have no personnel assignments. |
+| Instructions | Read-only input formats, workflow and limitations. |
+| Instructions_zh | Read-only Chinese translation in DengXian 9 pt; excluded from business data import. |
+| Metadata | Hidden JSON contract: format, version=3, mode, projectId, baseRevision, explicit 21/22-column headers and mappings, maxGroups=10. Do not edit. |
+
+Enter progress as 25% or 0.25, not numeric 25. Lag is a signed integer, duration a positive integer, priority 1/2/3 and people separated by semicolons. Blank subtask people clear assignments; blank dates/durations mean TBC, and blank lag/progress mean zero. Scheduling uses calendar days and FS/Lag. Formulas, external links, error cells, duplicate IDs, invalid hierarchy, dependency cycles, missing rows and edited read-only cells reject the whole batch. Deleting Plan rows cannot delete tasks.
+
+Update templates bind projectId and a SHA-256 source revision digest. Re-export after changes to web data, configuration, versions or audit. Each blank creation template import creates an independent project. Import validates and recalculates a candidate copy, then previews before/after values and derived changes. Cancellation does not save. Changes to memory or saved workspace during preview reject the commit.
+
+Each project retains up to three recovery points before updates. Restoring also preserves the state before restoration. Candidate data, recovery points and audit commit through a single localStorage write; failures never partially update data. Recovery points still depend on browser storage, so export JSON for long-term backups.
+
+v1.0 has no project identity or revision digest and only updates existing subtasks after an explicit target choice, retaining its 14-column contract. v2 retains the 14/15-column, three-role contract and explicitly adapts it to the first three stable groups. v3 uses 21/22 columns and all ten groups as the current full export format. None of these formats accepts formula inputs, Excel macros or external connections.
+
+### Visual and language conventions
+
+Keep the established design: system fonts; page titles 18px/500, or 16px on narrow desktops; section/dialog headings 13px/500; body and inputs 13px/400; controls 12px/400; hints and table headings 11px/400. Use shared `.ui-title`, `.ui-heading`, `.ui-caption` and `.btn` classes. Preserve the warm-stone Gantt background, 36px rows and capsule task bars. A single group uses its configured color; multiple groups use stripes in their configured colors. Names and colors come from project settings.
+
+Keep the full-height sidebar, three views and language switch at the bottom. Do not restore separate version/audit pages. Standard editing and dialog actions are at least 44px; Gantt inline inputs remain 28px and lightweight people-navigation actions 32px. Wide tables scroll inside their containers, dates stay on one line and focus remains visible. English and Chinese share components; user data is not translated.
+
+Original local designs are reference material only. This public contract excludes source people, organizations, tasks and personal paths.
+
+## 简体中文
 
 公开仓库仅允许 `scripts/privacy-check.cjs` 中 PUBLIC_FILES 列出的文件。忽略规则默认排除所有内容，再逐项开放；新文件需要审核并修改白名单。原始来源、历史证据、Excel 案例、导出包、截图、临时文件、机器配置和个人上下文保留本地。
 
