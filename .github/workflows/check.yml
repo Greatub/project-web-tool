@@ -14,3 +14,19 @@ jobs:
       - run: npm run privacy
       - run: node scripts/privacy-check.cjs --tracked
       - run: node scripts/privacy-check.cjs --history
+  browser-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # Playwright is a test-only tool; the app itself still has no dependencies.
+      - run: npm install --no-save playwright@1.55.0
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-screenshots
+          path: test-results/

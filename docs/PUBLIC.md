@@ -10,7 +10,7 @@ English is the primary repository and documentation language. Simplified Chinese
 
 Only files listed in `PUBLIC_FILES` in `scripts/privacy-check.cjs` may be published. Ignore rules exclude everything by default and allow reviewed files individually; additions require review and an allowlist update. Original sources, historical evidence, Excel cases, exports, screenshots, temporary files, machine configuration and personal context stay local.
 
-Run `npm test`, `npm run privacy` and `npm run release`. Review `public-release/` and initialize the public repository from that independent, scanned copy without the original directory's history. Run `npm run prepare-hooks`: commits scan staged contents, and pushes check tracked files and all local commit history. CI runs after upload and cannot replace local scanning.
+`src/index.html` is generated from the sources in `src/app/` by `npm run build`; commit both, and `npm test` fails when they differ. Run `npm test`, `npm run privacy` and `npm run release`. Review `public-release/` and initialize the public repository from that independent, scanned copy without the original directory's history. Run `npm run prepare-hooks`: commits scan staged contents, and pushes check tracked files and all local commit history. CI runs after upload and cannot replace local scanning.
 
 The scanner checks the allowlist, credentials, email addresses and local paths. One-way fingerprints block known source identifiers without reconstructing their names in code or tests. Embedded Excel XML is decoded and scanned too. Public source excludes original cases, people and task data. Scanning cannot cover every future input; user JSON and Excel exports are private exchange files and must stay outside the source repository.
 
@@ -46,7 +46,7 @@ Enter progress as 25% or 0.25, not numeric 25. Lag is a signed integer, duration
 
 Update templates bind projectId and a SHA-256 source revision digest. Re-export after changes to web data, configuration, versions or audit. Each blank creation template import creates an independent project. Import validates and recalculates a candidate copy, then previews before/after values and derived changes. Cancellation does not save. Changes to memory or saved workspace during preview reject the commit.
 
-Each project retains up to three recovery points before updates. Restoring also preserves the state before restoration. Candidate data, recovery points and audit commit through a single localStorage write; failures never partially update data. Recovery points still depend on browser storage, so export JSON for long-term backups.
+Each project retains up to three recovery points before updates. A recovery point stores project data and settings only (user-entered task fields; derived dates and roll-ups are recalculated); version snapshots are stored the same compact way. Restoring keeps the current snapshots and audit log and also preserves the state before restoration. Candidate data, recovery points and audit commit through a single localStorage write; failures never partially update data. Recovery points still depend on browser storage, so export JSON for long-term backups.
 
 v1.0 has no project identity or revision digest and only updates existing subtasks after an explicit target choice, retaining its 14-column contract. v2 retains the 14/15-column, three-role contract and explicitly adapts it to the first three stable groups. v3 uses 21/22 columns and all ten groups as the current full export format. None of these formats accepts formula inputs, Excel macros or external connections.
 
@@ -62,7 +62,7 @@ Original local designs are reference material only. This public contract exclude
 
 公开仓库仅允许 `scripts/privacy-check.cjs` 中 PUBLIC_FILES 列出的文件。忽略规则默认排除所有内容，再逐项开放；新文件需要审核并修改白名单。原始来源、历史证据、Excel 案例、导出包、截图、临时文件、机器配置和个人上下文保留本地。
 
-运行 `npm test`、`npm run privacy`、`npm run release`，审核 `public-release/` 后从该副本建立公开仓库。执行 `npm run prepare-hooks`，提交时扫描暂存内容，推送前检查已跟踪内容及所有本地提交历史。CI 在上传后运行，不能代替本地扫描。公开仓库必须从已扫描的独立副本初始化，不携带原始目录的历史。
+`src/index.html` 由 `npm run build` 从 `src/app/` 源码生成，两者需一并提交，不一致时 `npm test` 失败。运行 `npm test`、`npm run privacy`、`npm run release`，审核 `public-release/` 后从该副本建立公开仓库。执行 `npm run prepare-hooks`，提交时扫描暂存内容，推送前检查已跟踪内容及所有本地提交历史。CI 在上传后运行，不能代替本地扫描。公开仓库必须从已扫描的独立副本初始化，不携带原始目录的历史。
 
 扫描采用白名单和凭据、邮箱、本机路径规则；以单向指纹阻断已知来源标识，不在程序或测试中拼接还原旧名称。同时解码 HTML 内嵌 Excel XML。公开源码不包含原始案例、人员或任务数据。扫描不能覆盖所有未来输入；用户 JSON / Excel 是私有交换文件，不应上传源码仓库。
 

@@ -1,9 +1,13 @@
 {
   "name": "project-workspace",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
-    "test": "node tests/public/core.cjs && node tests/public/excel.cjs",
+    "build": "node scripts/build.cjs",
+    "check:build": "node scripts/build.cjs --check",
+    "test": "node scripts/build.cjs --check && node tests/public/core.cjs && node tests/public/excel.cjs && node tests/public/storage.cjs",
+    "test:e2e": "node tests/e2e/smoke.cjs",
+    "format": "npx --yes prettier@3.9.10 --print-width 110 --write \"src/app/**/*.{js,css}\" \"scripts/*.cjs\" \"tests/**/*.cjs\"",
     "privacy": "node scripts/privacy-check.cjs",
     "release": "node scripts/release.cjs",
     "prepare-hooks": "node -e \"const fs=require('node:fs'),cp=require('node:child_process');for(const f of ['pre-commit','pre-push'])fs.chmodSync('.githooks/'+f,0o755);cp.execFileSync('git',['config','core.hooksPath','.githooks']);\""
