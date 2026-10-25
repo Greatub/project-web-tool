@@ -12,7 +12,7 @@ Open `src/index.html` in a modern Edge or Chrome browser. No installation, depen
 
 English is the primary language; Simplified Chinese is available from the language button at the bottom of the sidebar. Saved language preferences are respected. Built-in project names, sample tasks and default groups use English in both languages. User-entered project names, task names and people are preserved without translation.
 
-Data stays in the current browser. Copying the HTML does not copy your projects: export a JSON bundle regularly for backup. There is no login, server sync, collaboration or access isolation.
+Data stays in the current browser. Copying the HTML does not copy your projects: export a JSON bundle regularly for backup. The header shows how much browser storage is used. A red banner appears when a save fails and stays until data is saved again; a yellow banner warns when storage is more than 80% full. There is no login, server sync, collaboration or access isolation.
 
 ### Features and workflow
 
@@ -27,7 +27,7 @@ Use **Export Excel** to download a blank creation template or a copy of the curr
 
 The controlled v3 template includes Project, Plan, NewTasks, Groups, Instructions and hidden Metadata sheets, plus Instructions_zh for Chinese guidance. Project contains the name and status date. Plan has 21 columns: A:K for scheduling and L:U for group1–group10. NewTasks adds column V, Parent WBS, to specify hierarchy. Groups configures ten stable slots. WBS uniquely matches workbook rows to web tasks; calculated fields are read-only.
 
-Wrong projects, stale revisions, changed read-only fields, missing rows, formulas and invalid values reject the entire import. A failed save preserves existing data. Up to three recovery points are retained in each project before updates and can be restored from the export panel. Keep separate JSON backups for long-term storage.
+Wrong projects, stale revisions, changed read-only fields, missing rows, formulas and invalid values reject the entire import. A failed save preserves existing data. Up to three recovery points are retained in each project before updates and can be restored from the export panel. A recovery point holds project data and settings only; restoring it keeps the current version snapshots and audit log. Keep separate JSON backups for long-term storage.
 
 Data sheets and Instructions use English in Arial 9 pt. Instructions_zh provides the Chinese translation in DengXian 9 pt, regardless of the interface language. User input is preserved. Empty Plan sheets omit empty data-validation nodes to avoid Excel repair prompts.
 
@@ -37,13 +37,32 @@ See the [Excel v3.0 contract](docs/PUBLIC.md#excel-v30-controlled-exchange) for 
 
 ### Development and validation
 
-Node.js 22 or newer is required. There are no third-party dependencies.
+Node.js 22 or newer is required. The app has no third-party dependencies.
+
+`src/index.html` is a generated single file. Edit the readable sources in `src/app/` and rebuild:
+
+| Source | Contents |
+| --- | --- |
+| `src/app/shell.html` | Page markup |
+| `src/app/styles.css` | Design tokens and styles |
+| `src/app/js/i18n.js` | All interface text and messages (English and Chinese), `t(key, ...args)` |
+| `src/app/js/model.js` | Dates, validation, scheduling, groups, project bundles |
+| `src/app/js/storage.js` | Browser workspace, saving, storage usage and save banner |
+| `src/app/js/exchange.js` | Excel and JSON import/export |
+| `src/app/js/views.js` | Gantt, table, cards, people views and sidebar |
+| `src/app/js/editing.js` | Dialogs, inline edits, dragging, versions, project actions |
+| `src/app/js/boot.js` | Event wiring and start-up (must stay last) |
 
 ```sh
-npm test
+npm run build        # regenerate src/index.html from src/app/
+npm test             # build freshness check + 56 logic checks (no dependencies)
+npm run test:e2e     # browser smoke test; needs: npm install --no-save playwright && npx playwright install chromium
+npm run format       # optional: Prettier formatting for sources and tests
 npm run privacy
 npm run release
 ```
+
+Add every new interface string to both languages in `src/app/js/i18n.js`; `npm test` fails when a key is missing in either language.
 
 `public-release/` is an allowlisted copy for public distribution. Review it before publishing. Original cases, screenshots, old templates and development records were removed from this workspace under prior authorization. Keep user data and browser exports outside the repository; publish from the reviewed copy rather than an entire local working directory.
 
@@ -71,13 +90,19 @@ Excel 数据表和 Instructions 固定为英文、Arial 9 号；新增 Instructi
 
 ## 开发与验证
 
-需要 Node.js 22 或更新版本，无第三方依赖。
+需要 Node.js 22 或更新版本，应用本身无第三方依赖。
+
+`src/index.html` 是生成的单文件。请修改 `src/app/` 下的源码（页面结构、样式、`js/` 下按职责拆分的脚本），再运行构建：
 
 ```sh
-npm test
+npm run build        # 由 src/app/ 重新生成 src/index.html
+npm test             # 构建一致性检查 + 56 项逻辑检查（无依赖）
+npm run test:e2e     # 浏览器冒烟测试；需先 npm install --no-save playwright && npx playwright install chromium
 npm run privacy
 npm run release
 ```
+
+所有界面文字和提示统一写在 `src/app/js/i18n.js`，中英文必须同时提供；缺少任一语言时 `npm test` 会失败。页面顶部显示浏览器存储用量；保存失败时出现红色横幅并保持到再次保存成功，用量超过 80% 时出现黄色提醒。恢复点只保存项目数据和设置，恢复时保留当前的版本快照与审计记录。
 
 `public-release/` 是面向公开仓库的白名单副本。历史案例、截图、旧模板和开发记录已按授权从当前目录清理；用户数据与浏览器导出不应上传。应从该副本建立公开仓库，避免直接同步整个本地工作目录。
 

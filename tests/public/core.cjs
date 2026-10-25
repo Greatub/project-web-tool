@@ -1,33 +1,236 @@
-const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict'),crypto=require('node:crypto');
-const html=fs.readFileSync(require('node:path').join(__dirname,'../../src/index.html'),'utf8');
-const script=html.match(/<script>([\s\S]*?)<\/script>/)[1];new vm.Script(script);
-const core=script.split('// Synchronize scroll')[0],nodes=new Map(),storage=new Map(),alerts=[];let failWrites=false;
-const document={documentElement:{style:{setProperty(){}}},getElementById(id){if(!nodes.has(id))nodes.set(id,{value:'',textContent:'',innerHTML:'',classList:{add(){},remove(){},toggle(){}}});return nodes.get(id);}};
-const localStorage={getItem:k=>storage.get(k)||null,setItem(k,v){if(failWrites)throw new Error('quota');storage.set(k,v);}};
-const ctx=vm.createContext({console,document,localStorage,alert:m=>alerts.push(m),confirm:()=>true,crypto,Date,Map,Set,Number,String,JSON,Blob,Response,DecompressionStream,TextEncoder,TextDecoder,Uint8Array,DataView});vm.runInContext(core,ctx);
-const run=s=>vm.runInContext(s,ctx);let checks=0;
-function test(name,fn){fn();checks++;console.log('PASS '+name);}
-function setup(tasks){ctx.fixture=[{wbs:'F',name:'Phase',mainTasks:[{wbs:'M',name:'Delivery',subtasks:tasks}]}];run('projectData=copy(fixture)');}
-const task=(wbs,extra={})=>({wbs,name:wbs,start:'2030-01-01',days:1,pct:0,lag:0,pred:'',group1:'',group2:'',group3:'',...extra});
-test('blank boot has no people, tasks, snapshots or audit',()=>{assert.equal(run('curLang'),'en');run('loadState()');assert.equal(run('projectMeta.name'),'Untitled project');assert.equal(run('projectData.length+versionList.length+auditLog.length+getPeople().length'),0);});
-test('FS with positive and negative lag',()=>{setup([task('A'),task('B',{pred:'A'}),task('C',{pred:'A',lag:3}),task('D',{pred:'A',lag:-1})]);run('recalculateSchedule()');assert.equal(run("findSubtaskByWbs('B').start"),'2030-01-02');assert.equal(run("findSubtaskByWbs('C').start"),'2030-01-05');assert.equal(run("findSubtaskByWbs('D').start"),'2030-01-01');});
-test('reverse chain of 100 tasks',()=>{setup(Array.from({length:100},(_,i)=>task('T'+(99-i),{pred:i===99?'':'T'+(98-i),start:i===99?'2030-01-01':''})));run('recalculateSchedule()');assert.equal(run("findSubtaskByWbs('T99').start"),'2030-04-10');});
-test('cycles and missing predecessors reject before mutation',()=>{for(const tasks of [[task('A',{pred:'B'}),task('B',{pred:'A'})],[task('A',{pred:'X'})],[task('A'),task('A')]]){setup(tasks);const before=run('JSON.stringify(projectData)');assert.throws(()=>run('recalculateSchedule()'));assert.equal(run('JSON.stringify(projectData)'),before);}});
-test('date and numeric validation',()=>{for(const extra of [{start:'2030-02-30'},{days:0},{days:1.5},{pct:101},{lag:0.5}]){setup([task('A',extra)]);assert.throws(()=>run('recalculateSchedule()'));}});
-test('TBC propagates; weighted progress rolls up',()=>{setup([task('A',{start:'',days:null}),task('B',{pred:'A'})]);run('recalculateSchedule()');assert.equal(run("findSubtaskByWbs('B').finish"),'');setup([task('A',{days:2,pct:100}),task('B',{days:6})]);run('recalculateSchedule()');assert.equal(run('projectData[0].pct'),25);});
-test('recalculation is stable',()=>{run('recalculateSchedule()');const before=run('JSON.stringify(projectData)');run('recalculateSchedule();recalculateSchedule()');assert.equal(run('JSON.stringify(projectData)'),before);});
-test('two projects isolate configuration, snapshots, audit and active version',()=>{
-  run('renderAll=()=>{};applyStaticI18n=()=>{};const firstId=projectId;projectSettings.people=["Demo Person A"];versionList=[{tag:"one",time:"2030-01-01",author:"Demo",note:"",span:"",progress:"0%",data:copy(projectData)}];activeVersionTag="one";recordAudit("A","edit","demo");saveState();const second=newProject("Second");addProject(second)');
-  assert.equal(run('projectData.length+versionList.length+auditLog.length+getPeople().length'),0);
-  run('switchProject(firstId)');assert.equal(run('activeVersionTag'),'one');assert.equal(run('auditLog.length'),1);assert.equal(run('getPeople()[0].key'),'Demo Person A');run('loadState()');assert.equal(run('projectId===firstId'),true);
+const fs = require("node:fs"),
+  vm = require("node:vm"),
+  assert = require("node:assert/strict"),
+  crypto = require("node:crypto");
+const html = fs.readFileSync(require("node:path").join(__dirname, "../../src/index.html"), "utf8");
+const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
+new vm.Script(script);
+const core = script.split("// Synchronize scroll")[0],
+  nodes = new Map(),
+  storage = new Map(),
+  alerts = [];
+let failWrites = false;
+const document = {
+  documentElement: { style: { setProperty() {} } },
+  getElementById(id) {
+    if (!nodes.has(id))
+      nodes.set(id, {
+        value: "",
+        textContent: "",
+        innerHTML: "",
+        classList: { add() {}, remove() {}, toggle() {} },
+      });
+    return nodes.get(id);
+  },
+};
+const localStorage = {
+  getItem: (k) => storage.get(k) || null,
+  setItem(k, v) {
+    if (failWrites) throw new Error("quota");
+    storage.set(k, v);
+  },
+};
+const ctx = vm.createContext({
+  console,
+  document,
+  localStorage,
+  alert: (m) => alerts.push(m),
+  confirm: () => true,
+  crypto,
+  Date,
+  Map,
+  Set,
+  Number,
+  String,
+  JSON,
+  Blob,
+  Response,
+  DecompressionStream,
+  TextEncoder,
+  TextDecoder,
+  Uint8Array,
+  DataView,
 });
-test('write failure blocks switching without partial persistent changes',()=>{const before=storage.get(run('WORKSPACE_KEY'));failWrites=true;run('switchProject(second.projectId)');assert.equal(run('projectId===firstId'),true);assert.equal(storage.get(run('WORKSPACE_KEY')),before);failWrites=false;run('lastSaveError=""');});
-test('snapshot JSON bundle roundtrip and unknown schema rejection',()=>{run('const roundtrip=validateBundle(JSON.parse(JSON.stringify(currentBundle())))');assert.equal(run('JSON.stringify(roundtrip)===JSON.stringify(currentBundle())'),true);assert.throws(()=>run('validateBundle({...currentBundle(),schemaVersion:99})'));});
-test('v1.0 headers and roundtrip preserve TBC, lag and role semantics',()=>{setup([task('A',{start:'',days:null,lag:-2,group1:'Demo Person A'})]);run('recalculateSchedule();const rows=exchangeRows();applyImportedRows(rows,projectData)');assert.equal(run('EXCEL_HEADERS.length'),14);assert.equal(run('EXCEL_HEADERS[12]'),'Group 2');assert.equal(run("findSubtaskByWbs('A').days"),null);assert.equal(run("findSubtaskByWbs('A').lag"),-2);assert.equal(run("findSubtaskByWbs('A').group1"),'Demo Person A');});
-test('invalid Excel rows do not modify live project via candidate edit',()=>{const before=run('JSON.stringify(projectData)');run('const invalidRows=copy(exchangeRows());invalidRows[3][0]="unknown"');assert.throws(()=>run('const candidate=copy(projectData);applyImportedRows(invalidRows,candidate)'));assert.equal(run('JSON.stringify(projectData)'),before);});
-test('corrupt storage is preserved and autosave pauses',()=>{storage.set(run('WORKSPACE_KEY'),'{broken');run('loadState();saveState()');assert.equal(storage.get(run('WORKSPACE_KEY')),'{broken');assert.equal(run('storageReadBlocked'),true);});
-test('default data values remain English in both interface languages',()=>{for(const lang of ['zh','en']){ctx.testLanguage=lang;run('curLang=testLanguage');assert.equal(run('newProject().metadata.name'),'Untitled project');assert.ok(!/[\u3400-\u9fff]/.test(run('JSON.stringify(syntheticData())')));assert.ok(!/[\u3400-\u9fff]/.test(run('JSON.stringify(defaultGroups())')));}});
-test('saved built-in blank name migrates atomically without translating custom content',()=>{failWrites=false;run(`storageReadBlocked=false;globalThis.oldDefault=newProject();oldDefault.metadata.name='空白项目';delete oldDefault.metadata.customName;oldDefault.currentData=[{wbs:'P',name:'用户任务',mainTasks:[]}];globalThis.oldState={schemaVersion:1,activeProjectId:oldDefault.projectId,projects:{[oldDefault.projectId]:oldDefault}};localStorage.setItem(WORKSPACE_KEY,JSON.stringify(oldState));loadState()`);assert.equal(run('projectMeta.name'),'Untitled project');assert.equal(run('projectData[0].name'),'用户任务');assert.equal(JSON.parse(storage.get(run('WORKSPACE_KEY'))).projects[run('projectId')].metadata.name,'Untitled project');run(`globalThis.custom=newProject('空白项目');selectBundle(custom)`);assert.equal(run('projectMeta.name'),'空白项目');});
-test('offline code and shared typography roles',()=>{assert.ok(!/<script[^>]+src=|<link[^>]+stylesheet|fonts\.googleapis/.test(html));for(const c of ['ui-title','ui-heading','ui-caption','btn-view-gantt','ui-control','ui-select'])assert.ok(html.includes(c));const selector=html.match(/<select[^>]*id="projectSelect"[^>]*>/)[0];assert.match(selector,/class="ui-control ui-select"/);assert.ok(!/style=/.test(selector));const controlRule=html.match(/\.btn,\.ui-control\s*\{([^}]+)\}/)[1];for(const property of ['font-family:var(--font-ui)','font-size:var(--type-control)','font-weight:var(--weight-body)','line-height:var(--line-ui)'])assert.ok(controlRule.includes(property));});
-test('privacy gate rejects non-allowlisted files, credentials and local paths',()=>{const {inspect}=require('../../scripts/privacy-check.cjs');assert.throws(()=>inspect(['private/example.json'],()=>''));assert.throws(()=>inspect(['README.md'],()=>['ghp_', 'x'.repeat(36)].join('')));assert.throws(()=>inspect(['README.md'],()=>['C:', 'Users','example','file'].join('\\')));});
-console.log(checks+' checks passed');
+vm.runInContext(core, ctx);
+const run = (s) => vm.runInContext(s, ctx);
+let checks = 0;
+function test(name, fn) {
+  fn();
+  checks++;
+  console.log("PASS " + name);
+}
+function setup(tasks) {
+  ctx.fixture = [{ wbs: "F", name: "Phase", mainTasks: [{ wbs: "M", name: "Delivery", subtasks: tasks }] }];
+  run("projectData=copy(fixture)");
+}
+const task = (wbs, extra = {}) => ({
+  wbs,
+  name: wbs,
+  start: "2030-01-01",
+  days: 1,
+  pct: 0,
+  lag: 0,
+  pred: "",
+  group1: "",
+  group2: "",
+  group3: "",
+  ...extra,
+});
+test("blank boot has no people, tasks, snapshots or audit", () => {
+  assert.equal(run("curLang"), "en");
+  run("loadState()");
+  assert.equal(run("projectMeta.name"), "Untitled project");
+  assert.equal(run("projectData.length+versionList.length+auditLog.length+getPeople().length"), 0);
+});
+test("FS with positive and negative lag", () => {
+  setup([
+    task("A"),
+    task("B", { pred: "A" }),
+    task("C", { pred: "A", lag: 3 }),
+    task("D", { pred: "A", lag: -1 }),
+  ]);
+  run("recalculateSchedule()");
+  assert.equal(run("findSubtaskByWbs('B').start"), "2030-01-02");
+  assert.equal(run("findSubtaskByWbs('C').start"), "2030-01-05");
+  assert.equal(run("findSubtaskByWbs('D').start"), "2030-01-01");
+});
+test("reverse chain of 100 tasks", () => {
+  setup(
+    Array.from({ length: 100 }, (_, i) =>
+      task("T" + (99 - i), { pred: i === 99 ? "" : "T" + (98 - i), start: i === 99 ? "2030-01-01" : "" }),
+    ),
+  );
+  run("recalculateSchedule()");
+  assert.equal(run("findSubtaskByWbs('T99').start"), "2030-04-10");
+});
+test("cycles and missing predecessors reject before mutation", () => {
+  for (const tasks of [
+    [task("A", { pred: "B" }), task("B", { pred: "A" })],
+    [task("A", { pred: "X" })],
+    [task("A"), task("A")],
+  ]) {
+    setup(tasks);
+    const before = run("JSON.stringify(projectData)");
+    assert.throws(() => run("recalculateSchedule()"));
+    assert.equal(run("JSON.stringify(projectData)"), before);
+  }
+});
+test("date and numeric validation", () => {
+  for (const extra of [{ start: "2030-02-30" }, { days: 0 }, { days: 1.5 }, { pct: 101 }, { lag: 0.5 }]) {
+    setup([task("A", extra)]);
+    assert.throws(() => run("recalculateSchedule()"));
+  }
+});
+test("TBC propagates; weighted progress rolls up", () => {
+  setup([task("A", { start: "", days: null }), task("B", { pred: "A" })]);
+  run("recalculateSchedule()");
+  assert.equal(run("findSubtaskByWbs('B').finish"), "");
+  setup([task("A", { days: 2, pct: 100 }), task("B", { days: 6 })]);
+  run("recalculateSchedule()");
+  assert.equal(run("projectData[0].pct"), 25);
+});
+test("recalculation is stable", () => {
+  run("recalculateSchedule()");
+  const before = run("JSON.stringify(projectData)");
+  run("recalculateSchedule();recalculateSchedule()");
+  assert.equal(run("JSON.stringify(projectData)"), before);
+});
+test("two projects isolate configuration, snapshots, audit and active version", () => {
+  run(
+    'renderAll=()=>{};applyStaticI18n=()=>{};const firstId=projectId;projectSettings.people=["Demo Person A"];versionList=[{tag:"one",time:"2030-01-01",author:"Demo",note:"",span:"",progress:"0%",data:copy(projectData)}];activeVersionTag="one";recordAudit("A","edit","demo");saveState();const second=newProject("Second");addProject(second)',
+  );
+  assert.equal(run("projectData.length+versionList.length+auditLog.length+getPeople().length"), 0);
+  run("switchProject(firstId)");
+  assert.equal(run("activeVersionTag"), "one");
+  assert.equal(run("auditLog.length"), 1);
+  assert.equal(run("getPeople()[0].key"), "Demo Person A");
+  run("loadState()");
+  assert.equal(run("projectId===firstId"), true);
+});
+test("write failure blocks switching without partial persistent changes", () => {
+  const before = storage.get(run("WORKSPACE_KEY"));
+  failWrites = true;
+  run("switchProject(second.projectId)");
+  assert.equal(run("projectId===firstId"), true);
+  assert.equal(storage.get(run("WORKSPACE_KEY")), before);
+  failWrites = false;
+  run('lastSaveError=""');
+});
+test("snapshot JSON bundle roundtrip and unknown schema rejection", () => {
+  run("const roundtrip=validateBundle(JSON.parse(JSON.stringify(currentBundle())))");
+  assert.equal(run("JSON.stringify(roundtrip)===JSON.stringify(currentBundle())"), true);
+  assert.throws(() => run("validateBundle({...currentBundle(),schemaVersion:99})"));
+});
+test("v1.0 headers and roundtrip preserve TBC, lag and role semantics", () => {
+  setup([task("A", { start: "", days: null, lag: -2, group1: "Demo Person A" })]);
+  run("recalculateSchedule();const rows=exchangeRows();applyImportedRows(rows,projectData)");
+  assert.equal(run("EXCEL_HEADERS.length"), 14);
+  assert.equal(run("EXCEL_HEADERS[12]"), "Group 2");
+  assert.equal(run("findSubtaskByWbs('A').days"), null);
+  assert.equal(run("findSubtaskByWbs('A').lag"), -2);
+  assert.equal(run("findSubtaskByWbs('A').group1"), "Demo Person A");
+});
+test("invalid Excel rows do not modify live project via candidate edit", () => {
+  const before = run("JSON.stringify(projectData)");
+  run('const invalidRows=copy(exchangeRows());invalidRows[3][0]="unknown"');
+  assert.throws(() => run("const candidate=copy(projectData);applyImportedRows(invalidRows,candidate)"));
+  assert.equal(run("JSON.stringify(projectData)"), before);
+});
+test("corrupt storage is preserved and autosave pauses", () => {
+  storage.set(run("WORKSPACE_KEY"), "{broken");
+  run("loadState();saveState()");
+  assert.equal(storage.get(run("WORKSPACE_KEY")), "{broken");
+  assert.equal(run("storageReadBlocked"), true);
+});
+test("default data values remain English in both interface languages", () => {
+  for (const lang of ["zh", "en"]) {
+    ctx.testLanguage = lang;
+    run("curLang=testLanguage");
+    assert.equal(run("newProject().metadata.name"), "Untitled project");
+    assert.ok(!/[\u3400-\u9fff]/.test(run("JSON.stringify(syntheticData())")));
+    assert.ok(!/[\u3400-\u9fff]/.test(run("JSON.stringify(defaultGroups())")));
+  }
+});
+test("saved built-in blank name migrates atomically without translating custom content", () => {
+  failWrites = false;
+  run(
+    `storageReadBlocked=false;globalThis.oldDefault=newProject();oldDefault.metadata.name='空白项目';delete oldDefault.metadata.customName;oldDefault.currentData=[{wbs:'P',name:'用户任务',mainTasks:[]}];globalThis.oldState={schemaVersion:1,activeProjectId:oldDefault.projectId,projects:{[oldDefault.projectId]:oldDefault}};localStorage.setItem(WORKSPACE_KEY,JSON.stringify(oldState));loadState()`,
+  );
+  assert.equal(run("projectMeta.name"), "Untitled project");
+  assert.equal(run("projectData[0].name"), "用户任务");
+  assert.equal(
+    JSON.parse(storage.get(run("WORKSPACE_KEY"))).projects[run("projectId")].metadata.name,
+    "Untitled project",
+  );
+  run(`globalThis.custom=newProject('空白项目');selectBundle(custom)`);
+  assert.equal(run("projectMeta.name"), "空白项目");
+});
+test("offline code and shared typography roles", () => {
+  assert.ok(!/<script[^>]+src=|<link[^>]+stylesheet|fonts\.googleapis/.test(html));
+  for (const c of ["ui-title", "ui-heading", "ui-caption", "btn-view-gantt", "ui-control", "ui-select"])
+    assert.ok(html.includes(c));
+  const selector = html.match(/<select[^>]*id="projectSelect"[^>]*>/)[0];
+  assert.match(selector, /class="ui-control ui-select"/);
+  assert.ok(!/style=/.test(selector));
+  const controlRule = html.match(/\.btn,\s*\.ui-control\s*\{([^}]+)\}/)[1].replace(/\s+/g, "");
+  for (const property of [
+    "font-family:var(--font-ui)",
+    "font-size:var(--type-control)",
+    "font-weight:var(--weight-body)",
+    "line-height:var(--line-ui)",
+  ])
+    assert.ok(controlRule.includes(property));
+});
+test("privacy gate rejects non-allowlisted files, credentials and local paths", () => {
+  const { inspect } = require("../../scripts/privacy-check.cjs");
+  assert.throws(() => inspect(["private/example.json"], () => ""));
+  assert.throws(() => inspect(["README.md"], () => ["ghp_", "x".repeat(36)].join("")));
+  assert.throws(() => inspect(["README.md"], () => ["C:", "Users", "example", "file"].join("\\")));
+  assert.throws(() => inspect(["README.md"], () => "see " + ["", "Users", "example", "file"].join("/")));
+  assert.throws(() => inspect(["README.md"], () => "see " + ["", "home", "example", "file"].join("/")));
+  assert.equal(
+    inspect(["README.md"], () => "Open src/app/js/views.js"),
+    1,
+  );
+});
+console.log(checks + " checks passed");

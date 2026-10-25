@@ -1,2 +1,3 @@
 #!/bin/sh
 node scripts/privacy-check.cjs --staged || exit 1
+node scripts/build.cjs --check || exit 1
