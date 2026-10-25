@@ -10,7 +10,14 @@ Updated: 2026-10-25 (Asia/Shanghai).
 - Controlled Excel v3, protected calculated cells, explicit 21/22-field mappings, group configuration, preview, source revision checks and downloads as new files. Legacy 14-column spreadsheet import remains positionally compatible; source-specific aliases have been removed. Legacy JSON requires a declared three-slot mapping.
 - Public source allowlist and irreversible identifier fingerprints with submission/push hooks. Historical source files, old templates, development images, raw audit records and old Git backups have been removed under explicit user authorization. The public repository was deleted and recreated under the same name, with a new repository identity and clean Git history; only the 13 reviewed files were uploaded.
 
-## Current change: audit #1 workflow and interface items
+## Current change: project conventions aligned with merged updates
+
+- Baseline: `c0f73fa` on main, including the data-safety/source restructuring and workflow/interface changes merged through pull requests #2 and #3.
+- Expanded `docs/PUBLIC.md` in English and Chinese with source ownership, generated build rules, task editing, session history boundaries, archive/deletion behavior, compact storage, save failures, interaction/accessibility and validation gates. README links to these rules.
+- Documents the existing implementation; does not change application behavior, the bundle schema or the Excel contract. Historical verification below belongs to its original change and is not a new test result.
+- This change: all 67 logic checks, `pnpm build`, build freshness, privacy scans, release generation and `git diff --check` passed. `pnpm lint` and `pnpm typecheck` are undefined. Browser smoke was attempted but Playwright is not installed in this isolated checkout; no new browser acceptance is claimed. When available, run the pinned Playwright setup above and review the 1024/1440 px English/Chinese screenshots.
+
+## Previous change: audit #1 workflow and interface items
 
 - Structure editing: phases can be renamed (child WBS numbers and predecessors follow), reordered and deleted; main tasks and sub-tasks can be reordered and moved to another parent. Empty phases now stay visible in the table (they were hidden before, so a new phase could not be filled). WBS numbers are suggested when adding.
 - Projects: delete from the Project menu (JSON backup offered first; at least one project always remains). Archived projects are read-only, grouped under "Archived" in the switcher and restorable from a notice bar.
@@ -69,7 +76,14 @@ Updated: 2026-10-25 (Asia/Shanghai).
 
 更新：2026-10-25（Asia/Shanghai）。
 
-### 本次变更：审计 #1 流程与界面改进
+### 本次变更：按已合并更新补齐项目规范
+
+- 基于 main 的 `c0f73fa`，包含 PR #2 的数据安全/源码拆分及 PR #3 的流程/界面更新。
+- `docs/PUBLIC.md` 同步补齐中英文源码职责、生成构建、任务编辑、会话历史边界、归档/删除、紧凑存储、保存失败、交互无障碍及验证门禁；README 增加规范入口。
+- 本次仅记录现有实现，不改变应用行为、项目包 schema 或 Excel 合约。下方历史验证仍属于原变更，不作为本次新执行结果。
+- 本次验证：67 项逻辑检查、`pnpm build`、构建一致性、隐私扫描、发布生成及 `git diff --check` 通过。`pnpm lint`、`pnpm typecheck` 未定义；浏览器冒烟已尝试，但隔离工作区未安装 Playwright，不宣称新的浏览器验收。后续按规范安装固定版本后运行，并人工查看 1024/1440 px 中英文截图。
+
+### 上次变更：审计 #1 流程与界面改进
 
 - 结构编辑：阶段可改名（子级 WBS 与前置关系同步）、调整顺序和删除；主任务与子任务可调整顺序、移到其他父级。空阶段现在会显示在表格中（此前会被隐藏，导致新建的阶段无法继续添加内容）。新增时自动建议 WBS 编号。
 - 项目：可从“项目”菜单删除（先提供 JSON 备份，工作区至少保留一个项目）；归档项目只读、在切换框中归入“已归档”，可从提示条恢复。

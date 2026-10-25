@@ -12,7 +12,61 @@ Only files listed in `PUBLIC_FILES` in `scripts/privacy-check.cjs` may be publis
 
 `src/index.html` is generated from the sources in `src/app/` by `npm run build`; commit both, and `npm test` fails when they differ. Run `npm test`, `npm run privacy` and `npm run release`. Review `public-release/` and initialize the public repository from that independent, scanned copy without the original directory's history. Run `npm run prepare-hooks`: commits scan staged contents, and pushes check tracked files and all local commit history. CI runs after upload and cannot replace local scanning.
 
-The scanner checks the allowlist, credentials, email addresses and local paths. One-way fingerprints block known source identifiers without reconstructing their names in code or tests. Embedded Excel XML is decoded and scanned too. Public source excludes original cases, people and task data. Scanning cannot cover every future input; user JSON and Excel exports are private exchange files and must stay outside the source repository.
+The scanner checks the allowlist, credentials, email addresses and local paths. One-way fingerprints block known source identifiers without reconstructing their names in code or tests. Embedded Excel XML in older revisions is decoded during history scans too. Public source excludes original cases, people and task data. Scanning cannot cover every future input; user JSON and Excel exports are private exchange files and must stay outside the source repository.
+
+### Source and build contract
+
+The application remains an offline, framework-free single HTML file with no runtime dependencies. Development uses the readable sources below; `src/index.html` is the generated distribution, not the editing entry point. Edit sources, run `npm run build`, and commit sources and generated output together. Do not add remote scripts, fonts or runtime services to the offline build.
+
+| Source | Responsibility |
+| --- | --- |
+| `src/app/shell.html`, `src/app/styles.css` | Markup, design tokens, shared components and layout |
+| `src/app/js/i18n.js` | English and Chinese interface strings and messages through `t(key, ...args)` |
+| `src/app/js/model.js` | Date rules, validation, scheduling, groups and bundle schema |
+| `src/app/js/storage.js` | Workspace persistence, project selection, compact stored data and save status |
+| `src/app/js/dialogs.js` | Shared application dialogs, confirmations, prompts and inline errors |
+| `src/app/js/exchange.js` | Excel/JSON validation, preview, import, export and recovery |
+| `src/app/js/views.js` | Header/sidebar, table, Gantt, cards, people view and display preferences |
+| `src/app/js/history.js` | Session undo/redo, saved versions and change log dialog |
+| `src/app/js/editing.js` | Task/phase edits, project actions, inline editing and Gantt interaction |
+| `src/app/js/boot.js` | Event wiring and initialization; keep it last |
+| `scripts/build.cjs` | Deterministic source assembly and generated-file freshness check |
+
+Keep the script order declared in `scripts/build.cjs`; these scripts share application state and are not independently loaded modules. The shell must retain exactly one styles marker and one scripts marker. Additions to the build sources must also be reviewed in the public allowlist and ignore rules. Never hand-patch only the generated HTML. Every new interface string, error, accessible label or dialog action must have both English and Chinese entries; preserve user text rather than translating it.
+
+### Editing, history and data safety contract
+
+- Keep three task levels: phase (Family), main task and sub-task. Empty phases must remain visible and usable. Suggest WBS values when adding items; retain validation for uniqueness, hierarchy, dates and dependencies.
+- Task-data edits use the candidate-copy validation and scheduling path in `transactionalEdit` before replacing live tasks. A rejected edit must not change live task data or add an undo step. Renaming a WBS must update matching descendant prefixes and predecessor references together; reordering and reparenting must preserve valid task relationships and scheduling.
+- Undo/redo covers task, phase and version changes in the current session, with at most 50 undo steps. A new recorded edit clears redo; opening a project clears history. It is not a persistent backup or a workspace-wide undo for project deletion, settings or imports. Do not intercept native text editing or run history shortcuts while an application dialog is open.
+- Saved versions support non-Latin tags, baseline comparison, restore and deletion. Restore and deletion are undoable. Keep versions and the recorded change log in the sidebar's shared dialog. The people assignment matrix describes actual assignments; do not label it RACI without a responsibility model.
+- Archived projects are read-only until restored; guard mutation paths as well as visible controls. Group them in the switcher and expose restoration. Project deletion requires an application confirmation and offers a JSON backup first; deleting the last project creates a blank replacement. Session undo is not deletion recovery.
+- Workspace persistence is an atomic write. Failed writes preserve the previous saved workspace; in-memory edits may remain unsaved. Keep the failure banner visible until a successful save, with JSON backup and retry actions. Corrupted storage must remain intact with automatic saving paused. Preserve the header's usage indicator and warn at or above 80% of the application's estimated storage budget; it is not a guaranteed browser quota measurement.
+- Store only input fields in version and recovery task data; recalculate derived dates, status and roll-ups when used. Recovery points must not recursively embed versions or audit history. Restoring an Excel recovery point retains current versions and audit, as well as the pre-restore recovery state. Structural compaction can change source revision digests: instruct users to export a fresh update workbook when an old one is stale.
+- Language, column visibility and split width are browser preferences. Opening another project must not change the interface language. Project data and group configuration remain isolated; preserve schemaVersion=2, the ten stable group IDs and the Excel compatibility rules below.
+
+### Interaction and accessibility acceptance
+
+Keep the project name prominent, with project selection, Project menu, undo/redo and save status in a stable header for both empty and populated projects. An empty workspace offers Add phase, Import and fictional demo actions. Use the shared `<dialog>` component for every message, confirmation and prompt; Esc closes it, focus enters and returns to the opener, and validation errors stay inline. Do not reintroduce browser-native dialogs.
+
+Dates display and accept YYYY-MM-DD in both languages, with a calendar action opening the browser picker. After inline edits, Tab and Enter retain the next field's focus and any typing entered before re-render. Table columns are configurable, including combined People, optional per-group columns and priority; the name column fills remaining space. Preserve remembered column/split preferences, visible duration/progress at 1024 and 1440 px, and real tree-toggle buttons with expanded state.
+
+Gantt bars remain keyboard-focusable: arrow keys move by one calendar day, Shift+arrow adjusts duration, and Enter opens the task. Pointer dragging and keyboard edits share validated scheduling behavior, including predecessor lag. Preserve touch input, delayed row/bar marking, P1–P3 priority labels and people from every group in labels. New interactions must remain usable in both languages with visible focus and the shared sizing tokens.
+
+### Validation and release acceptance
+
+Use Node.js 22 or newer. The current baseline has 67 logic checks and a 25-check browser smoke suite; record the actual counts and results for each change rather than treating these numbers as fixed requirements.
+
+| Gate | Command and acceptance |
+| --- | --- |
+| Generated distribution | `npm run build`, then `npm run check:build`; generated output must match sources |
+| Logic and contracts | `npm test`; build freshness, core/scheduling, Excel, storage and workflow checks must pass |
+| Browser behavior | `npm run test:e2e`; check 1024/1440 px, all views, language, edits, Gantt, dialogs, storage failure and reload; native dialogs and browser errors fail the suite |
+| Public contents | `npm run privacy`; scan every allowlisted source and generated file |
+| Commit/push | `node scripts/privacy-check.cjs --staged`, `--tracked` and `--history` at their corresponding Git stages; enable hooks with `npm run prepare-hooks` |
+| Release copy | `npm run release`; creates a fresh allowlisted `public-release/` and refuses an existing directory; review the result before publishing |
+
+Playwright is test-only. Match CI's pinned setup: `npm install --no-save playwright@1.55.0` and `npx playwright install chromium` locally; CI installs Chromium with `--with-deps` on Ubuntu 24.04. The `verify` job runs logic and privacy gates; `browser-smoke` runs browser checks and uploads `test-results/` screenshots even on failure. Screenshots, browser downloads and dependencies remain outside the public allowlist. `npm run format` is optional formatting, not a lint or type-check gate. The repository currently defines build but no lint or typecheck scripts; report unavailable commands and remaining manual checks explicitly. Passing automation does not establish native Excel acceptance or replace manual screenshot review for visual changes.
 
 ### Data and compatibility
 
@@ -64,7 +118,61 @@ Original local designs are reference material only. This public contract exclude
 
 `src/index.html` 由 `npm run build` 从 `src/app/` 源码生成，两者需一并提交，不一致时 `npm test` 失败。运行 `npm test`、`npm run privacy`、`npm run release`，审核 `public-release/` 后从该副本建立公开仓库。执行 `npm run prepare-hooks`，提交时扫描暂存内容，推送前检查已跟踪内容及所有本地提交历史。CI 在上传后运行，不能代替本地扫描。公开仓库必须从已扫描的独立副本初始化，不携带原始目录的历史。
 
-扫描采用白名单和凭据、邮箱、本机路径规则；以单向指纹阻断已知来源标识，不在程序或测试中拼接还原旧名称。同时解码 HTML 内嵌 Excel XML。公开源码不包含原始案例、人员或任务数据。扫描不能覆盖所有未来输入；用户 JSON / Excel 是私有交换文件，不应上传源码仓库。
+扫描采用白名单和凭据、邮箱、本机路径规则；以单向指纹阻断已知来源标识，不在程序或测试中拼接还原旧名称。扫描历史修订时同时解码旧 HTML 内嵌的 Excel XML。公开源码不包含原始案例、人员或任务数据。扫描不能覆盖所有未来输入；用户 JSON / Excel 是私有交换文件，不应上传源码仓库。
+
+## 源码与构建规范
+
+应用继续作为离线、无框架、无运行时依赖的单文件 HTML 分发。开发入口为 `src/app/` 的可读源码，`src/index.html` 是构建产物。修改源码后运行 `npm run build`，源码与产物一并提交；不得仅手改生成 HTML，也不向离线构建加入远程脚本、字体或运行时服务。
+
+| 源码 | 职责 |
+| --- | --- |
+| `src/app/shell.html`、`src/app/styles.css` | 页面结构、设计令牌、共享组件及布局 |
+| `src/app/js/i18n.js` | 经 `t(key, ...args)` 提供中英文界面文案及提示 |
+| `src/app/js/model.js` | 日期、校验、排程、组及项目包模型 |
+| `src/app/js/storage.js` | 工作区持久化、项目切换、紧凑存储及保存状态 |
+| `src/app/js/dialogs.js` | 应用内对话框、确认、输入提示及就地报错 |
+| `src/app/js/exchange.js` | Excel/JSON 校验、预览、导入导出及恢复 |
+| `src/app/js/views.js` | 头部、侧栏、表格、甘特、卡片、人员视图及显示偏好 |
+| `src/app/js/history.js` | 会话撤销/重做、版本及变更记录对话框 |
+| `src/app/js/editing.js` | 任务/阶段编辑、项目操作、行内编辑及甘特交互 |
+| `src/app/js/boot.js` | 事件绑定与初始化，必须最后加载 |
+| `scripts/build.cjs` | 确定性源码拼装及产物一致性检查 |
+
+保持构建脚本中的加载顺序；各脚本共享应用状态，并非独立加载的模块。页面模板必须各保留一个样式和脚本构建标记。新增构建源码须同步审核公开白名单及忽略规则。所有新增界面文字、错误、无障碍标签和操作均须提供中英文；用户输入原文不翻译。
+
+## 编辑、历史与数据安全规范
+
+- 保持阶段（Family）、主任务、子任务三级结构，空阶段必须可见且可继续添加内容。新增时建议 WBS 编号，并保留唯一性、层级、日期及依赖校验。
+- 任务数据变更须经 `transactionalEdit` 的候选副本校验与排程后才替换当前数据；拒绝的编辑不得改变当前任务或新增撤销步骤。WBS 改名须同步更新匹配的子级前缀和前置引用；排序和更换父级须保持有效层级及排程。
+- 撤销/重做只覆盖当前会话的任务、阶段和版本操作，最多保留 50 步撤销。新增已记录编辑清空重做，打开项目清空历史；不作为持久备份，也不覆盖项目删除、设置或导入等整个工作区操作。输入框原生编辑及应用对话框打开时不得被历史快捷键干扰。
+- 保存版本允许中文等非拉丁字符标签，支持基线比较、恢复和删除；恢复和删除可撤销。版本和变更记录保留在侧栏打开的共享对话框中。人员矩阵反映实际分工，没有职责模型时不得称为 RACI。
+- 归档项目恢复前只读，既约束可见控件，也约束数据变更入口；切换框分组显示并提供恢复入口。删除项目须在应用内确认并先提供 JSON 备份；删除最后一个项目时创建空白替代项目。会话撤销不作为项目删除恢复途径。
+- 工作区持久化为原子写入，失败时保留上次已保存的工作区；内存编辑可能尚未保存。失败横幅保持到保存成功，提供 JSON 备份和重试；存储损坏保留原值并暂停自动保存。头部显示用量，达到应用估算预算的 80% 时提醒；估算值不代表浏览器保证的实际配额。
+- 版本和恢复点的任务数据只存输入字段，使用时重算派生日期、状态和汇总；恢复点不得递归包含版本和审计历史。恢复 Excel 恢复点时保留当前版本、审计及恢复前状态。结构压缩可能改变源版本摘要，旧工作簿提示过期时须引导重新导出。
+- 语言、列显示和分栏宽度属于浏览器偏好，打开其他项目不得改变界面语言。项目数据和组配置继续隔离，保持 schemaVersion=2、十个稳定组编号及下方 Excel 兼容规则。
+
+## 交互与无障碍验收规范
+
+突出项目名称，项目切换、项目菜单、撤销/重做及保存状态位于稳定头部，空项目和有数据时高度一致。空项目提供新建阶段、导入、虚构示例引导。所有消息、确认和输入均使用共享 `<dialog>`：Esc 关闭、焦点进入并返回打开控件、校验错误就地显示，不恢复浏览器原生弹窗。
+
+中英文日期均以 YYYY-MM-DD 显示和输入，日历按钮打开浏览器选择器。行内编辑后 Tab/回车保持下一字段焦点及重绘前继续输入的内容。表格支持合并人员列、各组单独列、优先级等列配置，名称列占剩余空间；保留列选择和分栏宽度，1024/1440 px 下默认可见工期及进度，树形展开使用带展开状态的真正按钮。
+
+甘特条可键盘聚焦：方向键按自然日移动、Shift+方向键调工期、回车打开任务；Pointer 拖拽和键盘编辑共享经校验的排程逻辑（含前置 Lag）。保留触控、延期行/条标记、P1–P3 标签以及全部组的人员标签。新增交互须在双语下可用，并遵循焦点和共享尺寸规则。
+
+## 验证与发布验收规范
+
+使用 Node.js 22 或更新版本。目前基线为 67 项逻辑检查和 25 项浏览器冒烟检查；每次记录实际执行的数量和结果，不将数量固定为验收条件。
+
+| 检查 | 命令与验收要求 |
+| --- | --- |
+| 构建产物 | `npm run build` 后运行 `npm run check:build`，产物必须与源码一致 |
+| 逻辑及合约 | `npm test`，通过构建一致性、核心排程、Excel、存储及流程检查 |
+| 浏览器行为 | `npm run test:e2e`，覆盖 1024/1440 px、各视图、语言、编辑、甘特、对话框、保存失败及刷新；原生弹窗或浏览器报错即失败 |
+| 公开文件 | `npm run privacy`，扫描全部白名单源码及产物 |
+| 提交/推送 | 在相应 Git 阶段执行 `node scripts/privacy-check.cjs --staged`、`--tracked`、`--history`；用 `npm run prepare-hooks` 启用钩子 |
+| 发布副本 | `npm run release`，创建新的白名单 `public-release/`，已有目录时拒绝覆盖；发布前审核结果 |
+
+Playwright 仅用于测试。对齐 CI 固定配置：本地执行 `npm install --no-save playwright@1.55.0` 及 `npx playwright install chromium`；CI 在 Ubuntu 24.04 使用 `--with-deps` 安装 Chromium。`verify` 执行逻辑和隐私门禁，`browser-smoke` 执行浏览器检查，并在失败时也上传 `test-results/` 截图。截图、浏览器下载及依赖不纳入公开白名单。`npm run format` 仅为可选格式化，不能替代 lint 或类型检查。仓库目前有 build，无 lint/typecheck 脚本，必须明确记录无法执行项及人工检查。自动化通过不代表原生 Excel 验收，视觉变更仍须人工查看截图。
 
 ## 数据与兼容
 
