@@ -5,7 +5,7 @@
   "scripts": {
     "build": "node scripts/build.cjs",
     "check:build": "node scripts/build.cjs --check",
-    "test": "node scripts/build.cjs --check && node tests/public/core.cjs && node tests/public/excel.cjs && node tests/public/storage.cjs",
+    "test": "node scripts/build.cjs --check && node tests/public/core.cjs && node tests/public/excel.cjs && node tests/public/storage.cjs && node tests/public/workflow.cjs",
     "test:e2e": "node tests/e2e/smoke.cjs",
     "format": "npx --yes prettier@3.9.10 --print-width 110 --write \"src/app/**/*.{js,css}\" \"scripts/*.cjs\" \"tests/**/*.cjs\"",
     "privacy": "node scripts/privacy-check.cjs",

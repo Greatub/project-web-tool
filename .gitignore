@@ -15,8 +15,10 @@
 !/src/app/js/i18n.js
 !/src/app/js/model.js
 !/src/app/js/storage.js
+!/src/app/js/dialogs.js
 !/src/app/js/exchange.js
 !/src/app/js/views.js
+!/src/app/js/history.js
 !/src/app/js/editing.js
 !/src/app/js/boot.js
 !/docs/
@@ -35,6 +37,7 @@
 !/tests/public/core.cjs
 !/tests/public/excel.cjs
 !/tests/public/storage.cjs
+!/tests/public/workflow.cjs
 !/tests/e2e/
 /tests/e2e/*
 !/tests/e2e/smoke.cjs

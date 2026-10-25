@@ -34,6 +34,7 @@
       <details class="sidebar-action-group sidebar-filters" id="taskActions">
         <summary id="taskActionsLabel">Task actions</summary>
         <div class="group-actions">
+          <button class="btn" id="btnAddPhase" onclick="addPhase()">＋ Phase</button>
           <button class="btn" id="btnAddMain" onclick="openAddModal('Main Task')">＋ Main Task</button>
           <button class="btn" id="btnAddSub" onclick="openAddModal('Sub-task')">＋ Sub-task</button>
         </div>
@@ -44,6 +45,7 @@
           <button class="btn" id="btnImportXls" onclick="document.getElementById('excelFileInput').click()">📥 Import</button>
           <button class="btn" title="Standard .xlsx template / 标准 .xlsx 模板" id="btnExportXls" onclick="exportToExcelXML()">📤 Export Excel</button>
           <button class="btn btn-primary" id="btnSaveVer" onclick="openVersionModal()">📌 Save Version</button>
+          <button class="btn" id="btnHistory" onclick="openHistoryDialog()">🕘 Versions & history</button>
           <button class="btn" id="btnExportJson" onclick="exportVersionBundle()">💾 Export Bundle</button>
         </div>
       </details>
@@ -70,7 +72,10 @@
     </div>
     <div class="filter-item">
       <label id="lblStatusDate">Status Date:</label>
-      <input type="date" id="statusDateInput" value="" onchange="renderAll()">
+      <span class="date-field">
+        <input type="text" id="statusDateInput" class="date-text" inputmode="numeric" maxlength="10" placeholder="YYYY-MM-DD" value="" onchange="onStatusDateChange(this)">
+        <button type="button" class="btn btn-icon date-picker-btn" data-date-for="statusDateInput"></button>
+      </span>
     </div>
     <div class="filter-item">
       <label id="lblZoom">Zoom:</label>
@@ -81,6 +86,10 @@
         <span id="zoomPctLabel" style="font-size:10.5px;min-width:34px;text-align:center">100%</span>
       </div>
     </div>
+    <fieldset class="filter-item column-picker">
+      <legend id="lblColumns">Table columns</legend>
+      <div id="columnPicker" class="column-picker-list"></div>
+    </fieldset>
     <button class="btn" id="btnExpandAll" onclick="expandCollapseAll(2)">Expand All</button>
     <button class="btn" id="btnCollapseSub" onclick="expandCollapseAll(1)">Main Tasks Only</button>
   </div>
@@ -93,10 +102,22 @@
 <main class="main-column">
 <div id="saveBanner" class="save-banner" role="alert" hidden></div>
 <header class="top-header">
-  <div class="brand-area">
-    <div class="brand-title">
-      <div id="projectControls" class="project-controls"></div><h1 class="ui-title" id="uiTitle">Project Workspace — Project Management System</h1>
-      <p id="uiSubtitle">Task and people linkage · Export Bundle to back up browser data</p>
+  <div class="header-main">
+    <div class="title-row">
+      <h1 class="ui-title" id="uiTitle">Untitled project</h1>
+      <span id="archivedBadge" class="archived-badge" hidden>Archived</span>
+    </div>
+    <div class="project-bar">
+      <label class="visually-hidden" for="projectSelect" id="lblProjectSelect">Project</label>
+      <select class="ui-control ui-select" id="projectSelect" onchange="switchProject(this.value)"></select>
+      <details class="menu" id="projectMenu">
+        <summary class="btn" id="projectMenuLabel">Project</summary>
+        <div class="menu-list" role="menu" id="projectMenuList"></div>
+      </details>
+      <span class="toolbar-divider" aria-hidden="true"></span>
+      <button type="button" class="btn btn-icon-text" id="btnUndo" onclick="undo()" disabled></button>
+      <button type="button" class="btn btn-icon-text" id="btnRedo" onclick="redo()" disabled></button>
+      <span id="projectStatus" class="ui-caption project-status" role="status"></span>
     </div>
   </div>
   <div class="kpi-strip">
@@ -113,27 +134,31 @@
       <div class="val" id="kpiProgress">0.0%</div>
     </div>
   </div>
-
-</header><div class="app-layout"><div class="workspace">
+</header>
+<div id="archivedNotice" class="save-banner save-banner-info" role="status" hidden></div><div class="app-layout"><div class="workspace">
+  <section id="emptyState" class="empty-state" hidden aria-labelledby="emptyTitle">
+    <div class="empty-card">
+      <h2 class="ui-heading" id="emptyTitle">Start your plan</h2>
+      <p class="ui-caption" id="emptyIntro"></p>
+      <ol class="empty-steps">
+        <li id="emptyStep1"></li>
+        <li id="emptyStep2"></li>
+        <li id="emptyStep3"></li>
+      </ol>
+      <div class="empty-actions">
+        <button type="button" class="btn btn-primary" id="emptyAddPhase" onclick="addPhase()">Add phase</button>
+        <button type="button" class="btn" id="emptyImport" onclick="document.getElementById('excelFileInput').click()">Import</button>
+        <button type="button" class="btn" id="emptyDemo" onclick="loadDemoIntoProject()">Fill with fictional demo</button>
+      </div>
+    </div>
+  </section>
 
   <!-- VIEW 1: Split WBS Table + Interactive Gantt -->
   <div class="split-container" id="view-gantt">
     <div class="left-pane" id="leftPane">
       <div class="pane-header" id="leftHeader">
         <table class="wbs-table">
-          <colgroup>
-            <col style="width:58px">
-            <col style="width:245px">
-            <col style="width:64px">
-            <col style="width:46px">
-            <col style="width:132px">
-            <col style="width:105px">
-            <col style="width:50px">
-            <col style="width:52px">
-            <col style="width:110px">
-            <col style="width:165px">
-            <col style="width:130px">
-          </colgroup>
+          <colgroup></colgroup>
           <thead>
             <tr id="wbsTheadRow"></tr>
           </thead>
@@ -141,19 +166,7 @@
       </div>
       <div class="pane-body" id="leftBody">
         <table class="wbs-table" id="wbsBodyTable">
-          <colgroup>
-            <col style="width:58px">
-            <col style="width:245px">
-            <col style="width:64px">
-            <col style="width:46px">
-            <col style="width:132px">
-            <col style="width:105px">
-            <col style="width:50px">
-            <col style="width:52px">
-            <col style="width:110px">
-            <col style="width:165px">
-            <col style="width:130px">
-          </colgroup>
+          <colgroup></colgroup>
           <tbody id="wbsTbody"></tbody>
         </table>
       </div>
@@ -203,34 +216,33 @@
   <div id="legendTipBox"></div>
 </footer></main></div>
 
-<!-- Task Edit / Add Modal -->
-<div class="modal-backdrop" id="taskModal">
-  <div class="modal-box">
-    <div class="modal-hdr">
-      <span class="ui-heading" id="modalTitle">Edit task</span>
-      <button class="btn btn-icon" aria-label="Close" onclick="closeModal()"><svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="mdMode">
-      <input type="hidden" id="mdOrigWbs">
-
+<!-- Task add / edit dialog -->
+<dialog class="app-dialog app-dialog-wide" id="taskModal" aria-labelledby="modalTitle">
+  <div class="app-dialog-hdr">
+    <h2 class="ui-heading" id="modalTitle">Edit task</h2>
+    <button type="button" class="btn btn-icon" data-dialog-close aria-label="Close"></button>
+  </div>
+  <div class="app-dialog-body">
+    <input type="hidden" id="mdMode">
+    <input type="hidden" id="mdOrigWbs">
+    <div class="form-grid two-col">
       <div class="form-field">
-        <label id="lblMdType">Task Level</label>
+        <label id="lblMdType" for="mdType">Task Level</label>
         <select id="mdType" onchange="onModalTypeChange()">
           <option value="Sub-task">Sub-task</option>
           <option value="Main Task">Main Task</option>
         </select>
       </div>
       <div class="form-field" id="mdParentWrap">
-        <label id="mdParentLabel">Parent main task</label>
+        <label id="mdParentLabel" for="mdParent">Parent main task</label>
         <select id="mdParent"></select>
       </div>
       <div class="form-field">
-        <label id="lblMdWbs">WBS Code</label>
+        <label id="lblMdWbs" for="mdWbs">WBS Code</label>
         <input type="text" id="mdWbs" placeholder="1.1.5 / 2.5">
       </div>
       <div class="form-field">
-        <label id="lblMdPrio">Priority</label>
+        <label id="lblMdPrio" for="mdPrio">Priority</label>
         <select id="mdPrio">
           <option value="1">1 (High)</option>
           <option value="2">2 (Medium)</option>
@@ -239,78 +251,86 @@
         </select>
       </div>
       <div class="form-field full">
-        <label id="lblMdName">Task / Sub-task Description</label>
+        <label id="lblMdName" for="mdName">Task / Sub-task Description</label>
         <input type="text" id="mdName">
       </div>
-
-      <div id="mdSubtaskFields" style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div id="mdSubtaskFields" class="form-grid two-col full">
         <div class="form-field">
-          <label id="lblMdPred">Predecessor WBS (Finish-to-Start)</label>
+          <label id="lblMdPred" for="mdPred">Predecessor WBS (Finish-to-Start)</label>
           <select id="mdPred" onchange="onModalPredChange()"></select>
         </div>
         <div class="form-field">
-          <label id="lblMdLag">Lag (Calendar Days)</label>
+          <label id="lblMdLag" for="mdLag">Lag (Calendar Days)</label>
           <input type="number" id="mdLag" value="0" onchange="onModalPredChange()">
         </div>
         <div class="form-field">
-          <label id="lblMdStart">Starting Date</label>
-          <input type="date" id="mdStart" onchange="onModalStartOrDaysChange('start')">
+          <label id="lblMdStart" for="mdStart">Starting Date</label>
+          <span class="date-field">
+            <input type="text" id="mdStart" class="date-text" inputmode="numeric" maxlength="10" placeholder="YYYY-MM-DD" onchange="onModalStartOrDaysChange()">
+            <button type="button" class="btn btn-icon date-picker-btn" data-date-for="mdStart"></button>
+          </span>
         </div>
         <div class="form-field">
-          <label id="lblMdDays">Duration (Days)</label>
-          <input type="number" id="mdDays" min="1" value="7" onchange="onModalStartOrDaysChange('days')">
+          <label id="lblMdDays" for="mdDays">Duration (Days)</label>
+          <input type="number" id="mdDays" min="1" value="7" onchange="onModalStartOrDaysChange()">
         </div>
         <div class="form-field">
-          <label id="lblMdFinish">Delivery Date (Auto)</label>
-          <input type="date" id="mdFinish" readonly style="background:var(--bg-page)">
+          <label id="lblMdFinish" for="mdFinish">Delivery Date (Auto)</label>
+          <input type="text" id="mdFinish" class="date-text" readonly tabindex="-1">
         </div>
         <div class="form-field">
-          <label id="lblMdPct">% Complete (0~100)</label>
+          <label id="lblMdPct" for="mdPct">% Complete (0~100)</label>
           <input type="number" id="mdPct" min="0" max="100" value="0">
         </div>
-        <div id="taskGroupInputs" class="form-field full"></div>
-      </div>
-    </div>
-    <div class="modal-ftr">
-      <button class="btn btn-danger" id="mdDeleteBtn" onclick="deleteModalTask()">Delete Task</button>
-      <div style="display:flex;gap:8px;margin-left:auto">
-        <button class="btn" id="mdCancelBtn" onclick="closeModal()">Cancel</button>
-        <button class="btn btn-primary" id="mdSaveBtn" onclick="saveModalTask()">Save & Recalculate</button>
+        <div id="taskGroupInputs" class="form-grid two-col full"></div>
       </div>
     </div>
   </div>
-</div>
-
-<!-- Save New Version Snapshot Modal -->
-<div class="modal-backdrop" id="versionModal">
-  <div class="modal-box" style="width:480px">
-    <div class="modal-hdr">
-      <span class="ui-heading" id="verModalTitle">Save version snapshot</span>
-      <button class="btn btn-icon" aria-label="Close" onclick="closeVersionModal()"><svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button>
+  <p class="app-dialog-error" role="alert" hidden></p>
+  <div class="app-dialog-ftr">
+    <div class="app-dialog-ftr-start">
+      <button type="button" class="btn btn-danger" id="mdDeleteBtn" onclick="deleteModalTask()">Delete Task</button>
+      <button type="button" class="btn" id="mdMoveUp" onclick="moveModalTask(-1)">Move up</button>
+      <button type="button" class="btn" id="mdMoveDown" onclick="moveModalTask(1)">Move down</button>
     </div>
-    <div class="modal-body">
+    <div class="app-dialog-ftr-end">
+      <button type="button" class="btn" id="mdCancelBtn" data-dialog-close>Cancel</button>
+      <button type="button" class="btn btn-primary" id="mdSaveBtn" onclick="saveModalTask()">Save & Recalculate</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- Save version snapshot dialog -->
+<dialog class="app-dialog" id="versionModal" aria-labelledby="verModalTitle">
+  <div class="app-dialog-hdr">
+    <h2 class="ui-heading" id="verModalTitle">Save version snapshot</h2>
+    <button type="button" class="btn btn-icon" data-dialog-close aria-label="Close"></button>
+  </div>
+  <div class="app-dialog-body">
+    <div class="form-grid two-col">
       <div class="form-field">
-        <label id="lblVerTag">Version tag</label>
+        <label id="lblVerTag" for="verTagInput">Version tag</label>
         <input type="text" id="verTagInput" placeholder="V1.0">
       </div>
       <div class="form-field">
-        <label id="lblVerAuthor">Updated by</label>
+        <label id="lblVerAuthor" for="verAuthorInput">Updated by</label>
         <input type="text" id="verAuthorInput" value="PM">
       </div>
       <div class="form-field full">
-        <label id="lblVerNote">Change notes</label>
-        <textarea id="verNoteInput" rows="3" placeholder="Briefly describe schedule, people or task changes..."></textarea>
-      </div>
-    </div>
-    <div class="modal-ftr">
-      <div></div>
-      <div style="display:flex;gap:8px">
-        <button class="btn" onclick="closeVersionModal()" id="btnVerCancel">Cancel</button>
-        <button class="btn btn-primary" onclick="confirmSaveVersion()" id="btnVerConfirm">Save version</button>
+        <label id="lblVerNote" for="verNoteInput">Change notes</label>
+        <textarea id="verNoteInput" rows="3"></textarea>
       </div>
     </div>
   </div>
-</div>
+  <p class="app-dialog-error" role="alert" hidden></p>
+  <div class="app-dialog-ftr">
+    <div class="app-dialog-ftr-start"></div>
+    <div class="app-dialog-ftr-end">
+      <button type="button" class="btn" data-dialog-close id="btnVerCancel">Cancel</button>
+      <button type="button" class="btn btn-primary" onclick="confirmSaveVersion()" id="btnVerConfirm">Save version</button>
+    </div>
+  </div>
+</dialog>
 
 <div id="dragTooltip"></div>
 

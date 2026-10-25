@@ -54,7 +54,7 @@ v1.0 has no project identity or revision digest and only updates existing subtas
 
 Keep the established design: system fonts; page titles 18px/500, or 16px on narrow desktops; section/dialog headings 13px/500; body and inputs 13px/400; controls 12px/400; hints and table headings 11px/400. Use shared `.ui-title`, `.ui-heading`, `.ui-caption` and `.btn` classes. Preserve the warm-stone Gantt background, 36px rows and capsule task bars. A single group uses its configured color; multiple groups use stripes in their configured colors. Names and colors come from project settings.
 
-Keep the full-height sidebar, three views and language switch at the bottom. Do not restore separate version/audit pages. Standard editing and dialog actions are at least 44px; Gantt inline inputs remain 28px and lightweight people-navigation actions 32px. Wide tables scroll inside their containers, dates stay on one line and focus remains visible. English and Chinese share components; user data is not translated.
+Keep the full-height sidebar, three views and language switch at the bottom. Versions and the change log open in a dialog from the sidebar; do not add separate version/audit pages. All prompts, confirmations and errors use the shared in-app dialog (`src/app/js/dialogs.js`); never the browser's alert/confirm/prompt. Dates are displayed and entered as YYYY-MM-DD in every language. The interface language is a per-browser preference, not a project setting. Archived projects are read-only. Standard editing and dialog actions are at least 44px; Gantt inline inputs remain 28px and lightweight people-navigation actions 32px. Wide tables scroll inside their containers, dates stay on one line and focus remains visible. English and Chinese share components; user data is not translated.
 
 Original local designs are reference material only. This public contract excludes source people, organizations, tasks and personal paths.
 
@@ -100,6 +100,6 @@ v1.0 无项目身份和源版本摘要，只允许明确选择目标后更新既
 
 继承来源最新设计契约：系统字体；页面标题 18px/500、窄桌面 16px；章节/弹窗 13px/500；正文与输入 13px/400；控件 12px/400；说明/表头 11px/400。共享 `.ui-title`、`.ui-heading`、`.ui-caption`、`.btn`。暖石甘特背景、36px 行高、胶囊任务条保留；单组显示配置颜色，多组采用对应颜色条纹，组名和颜色来自项目配置。
 
-全高侧栏、三个视图、底部语言切换；不恢复版本/审计独立页面。标准编辑及弹窗操作至少 44px；甘特行内输入保留 28px；轻量人员跳转操作 32px。宽表在容器内滚动、日期不换行、焦点可见。中英文共享组件，用户数据不翻译。
+全高侧栏、三个视图、底部语言切换；版本与变更记录在侧栏打开的对话框中查看，不另设独立页面；所有提示、确认和报错统一使用应用内对话框（`src/app/js/dialogs.js`），不使用浏览器 alert/confirm/prompt。日期在各语言下均以 YYYY-MM-DD 显示和输入。界面语言是浏览器偏好，不随项目变化。归档项目为只读。标准编辑及弹窗操作至少 44px；甘特行内输入保留 28px；轻量人员跳转操作 32px。宽表在容器内滚动、日期不换行、焦点可见。中英文共享组件，用户数据不翻译。
 
 本地原始设计仅供参考；此公开约定不包含来源人员、组织、任务或个人路径。

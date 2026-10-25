@@ -29,16 +29,6 @@
   flex-shrink: 0;
   border-bottom: 0.5px solid var(--border-soft);
 }
-.brand-title h1 {
-  font-size: 15px;
-  font-weight: 400;
-  color: var(--text-main);
-}
-.brand-title p {
-  font-size: 11px;
-  color: var(--text-secondary);
-  margin-top: 1px;
-}
 .kpi-card .lbl {
   font-size: 10px;
   color: var(--text-muted);
@@ -598,39 +588,6 @@ footer.legend-bar {
   border-radius: 0px;
   display: inline-block;
 }
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(56, 59, 55, 0.35);
-  backdrop-filter: blur(2px);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-}
-.modal-backdrop.open {
-  display: flex;
-}
-.modal-box {
-  background: var(--bg-panel);
-  width: 620px;
-  max-width: 95vw;
-  border-radius: 0px;
-  border: 0.5px solid var(--border-soft);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
-  overflow: hidden;
-}
-.modal-hdr {
-  background: var(--bg-header);
-  color: var(--text-main);
-  padding: 12px 20px;
-  font-size: 14px;
-  font-weight: 400;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 0.5px solid var(--border-soft);
-}
 .form-field.full {
   grid-column: 1 / -1;
 }
@@ -646,14 +603,6 @@ footer.legend-bar {
   background: #fff;
   color: var(--text-main);
   outline: none;
-}
-.modal-ftr {
-  background: var(--bg-page);
-  padding: 10px 20px;
-  border-top: 0.5px solid var(--border-soft);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 body {
   height: 100vh;
@@ -683,13 +632,6 @@ textarea {
   gap: var(--space-component);
   flex-wrap: wrap;
 }
-.brand-title h1 {
-  font-size: var(--type-page);
-  font-weight: 600;
-  line-height: 1.3;
-  color: var(--secondary);
-}
-.brand-title p,
 .kpi-card .lbl {
   font-size: var(--type-caption);
   color: var(--text-muted);
@@ -766,12 +708,6 @@ textarea {
   border: 1px solid var(--border-soft);
   padding: 10px 12px;
 }
-.modal-hdr h2 {
-  font-size: var(--type-section);
-  line-height: 1.4;
-  font-weight: 600;
-  color: var(--secondary);
-}
 .pill,
 .status-badge {
   font-family: var(--font-ui);
@@ -831,25 +767,6 @@ textarea {
   display: none;
   padding: 16px;
 }
-.modal-box {
-  max-height: 94vh;
-  display: flex;
-  flex-direction: column;
-}
-.modal-body {
-  padding: 16px 20px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  max-height: 75vh;
-  overflow-y: auto;
-  min-height: 0;
-  overflow: auto;
-}
-.modal-hdr,
-.modal-ftr {
-  flex-shrink: 0;
-}
 :is(button, input, select, textarea, [tabindex]):focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
@@ -897,23 +814,6 @@ select:disabled {
   flex-wrap: nowrap;
   border-top: none;
   border-bottom: 1px solid var(--border);
-}
-.brand-area {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-  flex: 1 1 auto;
-}
-.brand-title h1 {
-  font-size: 18px;
-  font-weight: 500;
-  line-height: 1.3;
-}
-.brand-title p {
-  font-size: 11px;
-  margin-top: 4px;
-  max-width: 430px;
 }
 .kpi-strip {
   display: flex;
@@ -1143,12 +1043,6 @@ select:disabled {
 @media (max-width: 1200px) {
   .top-header {
     align-items: center;
-  }
-  .brand-title h1 {
-    font-size: 16px;
-  }
-  .brand-title p {
-    max-width: 300px;
   }
   .kpi-strip {
     gap: 10px;
@@ -1710,11 +1604,6 @@ select:disabled {
 .form-field input[readonly] {
   color: var(--text-muted);
 }
-.modal-ftr .btn {
-  min-height: 44px;
-  padding: 8px 12px;
-}
-.modal-hdr,
 .section-card-hdr {
   font-size: var(--type-section);
   font-weight: var(--weight-title);
@@ -1765,9 +1654,6 @@ table.data-grid th {
   line-height: var(--line-ui);
   font-weight: var(--weight-body);
 }
-.modal-backdrop {
-  z-index: 1000;
-}
 #dragTooltip {
   position: fixed;
   background: rgba(56, 59, 55, 0.9);
@@ -1784,66 +1670,6 @@ table.data-grid th {
   .ui-title {
     font-size: 16px;
   }
-}
-
-.project-controls {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
-  align-items: center;
-}
-.project-controls select {
-  max-width: 260px;
-  min-height: 36px;
-}
-.project-controls .btn {
-  min-height: 36px;
-}
-.project-dialog {
-  width: min(640px, 90vw);
-  max-height: 85vh;
-  margin: auto;
-  overflow: auto;
-  border: 1px solid var(--border);
-  padding: 24px;
-  color: var(--text);
-  font: inherit;
-  z-index: 1000;
-}
-.project-dialog::backdrop {
-  background: #0006;
-}
-.project-dialog input,
-.project-dialog textarea {
-  font-family: inherit;
-  font-size: 13px;
-  line-height: 1.4;
-  width: 100%;
-  min-height: 44px;
-  margin: 6px 0 12px;
-}
-.project-dialog textarea {
-  height: 130px;
-}
-.project-dialog .dialog-actions {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-}
-.project-dialog .dialog-actions button {
-  min-height: 44px;
-}
-.project-dialog label {
-  display: block;
-  font-size: 12px;
-}
-.project-controls .ui-caption {
-  color: var(--text-muted);
-}
-
-.exchange-dialog p {
-  margin: 12px 0;
 }
 .exchange-options {
   display: flex;
@@ -1868,12 +1694,6 @@ table.data-grid th {
   overflow-wrap: anywhere;
   min-width: 90px;
 }
-.exchange-dialog .dialog-actions {
-  position: sticky;
-  bottom: -24px;
-  background: var(--card-bg);
-  padding: 12px 0;
-}
 .settings-group-row {
   display: grid;
   grid-template-columns: 64px minmax(0, 1fr) 52px auto;
@@ -1891,9 +1711,6 @@ table.data-grid th {
 #taskGroupInputs {
   display: grid;
   gap: 12px;
-}
-.exchange-dialog {
-  max-width: min(960px, 94vw);
 }
 
 /* Save / storage banner (shown until data is saved again or storage usage drops). */
@@ -1923,6 +1740,523 @@ table.data-grid th {
   min-height: 32px;
   background: var(--card-bg);
 }
+
+/* ---- Header: title first, one stable project bar, KPIs on the right ---- */
+.top-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 84px;
+  padding: 10px 16px;
+  flex-wrap: nowrap;
+}
+.header-main {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.title-row .ui-title {
+  color: var(--secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.archived-badge {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  font-size: var(--type-caption);
+  color: var(--warning-text);
+  background: var(--warning-bg);
+  border: 1px solid var(--warning-border);
+}
+.project-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+.project-bar .ui-select {
+  max-width: 240px;
+  min-height: 32px;
+  padding: 4px 8px;
+}
+.project-bar .btn {
+  min-height: 32px;
+  padding: 4px 10px;
+}
+.project-status {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.toolbar-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+.btn-icon-text {
+  border-color: transparent;
+  background: transparent;
+  color: var(--secondary);
+}
+.btn-icon-text .action-icon {
+  width: 16px;
+  height: 16px;
+}
+.btn-icon-text:disabled {
+  background: transparent;
+  color: var(--disabled-text);
+  border-color: transparent;
+}
+.top-header .kpi-strip {
+  flex: 0 0 auto;
+  gap: 20px;
+}
+@media (max-width: 1200px) {
+  .top-header {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  .top-header .kpi-strip {
+    gap: 12px;
+  }
+  .btn-icon-text span {
+    display: none;
+  }
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---- Menus (project menu) ---- */
+details.menu {
+  position: relative;
+}
+details.menu > summary {
+  list-style: none;
+  cursor: pointer;
+}
+details.menu > summary::-webkit-details-marker {
+  display: none;
+}
+details.menu > summary::after {
+  content: "▾";
+  margin-left: 6px;
+  font-size: 10px;
+}
+.menu-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 200;
+  min-width: 200px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 24px rgba(40, 57, 72, 0.14);
+}
+.menu-item {
+  min-height: 34px;
+  padding: 6px 10px;
+  text-align: left;
+  font: inherit;
+  font-size: var(--type-control);
+  color: var(--secondary);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+.menu-item:hover,
+.menu-item:focus-visible {
+  background: var(--bg-dark);
+}
+.menu-item.is-danger {
+  color: var(--danger);
+  border-top: 1px solid var(--border);
+}
+
+/* ---- Unified dialogs ---- */
+dialog.app-dialog {
+  width: min(560px, 94vw);
+  max-height: 90vh;
+  padding: 0;
+  margin: auto;
+  border: 1px solid var(--border-soft);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.16);
+  color: var(--text);
+  background: var(--card-bg);
+  font-family: var(--font-ui);
+  font-size: var(--type-body);
+}
+dialog.app-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+dialog.app-dialog-wide {
+  width: min(900px, 94vw);
+}
+dialog.app-dialog::backdrop {
+  background: rgba(40, 45, 50, 0.38);
+}
+.app-dialog-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-dark);
+  flex-shrink: 0;
+}
+.app-dialog-hdr .ui-heading {
+  margin: 0;
+}
+.app-dialog-body {
+  padding: 16px 20px;
+  overflow: auto;
+  min-height: 0;
+}
+.app-dialog-error {
+  margin: 0 20px 8px;
+  padding: 8px 12px;
+  color: var(--danger);
+  background: var(--danger-bg);
+  border-left: 3px solid var(--danger);
+}
+.app-dialog-ftr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-dark);
+  flex-shrink: 0;
+}
+.app-dialog-ftr-start,
+.app-dialog-ftr-end {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.app-dialog-ftr .btn {
+  min-height: 40px;
+}
+.app-dialog-message {
+  margin: 0 0 12px;
+  line-height: 1.5;
+}
+.app-dialog-message.is-error {
+  color: var(--danger);
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+.form-grid.two-col {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.form-grid .full {
+  grid-column: 1 / -1;
+}
+.form-grid[hidden] {
+  display: none;
+}
+@media (max-width: 640px) {
+  .form-grid.two-col {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.check-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  font-size: var(--type-control);
+  color: var(--text);
+  cursor: pointer;
+}
+.settings-subhead {
+  margin: 16px 0 4px;
+}
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.tabs [role="tab"] {
+  padding: 8px 14px;
+  font: inherit;
+  font-size: var(--type-control);
+  color: var(--text-muted);
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+.tabs [role="tab"][aria-selected="true"] {
+  color: var(--accent-text);
+  border-bottom-color: var(--action-primary);
+}
+.table-scroll {
+  max-height: 52vh;
+  overflow: auto;
+}
+.row-actions {
+  white-space: nowrap;
+}
+.row-actions .btn {
+  min-height: 30px;
+  padding: 2px 8px;
+  margin-right: 4px;
+}
+.empty-note {
+  padding: 16px 0;
+  color: var(--text-muted);
+}
+
+/* ---- Empty project guide ---- */
+.workspace {
+  position: relative;
+}
+.empty-state {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(247, 247, 247, 0.92);
+}
+.empty-state[hidden] {
+  display: none;
+}
+.empty-card {
+  max-width: 520px;
+  padding: 24px 28px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+}
+.empty-card .ui-heading {
+  font-size: 16px;
+  margin: 0 0 6px;
+}
+.empty-steps {
+  margin: 12px 0 18px 20px;
+  line-height: 1.7;
+}
+.empty-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ---- Archived (read-only) state ---- */
+.save-banner-info {
+  border-bottom-color: var(--warning-border);
+  background: var(--warning-bg);
+  color: var(--warning-text);
+}
+.is-archived #btnAddPhase,
+.is-archived #btnAddMain,
+.is-archived #btnAddSub,
+.is-archived #btnSaveVer {
+  opacity: 0.5;
+}
+.gantt-bar-subtask.is-readonly {
+  cursor: default;
+}
+
+/* ---- Date fields (ISO text + picker button) ---- */
+.date-field {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+}
+.date-field .date-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.date-text {
+  font-variant-numeric: tabular-nums;
+}
+.date-picker-btn {
+  flex-shrink: 0;
+}
+.form-field .date-picker-btn {
+  min-height: 44px;
+  width: 44px;
+}
+.date-proxy {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+  border: 0;
+  padding: 0;
+}
+
+/* ---- WBS table ---- */
+.cell-center {
+  text-align: center;
+}
+.tree-toggle {
+  font: inherit;
+  font-size: 11px;
+  line-height: 1;
+  padding: 0;
+}
+.tree-toggle:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+.indent-1 {
+  display: inline-block;
+  width: 10px;
+}
+.indent-2 {
+  display: inline-block;
+  width: 28px;
+  padding-left: 22px;
+  color: var(--text-muted);
+}
+.name-text {
+  margin-left: 2px;
+}
+.row-subtask .prio-badge {
+  width: auto;
+  padding: 0 4px;
+  margin-right: 6px;
+  font-size: 10px;
+  line-height: 16px;
+}
+.pred-ref {
+  color: var(--sage-dark);
+}
+.muted-dash {
+  color: var(--text-muted);
+}
+.rollup-note {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+.inline-input {
+  text-align: center;
+}
+.inline-input:disabled {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text);
+}
+tr.is-delayed td:first-child {
+  box-shadow: inset 3px 0 0 var(--danger);
+}
+.pill-person {
+  border-color: var(--pill-color, var(--border));
+  border-left-width: 3px;
+  background: var(--card-bg);
+  color: var(--text);
+}
+.column-picker {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.column-picker legend {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+.column-picker-list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- Gantt: delay and priority marks, keyboard focus ---- */
+#view-gantt .gantt-bar-subtask.is-delayed,
+#view-gantt .gantt-bar-summary.is-delayed {
+  box-shadow:
+    0 0 0 2px var(--card-bg),
+    0 0 0 3.5px var(--danger);
+}
+#view-gantt .gantt-bar-subtask {
+  touch-action: none;
+}
+#view-gantt .gantt-bar-subtask:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+.bar-prio {
+  display: inline-block;
+  margin-right: 5px;
+  padding: 0 4px;
+  font-size: 9.5px;
+  line-height: 14px;
+  border: 1px solid currentColor;
+  background: var(--card-bg);
+}
+.bar-prio.prio-1 {
+  color: var(--danger);
+  font-weight: 600;
+}
+.bar-prio.prio-2 {
+  color: var(--warning-text);
+}
+.bar-prio.prio-3 {
+  color: var(--text-muted);
+}
+.bar-delay {
+  margin-right: 5px;
+  color: var(--danger);
+  font-weight: 600;
+}
+.swatch-delayed {
+  background: var(--card-bg);
+  box-shadow: 0 0 0 1.5px var(--danger);
+}
+.column-picker .check-field input[type="checkbox"],
+.app-dialog .check-field input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  flex: 0 0 auto;
+}
+.column-picker .check-field {
+  font-size: 12px;
+  min-height: 26px;
+}
+#historyDialog {
+  width: min(1080px, 94vw);
+}
 </style>
 </head>
 <body>
@@ -1950,6 +2284,7 @@ table.data-grid th {
       <details class="sidebar-action-group sidebar-filters" id="taskActions">
         <summary id="taskActionsLabel">Task actions</summary>
         <div class="group-actions">
+          <button class="btn" id="btnAddPhase" onclick="addPhase()">＋ Phase</button>
           <button class="btn" id="btnAddMain" onclick="openAddModal('Main Task')">＋ Main Task</button>
           <button class="btn" id="btnAddSub" onclick="openAddModal('Sub-task')">＋ Sub-task</button>
         </div>
@@ -1960,6 +2295,7 @@ table.data-grid th {
           <button class="btn" id="btnImportXls" onclick="document.getElementById('excelFileInput').click()">📥 Import</button>
           <button class="btn" title="Standard .xlsx template / 标准 .xlsx 模板" id="btnExportXls" onclick="exportToExcelXML()">📤 Export Excel</button>
           <button class="btn btn-primary" id="btnSaveVer" onclick="openVersionModal()">📌 Save Version</button>
+          <button class="btn" id="btnHistory" onclick="openHistoryDialog()">🕘 Versions & history</button>
           <button class="btn" id="btnExportJson" onclick="exportVersionBundle()">💾 Export Bundle</button>
         </div>
       </details>
@@ -1986,7 +2322,10 @@ table.data-grid th {
     </div>
     <div class="filter-item">
       <label id="lblStatusDate">Status Date:</label>
-      <input type="date" id="statusDateInput" value="" onchange="renderAll()">
+      <span class="date-field">
+        <input type="text" id="statusDateInput" class="date-text" inputmode="numeric" maxlength="10" placeholder="YYYY-MM-DD" value="" onchange="onStatusDateChange(this)">
+        <button type="button" class="btn btn-icon date-picker-btn" data-date-for="statusDateInput"></button>
+      </span>
     </div>
     <div class="filter-item">
       <label id="lblZoom">Zoom:</label>
@@ -1997,6 +2336,10 @@ table.data-grid th {
         <span id="zoomPctLabel" style="font-size:10.5px;min-width:34px;text-align:center">100%</span>
       </div>
     </div>
+    <fieldset class="filter-item column-picker">
+      <legend id="lblColumns">Table columns</legend>
+      <div id="columnPicker" class="column-picker-list"></div>
+    </fieldset>
     <button class="btn" id="btnExpandAll" onclick="expandCollapseAll(2)">Expand All</button>
     <button class="btn" id="btnCollapseSub" onclick="expandCollapseAll(1)">Main Tasks Only</button>
   </div>
@@ -2009,10 +2352,22 @@ table.data-grid th {
 <main class="main-column">
 <div id="saveBanner" class="save-banner" role="alert" hidden></div>
 <header class="top-header">
-  <div class="brand-area">
-    <div class="brand-title">
-      <div id="projectControls" class="project-controls"></div><h1 class="ui-title" id="uiTitle">Project Workspace — Project Management System</h1>
-      <p id="uiSubtitle">Task and people linkage · Export Bundle to back up browser data</p>
+  <div class="header-main">
+    <div class="title-row">
+      <h1 class="ui-title" id="uiTitle">Untitled project</h1>
+      <span id="archivedBadge" class="archived-badge" hidden>Archived</span>
+    </div>
+    <div class="project-bar">
+      <label class="visually-hidden" for="projectSelect" id="lblProjectSelect">Project</label>
+      <select class="ui-control ui-select" id="projectSelect" onchange="switchProject(this.value)"></select>
+      <details class="menu" id="projectMenu">
+        <summary class="btn" id="projectMenuLabel">Project</summary>
+        <div class="menu-list" role="menu" id="projectMenuList"></div>
+      </details>
+      <span class="toolbar-divider" aria-hidden="true"></span>
+      <button type="button" class="btn btn-icon-text" id="btnUndo" onclick="undo()" disabled></button>
+      <button type="button" class="btn btn-icon-text" id="btnRedo" onclick="redo()" disabled></button>
+      <span id="projectStatus" class="ui-caption project-status" role="status"></span>
     </div>
   </div>
   <div class="kpi-strip">
@@ -2029,27 +2384,31 @@ table.data-grid th {
       <div class="val" id="kpiProgress">0.0%</div>
     </div>
   </div>
-
-</header><div class="app-layout"><div class="workspace">
+</header>
+<div id="archivedNotice" class="save-banner save-banner-info" role="status" hidden></div><div class="app-layout"><div class="workspace">
+  <section id="emptyState" class="empty-state" hidden aria-labelledby="emptyTitle">
+    <div class="empty-card">
+      <h2 class="ui-heading" id="emptyTitle">Start your plan</h2>
+      <p class="ui-caption" id="emptyIntro"></p>
+      <ol class="empty-steps">
+        <li id="emptyStep1"></li>
+        <li id="emptyStep2"></li>
+        <li id="emptyStep3"></li>
+      </ol>
+      <div class="empty-actions">
+        <button type="button" class="btn btn-primary" id="emptyAddPhase" onclick="addPhase()">Add phase</button>
+        <button type="button" class="btn" id="emptyImport" onclick="document.getElementById('excelFileInput').click()">Import</button>
+        <button type="button" class="btn" id="emptyDemo" onclick="loadDemoIntoProject()">Fill with fictional demo</button>
+      </div>
+    </div>
+  </section>
 
   <!-- VIEW 1: Split WBS Table + Interactive Gantt -->
   <div class="split-container" id="view-gantt">
     <div class="left-pane" id="leftPane">
       <div class="pane-header" id="leftHeader">
         <table class="wbs-table">
-          <colgroup>
-            <col style="width:58px">
-            <col style="width:245px">
-            <col style="width:64px">
-            <col style="width:46px">
-            <col style="width:132px">
-            <col style="width:105px">
-            <col style="width:50px">
-            <col style="width:52px">
-            <col style="width:110px">
-            <col style="width:165px">
-            <col style="width:130px">
-          </colgroup>
+          <colgroup></colgroup>
           <thead>
             <tr id="wbsTheadRow"></tr>
           </thead>
@@ -2057,19 +2416,7 @@ table.data-grid th {
       </div>
       <div class="pane-body" id="leftBody">
         <table class="wbs-table" id="wbsBodyTable">
-          <colgroup>
-            <col style="width:58px">
-            <col style="width:245px">
-            <col style="width:64px">
-            <col style="width:46px">
-            <col style="width:132px">
-            <col style="width:105px">
-            <col style="width:50px">
-            <col style="width:52px">
-            <col style="width:110px">
-            <col style="width:165px">
-            <col style="width:130px">
-          </colgroup>
+          <colgroup></colgroup>
           <tbody id="wbsTbody"></tbody>
         </table>
       </div>
@@ -2119,34 +2466,33 @@ table.data-grid th {
   <div id="legendTipBox"></div>
 </footer></main></div>
 
-<!-- Task Edit / Add Modal -->
-<div class="modal-backdrop" id="taskModal">
-  <div class="modal-box">
-    <div class="modal-hdr">
-      <span class="ui-heading" id="modalTitle">Edit task</span>
-      <button class="btn btn-icon" aria-label="Close" onclick="closeModal()"><svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="mdMode">
-      <input type="hidden" id="mdOrigWbs">
-
+<!-- Task add / edit dialog -->
+<dialog class="app-dialog app-dialog-wide" id="taskModal" aria-labelledby="modalTitle">
+  <div class="app-dialog-hdr">
+    <h2 class="ui-heading" id="modalTitle">Edit task</h2>
+    <button type="button" class="btn btn-icon" data-dialog-close aria-label="Close"></button>
+  </div>
+  <div class="app-dialog-body">
+    <input type="hidden" id="mdMode">
+    <input type="hidden" id="mdOrigWbs">
+    <div class="form-grid two-col">
       <div class="form-field">
-        <label id="lblMdType">Task Level</label>
+        <label id="lblMdType" for="mdType">Task Level</label>
         <select id="mdType" onchange="onModalTypeChange()">
           <option value="Sub-task">Sub-task</option>
           <option value="Main Task">Main Task</option>
         </select>
       </div>
       <div class="form-field" id="mdParentWrap">
-        <label id="mdParentLabel">Parent main task</label>
+        <label id="mdParentLabel" for="mdParent">Parent main task</label>
         <select id="mdParent"></select>
       </div>
       <div class="form-field">
-        <label id="lblMdWbs">WBS Code</label>
+        <label id="lblMdWbs" for="mdWbs">WBS Code</label>
         <input type="text" id="mdWbs" placeholder="1.1.5 / 2.5">
       </div>
       <div class="form-field">
-        <label id="lblMdPrio">Priority</label>
+        <label id="lblMdPrio" for="mdPrio">Priority</label>
         <select id="mdPrio">
           <option value="1">1 (High)</option>
           <option value="2">2 (Medium)</option>
@@ -2155,78 +2501,86 @@ table.data-grid th {
         </select>
       </div>
       <div class="form-field full">
-        <label id="lblMdName">Task / Sub-task Description</label>
+        <label id="lblMdName" for="mdName">Task / Sub-task Description</label>
         <input type="text" id="mdName">
       </div>
-
-      <div id="mdSubtaskFields" style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div id="mdSubtaskFields" class="form-grid two-col full">
         <div class="form-field">
-          <label id="lblMdPred">Predecessor WBS (Finish-to-Start)</label>
+          <label id="lblMdPred" for="mdPred">Predecessor WBS (Finish-to-Start)</label>
           <select id="mdPred" onchange="onModalPredChange()"></select>
         </div>
         <div class="form-field">
-          <label id="lblMdLag">Lag (Calendar Days)</label>
+          <label id="lblMdLag" for="mdLag">Lag (Calendar Days)</label>
           <input type="number" id="mdLag" value="0" onchange="onModalPredChange()">
         </div>
         <div class="form-field">
-          <label id="lblMdStart">Starting Date</label>
-          <input type="date" id="mdStart" onchange="onModalStartOrDaysChange('start')">
+          <label id="lblMdStart" for="mdStart">Starting Date</label>
+          <span class="date-field">
+            <input type="text" id="mdStart" class="date-text" inputmode="numeric" maxlength="10" placeholder="YYYY-MM-DD" onchange="onModalStartOrDaysChange()">
+            <button type="button" class="btn btn-icon date-picker-btn" data-date-for="mdStart"></button>
+          </span>
         </div>
         <div class="form-field">
-          <label id="lblMdDays">Duration (Days)</label>
-          <input type="number" id="mdDays" min="1" value="7" onchange="onModalStartOrDaysChange('days')">
+          <label id="lblMdDays" for="mdDays">Duration (Days)</label>
+          <input type="number" id="mdDays" min="1" value="7" onchange="onModalStartOrDaysChange()">
         </div>
         <div class="form-field">
-          <label id="lblMdFinish">Delivery Date (Auto)</label>
-          <input type="date" id="mdFinish" readonly style="background:var(--bg-page)">
+          <label id="lblMdFinish" for="mdFinish">Delivery Date (Auto)</label>
+          <input type="text" id="mdFinish" class="date-text" readonly tabindex="-1">
         </div>
         <div class="form-field">
-          <label id="lblMdPct">% Complete (0~100)</label>
+          <label id="lblMdPct" for="mdPct">% Complete (0~100)</label>
           <input type="number" id="mdPct" min="0" max="100" value="0">
         </div>
-        <div id="taskGroupInputs" class="form-field full"></div>
-      </div>
-    </div>
-    <div class="modal-ftr">
-      <button class="btn btn-danger" id="mdDeleteBtn" onclick="deleteModalTask()">Delete Task</button>
-      <div style="display:flex;gap:8px;margin-left:auto">
-        <button class="btn" id="mdCancelBtn" onclick="closeModal()">Cancel</button>
-        <button class="btn btn-primary" id="mdSaveBtn" onclick="saveModalTask()">Save & Recalculate</button>
+        <div id="taskGroupInputs" class="form-grid two-col full"></div>
       </div>
     </div>
   </div>
-</div>
-
-<!-- Save New Version Snapshot Modal -->
-<div class="modal-backdrop" id="versionModal">
-  <div class="modal-box" style="width:480px">
-    <div class="modal-hdr">
-      <span class="ui-heading" id="verModalTitle">Save version snapshot</span>
-      <button class="btn btn-icon" aria-label="Close" onclick="closeVersionModal()"><svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button>
+  <p class="app-dialog-error" role="alert" hidden></p>
+  <div class="app-dialog-ftr">
+    <div class="app-dialog-ftr-start">
+      <button type="button" class="btn btn-danger" id="mdDeleteBtn" onclick="deleteModalTask()">Delete Task</button>
+      <button type="button" class="btn" id="mdMoveUp" onclick="moveModalTask(-1)">Move up</button>
+      <button type="button" class="btn" id="mdMoveDown" onclick="moveModalTask(1)">Move down</button>
     </div>
-    <div class="modal-body">
+    <div class="app-dialog-ftr-end">
+      <button type="button" class="btn" id="mdCancelBtn" data-dialog-close>Cancel</button>
+      <button type="button" class="btn btn-primary" id="mdSaveBtn" onclick="saveModalTask()">Save & Recalculate</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- Save version snapshot dialog -->
+<dialog class="app-dialog" id="versionModal" aria-labelledby="verModalTitle">
+  <div class="app-dialog-hdr">
+    <h2 class="ui-heading" id="verModalTitle">Save version snapshot</h2>
+    <button type="button" class="btn btn-icon" data-dialog-close aria-label="Close"></button>
+  </div>
+  <div class="app-dialog-body">
+    <div class="form-grid two-col">
       <div class="form-field">
-        <label id="lblVerTag">Version tag</label>
+        <label id="lblVerTag" for="verTagInput">Version tag</label>
         <input type="text" id="verTagInput" placeholder="V1.0">
       </div>
       <div class="form-field">
-        <label id="lblVerAuthor">Updated by</label>
+        <label id="lblVerAuthor" for="verAuthorInput">Updated by</label>
         <input type="text" id="verAuthorInput" value="PM">
       </div>
       <div class="form-field full">
-        <label id="lblVerNote">Change notes</label>
-        <textarea id="verNoteInput" rows="3" placeholder="Briefly describe schedule, people or task changes..."></textarea>
-      </div>
-    </div>
-    <div class="modal-ftr">
-      <div></div>
-      <div style="display:flex;gap:8px">
-        <button class="btn" onclick="closeVersionModal()" id="btnVerCancel">Cancel</button>
-        <button class="btn btn-primary" onclick="confirmSaveVersion()" id="btnVerConfirm">Save version</button>
+        <label id="lblVerNote" for="verNoteInput">Change notes</label>
+        <textarea id="verNoteInput" rows="3"></textarea>
       </div>
     </div>
   </div>
-</div>
+  <p class="app-dialog-error" role="alert" hidden></p>
+  <div class="app-dialog-ftr">
+    <div class="app-dialog-ftr-start"></div>
+    <div class="app-dialog-ftr-end">
+      <button type="button" class="btn" data-dialog-close id="btnVerCancel">Cancel</button>
+      <button type="button" class="btn btn-primary" onclick="confirmSaveVersion()" id="btnVerConfirm">Save version</button>
+    </div>
+  </div>
+</dialog>
 
 <div id="dragTooltip"></div>
 
@@ -2241,8 +2595,6 @@ try {
 const I18N = {
   zh: {
     langBtn: "🌐 Switch to EN",
-    uiTitle: "Project Workspace — 项目管理系统",
-    uiSubtitle: "任务与人员联动 · 修改保存在当前浏览器，请导出版本包备份",
     lblKpiSpan: "项目周期",
     lblKpiCounts: "WBS 层级结构",
     lblKpiProg: "工期加权总进度",
@@ -2270,8 +2622,6 @@ const I18N = {
     btnCollapseSub: "仅主任务",
     legendTitle: "底部图例：",
     legBase: "基线对比条 (Baseline)",
-    legTip:
-      "提示：左右拖拽任务条改期 · 拖拽右边缘调工期 · Ctrl+滚轮缩放 · 每次修改自动记入变更日志，在左侧【数据与版本】中保存新版本固化快照",
     thWbs: "WBS",
     thName: "主任务 / 子任务 (双击编辑)",
     thPred: "前置依赖",
@@ -2527,12 +2877,6 @@ const I18N = {
     msgExpandNavigation: "展开导航栏",
     msgCollapseNavigation: "折叠导航栏",
     lblProject: "项目",
-    btnNewProject: "新建",
-    btnDemoProject: "虚构示例",
-    btnDuplicateProject: "复制",
-    btnProjectSettings: "项目设置",
-    btnArchiveProject: "归档 / 恢复",
-    btnAddPhase: "新建阶段",
     msgDataStoredInThisBrowser: "数据仅保存在此浏览器",
     msgStorageUsage: "数据仅保存在此浏览器 · 已用 {0} / 约 5 MB",
     msgBannerReadBlocked:
@@ -2541,11 +2885,112 @@ const I18N = {
     msgBannerStorageHigh: "浏览器存储已用 {0}%（{1}）。请导出 JSON 备份；存储写满后将无法保存。",
     msgExportJsonBackup: "导出 JSON 备份",
     msgRetrySave: "重试保存",
+    msgNotice: "提示",
+    msgOk: "确定",
+    msgSomethingWentWrong: "操作未完成",
+    msgPleaseConfirm: "请确认",
+    msgFieldRequired: "请填写“{0}”。",
+    msgProjectArchivedReadOnly: "此项目已归档，处于只读状态。请先恢复项目再修改。",
+    msgUndoMove: "移动 {0}",
+    msgLagChange: "Lag {0} 天",
+    msgDateFormat: "日期格式为 YYYY-MM-DD，例如 2026-10-25。",
+    msgUndoEdit: "修改 {0}",
+    msgUndoSaveVersion: "保存版本 {0}",
+    msgAddPhaseFirst: "请先新建阶段。主任务需要归属于某个阶段。",
+    msgAddMainTaskFirst: "请先新建主任务。子任务需要归属于某个主任务。",
+    msgDeleteMainTaskWithChildren: "删除主任务 {0} 及其 {1} 个子任务？",
+    msgDeleteTask: "删除 {0}？",
+    msgDeleteAction: "删除",
+    msgUndoDelete: "删除 {0}",
+    msgAddPhaseTitle: "新建阶段",
+    msgAddPhaseIntro: "阶段用于归组主任务，其 WBS 编号作为内部任务编号的前缀。",
+    msgUndoAdd: "新增 {0}",
+    msgEditPhaseTitle: "编辑阶段 {0}",
+    msgPhaseRenameHint: "修改 WBS 编号时，以该编号开头的任务会同步改名（如 1.2 → 3.2），前置关系也会更新。",
+    msgMoveUp: "上移",
+    msgMoveDown: "下移",
+    msgDeletePhaseWithChildren: "删除阶段“{0}”及其中的 {1} 个任务？",
+    msgDeletePhaseTitle: "删除阶段",
+    msgCreate: "创建",
+    msgDeleteProjectTitle: "删除项目",
+    msgDeleteProjectIntro: "从此浏览器中删除“{0}”及其版本和变更记录？此操作无法撤销。",
+    msgDownloadBackupFirst: "删除前先下载 JSON 备份",
+    msgDeleteProjectAction: "删除项目",
+    msgGroupSlot: "组位 {0}",
+    msgGroupsHeading: "自定义组",
+    msgAliasesJsonInvalid: '人员别名必须是有效的 JSON，例如 {"alex": "Alex Chen"}。',
+    msgImportJsonSummary:
+      "“{0}”：{1} 条任务、{2} 个版本。将作为新项目加入，不会改动已有项目；导入前会先下载当前项目的备份。",
+    msgImportJsonTitle: "导入项目文件",
+    msgImportAsCopy: "作为新项目导入",
+    msgRestore: "恢复",
+    msgUndoNamed: "撤销：{0}",
+    msgUndo: "撤销",
+    msgRedoNamed: "重做：{0}",
+    msgRedo: "重做",
+    msgRestoreVersionConfirm: "用版本 {0} 替换当前任务？版本和变更记录会保留，并且可以撤销。",
+    msgRestoreVersionTitle: "恢复版本",
+    msgUndoRestoreVersion: "恢复 {0}",
+    msgDeleteVersionConfirm: "删除版本 {0}？关闭页面前可以撤销。",
+    msgDeleteVersionTitle: "删除版本",
+    msgUndoDeleteVersion: "删除版本 {0}",
+    msgNoVersionsYet: "尚未保存版本。保存版本后可用于对比基线或恢复。",
+    msgCurrentBase: "当前",
+    msgIsBaseline: "基线中",
+    vColTag: "版本号",
+    vColTime: "保存时间",
+    vColAuthor: "更新人",
+    vColNote: "版本说明",
+    vColSpan: "项目周期",
+    vColProg: "总进度",
+    vColAct: "操作",
+    vBtnSetBase: "设为对比基线",
+    vBtnRestore: "恢复",
+    logColTime: "时间",
+    logColVer: "所属版本",
+    logColWbs: "任务 WBS",
+    logColAction: "变更类型",
+    logColDetail: "变更明细",
+    msgNoChangesYet: "暂无变更记录。",
+    msgAuditLimit: "最近 {0} 条变更（最多保留 200 条）。",
+    msgHistoryTitle: "版本与变更记录",
+    msgVersionsTab: "版本（{0}）",
+    msgChangeLogTab: "变更记录（{0}）",
+    msgProjectNotFound: "找不到该项目。",
+    msgBarKeyboardHint: "方向键按天移动，Shift+方向键调整工期，回车打开任务",
+    legDelayed: "延期",
+    legPriority: "优先级 1–3",
+    lblColumns: "表格列",
+    msgPickDate: "选择日期",
+    msgArchivedProjects: "已归档",
+    msgProjectMenu: "项目",
+    msgRestoreProject: "恢复项目",
+    msgArchivedNotice: "此项目已归档，处于只读状态，仍可查看、筛选和导出。",
+    btnDeleteProject: "删除项目…",
+    btnArchiveProject: "归档项目",
+    msgUndoReschedule: "改期 {0}",
+    msgUndoResize: "调整工期 {0}",
+    thPeople: "人员",
+    msgExpandRow: "展开 {0}",
+    msgCollapseRow: "折叠 {0}",
+    btnHistory: "🕘 版本与记录",
+    btnAddPhase: "＋ 阶段",
+    btnNewProject: "新建项目…",
+    btnDemoProject: "新建虚构示例…",
+    btnDuplicateProject: "复制项目…",
+    btnProjectSettings: "项目设置…",
+    msgEmptyTitle: "开始制定计划",
+    msgEmptyIntro: "这是一个空项目。计划分为三级：",
+    msgEmptyStep1: "新建阶段，例如“设计”或“上线”。",
+    msgEmptyStep2: "在侧栏“任务操作”中为阶段添加主任务。",
+    msgEmptyStep3: "添加带日期、工期和人员的子任务；主任务和阶段会自动汇总。",
+    msgEmptyImport: "导入 Excel 或 JSON",
+    msgEmptyDemo: "填入虚构示例",
+    legTip:
+      "提示：拖拽任务条或选中后按方向键改期 · 拖右边缘或 Shift+方向键调整工期 · Ctrl+Z 撤销 · Ctrl+滚轮缩放",
   },
   en: {
     langBtn: "🌐 切换中文",
-    uiTitle: "Project Workspace — Project Management System",
-    uiSubtitle: "Task and people linkage · Export Bundle to back up browser data",
     lblKpiSpan: "Timeline Span",
     lblKpiCounts: "WBS Hierarchy",
     lblKpiProg: "Weighted Progress",
@@ -2573,8 +3018,6 @@ const I18N = {
     btnCollapseSub: "Main Tasks Only",
     legendTitle: "Legend:",
     legBase: "Baseline Ghost Bar",
-    legTip:
-      "Tip: Drag bars to reschedule · Drag right edge to resize · Ctrl+Wheel to zoom · Use Data & versions in the sidebar to save a version or export a backup",
     thWbs: "WBS",
     thName: "Main Task / Sub-task (Dbl-Click)",
     thPred: "Predecessor",
@@ -2844,12 +3287,6 @@ const I18N = {
     msgExpandNavigation: "Expand navigation",
     msgCollapseNavigation: "Collapse navigation",
     lblProject: "Project",
-    btnNewProject: "New",
-    btnDemoProject: "Fictional demo",
-    btnDuplicateProject: "Duplicate",
-    btnProjectSettings: "Settings",
-    btnArchiveProject: "Archive / restore",
-    btnAddPhase: "Add phase",
     msgDataStoredInThisBrowser: "Data stored in this browser",
     msgStorageUsage: "Data stored in this browser · {0} of ~5 MB used",
     msgBannerReadBlocked:
@@ -2860,6 +3297,114 @@ const I18N = {
       "Browser storage is {0}% full ({1}). Export a JSON backup; saving stops when storage is full.",
     msgExportJsonBackup: "Export JSON backup",
     msgRetrySave: "Retry save",
+    msgNotice: "Notice",
+    msgOk: "OK",
+    msgSomethingWentWrong: "Could not complete the action",
+    msgPleaseConfirm: "Please confirm",
+    msgFieldRequired: "{0} is required.",
+    msgProjectArchivedReadOnly: "This project is archived and read-only. Restore it to make changes.",
+    msgUndoMove: "move {0}",
+    msgLagChange: "Lag {0}d",
+    msgDateFormat: "Enter dates as YYYY-MM-DD, for example 2026-10-25.",
+    msgUndoEdit: "edit {0}",
+    msgUndoSaveVersion: "save version {0}",
+    msgAddPhaseFirst: "Add a phase first. Main tasks belong to a phase.",
+    msgAddMainTaskFirst: "Add a main task first. Sub-tasks belong to a main task.",
+    msgDeleteMainTaskWithChildren: "Delete main task {0} and its {1} sub-tasks?",
+    msgDeleteTask: "Delete {0}?",
+    msgDeleteAction: "Delete",
+    msgUndoDelete: "delete {0}",
+    msgAddPhaseTitle: "Add phase",
+    msgAddPhaseIntro: "A phase groups main tasks. Its WBS is the prefix for the tasks inside it.",
+    msgUndoAdd: "add {0}",
+    msgEditPhaseTitle: "Edit phase {0}",
+    msgPhaseRenameHint:
+      "Changing the WBS also renames tasks that start with it (for example 1.2 → 3.2) and updates their predecessors.",
+    msgMoveUp: "Move up",
+    msgMoveDown: "Move down",
+    msgDeletePhaseWithChildren: 'Delete phase "{0}" and the {1} tasks inside it?',
+    msgDeletePhaseTitle: "Delete phase",
+    msgCreate: "Create",
+    msgDeleteProjectTitle: "Delete project",
+    msgDeleteProjectIntro:
+      'Delete "{0}" from this browser, including its versions and change log? This cannot be undone.',
+    msgDownloadBackupFirst: "Download a JSON backup first",
+    msgDeleteProjectAction: "Delete project",
+    msgGroupSlot: "Group slot {0}",
+    msgGroupsHeading: "Groups",
+    msgAliasesJsonInvalid: 'People aliases must be valid JSON, for example {"alex": "Alex Chen"}.',
+    msgImportJsonSummary:
+      '"{0}": {1} tasks and {2} versions. It is added as a new project; existing projects are not changed. A backup of the current project is downloaded first.',
+    msgImportJsonTitle: "Import project file",
+    msgImportAsCopy: "Import as new project",
+    msgRestore: "Restore",
+    msgUndoNamed: "Undo {0}",
+    msgUndo: "Undo",
+    msgRedoNamed: "Redo {0}",
+    msgRedo: "Redo",
+    msgRestoreVersionConfirm:
+      "Replace the current tasks with version {0}? Versions and the change log are kept, and you can undo this.",
+    msgRestoreVersionTitle: "Restore version",
+    msgUndoRestoreVersion: "restore {0}",
+    msgDeleteVersionConfirm: "Delete version {0}? You can undo this until you close the page.",
+    msgDeleteVersionTitle: "Delete version",
+    msgUndoDeleteVersion: "delete version {0}",
+    msgNoVersionsYet:
+      "No versions saved yet. Save a version to keep a snapshot you can compare against or restore.",
+    msgCurrentBase: "current",
+    msgIsBaseline: "Baseline",
+    vColTag: "Version",
+    vColTime: "Saved",
+    vColAuthor: "By",
+    vColNote: "Notes",
+    vColSpan: "Timeline",
+    vColProg: "Progress",
+    vColAct: "Actions",
+    vBtnSetBase: "Compare",
+    vBtnRestore: "Restore",
+    logColTime: "Time",
+    logColVer: "Version",
+    logColWbs: "WBS",
+    logColAction: "Action",
+    logColDetail: "Details",
+    msgNoChangesYet: "No changes recorded yet.",
+    msgAuditLimit: "Latest {0} changes (up to 200 are kept).",
+    msgHistoryTitle: "Versions & change log",
+    msgVersionsTab: "Versions ({0})",
+    msgChangeLogTab: "Change log ({0})",
+    msgProjectNotFound: "Project not found.",
+    msgBarKeyboardHint: "Arrow keys move by one day, Shift+Arrow changes the duration, Enter opens the task",
+    legDelayed: "Delayed",
+    legPriority: "Priority 1–3",
+    lblColumns: "Table columns",
+    msgPickDate: "Pick a date",
+    msgArchivedProjects: "Archived",
+    msgProjectMenu: "Project",
+    msgRestoreProject: "Restore project",
+    msgArchivedNotice: "This project is archived and read-only. You can still view, filter and export it.",
+    btnDeleteProject: "Delete project…",
+    btnArchiveProject: "Archive project",
+    msgUndoReschedule: "reschedule {0}",
+    msgUndoResize: "resize {0}",
+    thPeople: "People",
+    msgExpandRow: "Expand {0}",
+    msgCollapseRow: "Collapse {0}",
+    btnHistory: "🕘 Versions & history",
+    btnAddPhase: "＋ Phase",
+    btnNewProject: "New project…",
+    btnDemoProject: "New fictional demo…",
+    btnDuplicateProject: "Duplicate…",
+    btnProjectSettings: "Settings…",
+    msgEmptyTitle: "Start your plan",
+    msgEmptyIntro: "This project is empty. Plans have three levels:",
+    msgEmptyStep1: 'Add a phase, such as "Design" or "Launch".',
+    msgEmptyStep2: "Add main tasks to the phase from Task actions in the sidebar.",
+    msgEmptyStep3:
+      "Add sub-tasks with dates, durations and people. Main tasks and phases roll up automatically.",
+    msgEmptyImport: "Import Excel or JSON",
+    msgEmptyDemo: "Fill with fictional demo",
+    legTip:
+      "Tip: drag a bar or focus it and use the arrow keys to reschedule · drag the right edge or Shift+Arrow to change duration · Ctrl+Z undoes · Ctrl+wheel zooms",
   },
 };
 
@@ -3018,6 +3563,9 @@ function validateProject(data) {
   return { subs, order };
 }
 
+// Version tags: letters (any script), digits, spaces, dots, underscores and hyphens.
+const VERSION_TAG_PATTERN = /^[\p{L}\p{N}._ -]+$/u;
+
 function validateVersions(list) {
   if (!Array.isArray(list)) throw inputError("msgInvalidVersionHistory");
   const tags = new Set();
@@ -3025,7 +3573,7 @@ function validateVersions(list) {
     if (
       !v ||
       typeof v.tag !== "string" ||
-      !/^[A-Za-z0-9._ -]+$/.test(v.tag) ||
+      !VERSION_TAG_PATTERN.test(v.tag) ||
       tags.has(v.tag) ||
       !["time", "author", "note"].every((k) => typeof v[k] === "string")
     )
@@ -3602,7 +4150,8 @@ function selectBundle(b) {
   auditLog = copy(b.auditLog);
   activeVersionTag = b.activeVersionTag;
   selectedBaselineTag = "NONE";
-  curLang = projectSettings.language;
+  // The interface language is a per-browser preference (see i18n.js); project settings no longer change it.
+  clearUndoHistory();
   document.getElementById("statusDateInput").value = projectSettings.statusDate;
   for (const id of ["fltFamily", "fltPerson", "fltRole"]) document.getElementById(id).value = "ALL";
   document.getElementById("fltBaseline").value = "NONE";
@@ -3683,9 +4232,32 @@ function switchProject(id) {
     applyStaticI18n();
     renderAll();
   } catch (e) {
-    alert(e.message);
+    showError(e.message);
     renderProjectControls();
   }
+}
+
+// Deletes a project. The workspace always keeps at least one project, so deleting the last one
+// leaves a new blank project in its place.
+function removeProject(id) {
+  if (storageReadBlocked) throw inputError("msgStoragePausedExportABackupAnd");
+  const next = copy(workspace);
+  const removed = next.projects[id];
+  if (!removed) throw inputError("msgProjectNotFound");
+  delete next.projects[id];
+  let remaining = Object.values(next.projects);
+  if (!remaining.length) {
+    const blank = newProject("Untitled project");
+    next.projects[blank.projectId] = blank;
+    remaining = [blank];
+  }
+  const target = remaining.find((b) => !b.metadata.archived) || remaining[0];
+  next.activeProjectId = target.projectId;
+  commitWorkspace(next);
+  selectBundle(copy(target));
+  applyStaticI18n();
+  renderAll();
+  return removed.metadata.name;
 }
 
 function addProject(b) {
@@ -3707,6 +4279,250 @@ function exportVersionBundle() {
     "Project_" + projectId + "_" + today() + ".json",
     "application/json",
   );
+}
+
+// ---- src/app/js/dialogs.js ----
+// One dialog component for every modal in the app: a title bar with a close button, a body, an inline
+// error line and a footer of actions. It is built on <dialog>, so Esc closes it, focus moves into it,
+// and focus returns to the control that opened it. Native alert/confirm/prompt are not used.
+
+const CLOSE_ICON =
+  '<svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg>';
+let dialogSequence = 0;
+
+// Wires a <dialog class="app-dialog"> (static or created on the fly) and returns helpers.
+function enhanceDialog(d, { onClose } = {}) {
+  if (d.dataset.enhanced) return d;
+  d.dataset.enhanced = "true";
+  d.addEventListener("cancel", (e) => {
+    e.preventDefault();
+    closeAppDialog(d, null);
+  });
+  d.addEventListener("click", (e) => {
+    if (e.target.closest("[data-dialog-close]")) closeAppDialog(d, null);
+  });
+  d.addEventListener("keydown", (e) => {
+    // Enter in a single-line field submits the primary action, as in a form.
+    if (e.key !== "Enter" || e.isComposing || e.shiftKey) return;
+    const field = e.target.closest("input:not([type=checkbox]):not([type=color]), select");
+    if (!field || field.closest(".no-enter-submit")) return;
+    const primary = d.querySelector(".app-dialog-ftr .btn-primary:not(:disabled)");
+    if (primary) {
+      e.preventDefault();
+      primary.click();
+    }
+  });
+  d._onClose = onClose;
+  return d;
+}
+
+function openAppDialog(d) {
+  enhanceDialog(d);
+  d._opener = document.activeElement;
+  setDialogError(d, "");
+  if (!d.open) d.showModal();
+  const first =
+    d.querySelector("[autofocus]") ||
+    d.querySelector(".app-dialog-body :is(input,select,textarea,button):not([disabled]):not([type=hidden])");
+  first?.focus();
+  return d;
+}
+
+function closeAppDialog(d, value) {
+  if (!d) return;
+  if (d.open) d.close();
+  const opener = d._opener;
+  d._opener = null;
+  if (opener && document.contains(opener)) opener.focus?.();
+  d._onClose?.(value);
+  if (d.dataset.temporary) d.remove();
+}
+
+function setDialogError(d, message) {
+  const line = d?.querySelector(".app-dialog-error");
+  if (!line) return;
+  line.textContent = message || "";
+  line.hidden = !message;
+}
+
+// Builds and opens a temporary dialog. actions: [{ label, value, kind: "primary"|"danger"|"", align: "start", onClick }]
+// onClick may return false to keep the dialog open; a thrown error is shown inline.
+function showDialog({ title, bodyHtml = "", actions = [], size = "", id = "", onOpen }) {
+  return new Promise((resolve) => {
+    if (id) document.getElementById(id)?.remove();
+    const d = document.createElement("dialog");
+    const titleId = "dialogTitle" + ++dialogSequence;
+    if (id) d.id = id;
+    d.dataset.temporary = "true";
+    d.className = "app-dialog" + (size ? " app-dialog-" + size : "");
+    d.setAttribute("aria-labelledby", titleId);
+    const button = (a, i) =>
+      '<button type="button" class="btn' +
+      (a.kind ? " btn-" + a.kind : "") +
+      '" data-action="' +
+      i +
+      '">' +
+      escapeHtml(a.label) +
+      "</button>";
+    const start = actions.map((a, i) => (a.align === "start" ? button(a, i) : "")).join("");
+    const end = actions.map((a, i) => (a.align === "start" ? "" : button(a, i))).join("");
+    d.innerHTML =
+      '<div class="app-dialog-hdr"><h2 class="ui-heading" id="' +
+      titleId +
+      '">' +
+      escapeHtml(title) +
+      '</h2><button type="button" class="btn btn-icon" data-dialog-close aria-label="' +
+      escapeHtml(t("closeLabel")) +
+      '" title="' +
+      escapeHtml(t("closeLabel")) +
+      '">' +
+      CLOSE_ICON +
+      '</button></div><div class="app-dialog-body">' +
+      bodyHtml +
+      '</div><p class="app-dialog-error" role="alert" hidden></p><div class="app-dialog-ftr"><div class="app-dialog-ftr-start">' +
+      start +
+      '</div><div class="app-dialog-ftr-end">' +
+      end +
+      "</div></div>";
+    enhanceDialog(d, { onClose: resolve });
+    d.addEventListener("click", async (e) => {
+      const target = e.target.closest("[data-action]");
+      if (!target) return;
+      const action = actions[Number(target.dataset.action)];
+      try {
+        setDialogError(d, "");
+        const keepOpen = action.onClick ? (await action.onClick(d)) === false : false;
+        if (!keepOpen) closeAppDialog(d, action.value);
+      } catch (err) {
+        setDialogError(d, err.message);
+      }
+    });
+    document.body.append(d);
+    onOpen?.(d);
+    openAppDialog(d);
+  });
+}
+
+function showMessage(message, { title = t("msgNotice"), kind = "info" } = {}) {
+  return showDialog({
+    title,
+    bodyHtml:
+      '<p class="app-dialog-message' +
+      (kind === "error" ? " is-error" : "") +
+      '">' +
+      escapeHtml(message) +
+      "</p>",
+    actions: [{ label: t("msgOk"), value: true, kind: "primary" }],
+  });
+}
+
+function showError(message) {
+  return showMessage(message, { title: t("msgSomethingWentWrong"), kind: "error" });
+}
+
+async function askConfirm(
+  message,
+  { title = t("msgPleaseConfirm"), confirmLabel = t("msgOk"), danger = false, detailHtml = "" } = {},
+) {
+  const value = await showDialog({
+    title,
+    bodyHtml: '<p class="app-dialog-message">' + escapeHtml(message) + "</p>" + detailHtml,
+    actions: [
+      { label: t("msgCancel"), value: false },
+      { label: confirmLabel, value: true, kind: danger ? "danger" : "primary" },
+    ],
+  });
+  return value === true;
+}
+
+// fields: [{ name, label, type: "text"|"checkbox"|"select", value, required, hint, options: [{value,label}], placeholder }]
+// validate(values) may throw to keep the dialog open with an inline error.
+function askForm({ title, intro = "", fields, submitLabel = t("msgSave"), validate }) {
+  let values = null;
+  const fieldHtml = (f) => {
+    const id = "formField_" + f.name;
+    if (f.type === "checkbox")
+      return (
+        '<label class="check-field"><input type="checkbox" id="' +
+        id +
+        '" name="' +
+        f.name +
+        '"' +
+        (f.value ? " checked" : "") +
+        "> " +
+        escapeHtml(f.label) +
+        "</label>"
+      );
+    const control =
+      f.type === "select"
+        ? '<select id="' +
+          id +
+          '" name="' +
+          f.name +
+          '">' +
+          f.options
+            .map(
+              (o) =>
+                '<option value="' +
+                escapeHtml(o.value) +
+                '"' +
+                (o.value === f.value ? " selected" : "") +
+                ">" +
+                escapeHtml(o.label) +
+                "</option>",
+            )
+            .join("") +
+          "</select>"
+        : '<input type="text" id="' +
+          id +
+          '" name="' +
+          f.name +
+          '" value="' +
+          escapeHtml(f.value ?? "") +
+          '"' +
+          (f.placeholder ? ' placeholder="' + escapeHtml(f.placeholder) + '"' : "") +
+          (f.required ? " required" : "") +
+          ">";
+    return (
+      '<div class="form-field full"><label for="' +
+      id +
+      '">' +
+      escapeHtml(f.label) +
+      "</label>" +
+      control +
+      (f.hint ? '<span class="ui-caption">' + escapeHtml(f.hint) + "</span>" : "") +
+      "</div>"
+    );
+  };
+  return showDialog({
+    title,
+    bodyHtml:
+      (intro ? '<p class="app-dialog-message">' + escapeHtml(intro) + "</p>" : "") +
+      '<div class="form-grid">' +
+      fields.map(fieldHtml).join("") +
+      "</div>",
+    actions: [
+      { label: t("msgCancel"), value: null },
+      {
+        label: submitLabel,
+        kind: "primary",
+        value: "submit",
+        onClick(d) {
+          const read = {};
+          for (const f of fields) {
+            const el = d.querySelector('[name="' + f.name + '"]');
+            read[f.name] = f.type === "checkbox" ? el.checked : el.value.trim();
+            if (f.required && !read[f.name]) {
+              el.focus();
+              throw inputError("msgFieldRequired", f.label);
+            }
+          }
+          validate?.(read);
+          values = read;
+        },
+      },
+    ],
+  }).then((result) => (result === "submit" ? values : null));
 }
 
 // ---- src/app/js/exchange.js ----
@@ -4066,17 +4882,14 @@ async function handleFileImport(event) {
         b.legacyGroupFields = raw.legacyGroupFields;
         b = migrateBundle(b);
       }
-      if (
-        !confirm(
-          t("msgImportPreviewCreateAnIndependentCopy") +
-            b.metadata.name +
-            "\n" +
-            allItems(b.currentData).length +
-            t("msgTasksVersions") +
-            b.versionHistory.length,
-        )
-      )
-        return;
+      const confirmed = await askConfirm(
+        t("msgImportJsonSummary", b.metadata.name, allItems(b.currentData).length, b.versionHistory.length),
+        {
+          title: t("msgImportJsonTitle"),
+          confirmLabel: t("msgImportAsCopy"),
+        },
+      );
+      if (!confirmed) return;
       // Complete backup download is initiated before applying any migration.
       exportVersionBundle();
       b = copy(b);
@@ -4086,7 +4899,7 @@ async function handleFileImport(event) {
       await importControlledExcel(file);
     } else throw inputError("msgUseJsonOrXlsx");
   } catch (e) {
-    alert(t("msgImportNotApplied") + e.message);
+    showError(t("msgImportNotApplied") + e.message);
   } finally {
     event.target.value = "";
   }
@@ -4575,59 +5388,43 @@ function exchangeStyles() {
 }
 
 function previewExcel(plan) {
-  return new Promise((resolve) => {
-    const d = document.createElement("dialog");
-    d.className = "project-dialog exchange-dialog";
-    d.id = "excelPreview";
-    const title = t("msgExcelImportPreview");
-    d.innerHTML =
-      '<h2 class="ui-heading">' +
-      title +
-      "</h2><p>" +
+  const rows = plan.changes
+    .map(
+      (c) =>
+        "<tr>" +
+        [c.wbs, c.field, c.before, c.after].map((v) => "<td>" + escapeHtml(v) + "</td>").join("") +
+        "</tr>",
+    )
+    .join("");
+  return showDialog({
+    title: t("msgExcelImportPreview"),
+    size: "wide",
+    bodyHtml:
+      '<p class="app-dialog-message">' +
       escapeHtml(
         (plan.create ? t("msgCreateProject") : t("msgUpdateProject")) + plan.candidate.metadata.name,
       ) +
       '</p><p class="ui-caption">' +
       escapeHtml(plan.legacy ? t("msgLegacyV10NoProjectIdentity") : t("msgV20EditableFieldsOnlyRecovery")) +
       '</p><p class="ui-caption">' +
-      escapeHtml(projectId) +
-      " · " +
       plan.added +
       t("msgNew") +
       plan.changes.length +
       t("msgFieldChangesIncludingRecalculations") +
-      '</p><div class="exchange-changes"><table><thead><tr>' +
-      [t("msgTask"), t("msgField"), t("msgBefore"), t("msgAfter")].map((t) => "<th>" + t + "</th>").join("") +
-      "</tr></thead><tbody>" +
-      plan.changes
-        .map(
-          (c) =>
-            "<tr>" +
-            [c.wbs, c.field, c.before, c.after].map((v) => "<td>" + escapeHtml(v) + "</td>").join("") +
-            "</tr>",
-        )
+      '</p><div class="exchange-changes"><table class="data-grid"><thead><tr>' +
+      [t("msgTask"), t("msgField"), t("msgBefore"), t("msgAfter")]
+        .map((label) => "<th>" + label + "</th>")
         .join("") +
+      "</tr></thead><tbody>" +
+      rows +
       '</tbody></table></div><p class="ui-caption">' +
       t("msgTheSourceExcelIsNeverWritten") +
-      '</p><div class="dialog-actions"><button class="btn" id="excelCancel">' +
-      t("msgCancel") +
-      '</button><button class="btn btn-primary" id="excelApply">' +
-      t("msgApplyChanges") +
-      "</button></div>";
-    const done = (value) => {
-      d.close();
-      d.remove();
-      resolve(value);
-    };
-    d.querySelector("#excelCancel").onclick = () => done(false);
-    d.querySelector("#excelApply").onclick = () => done(true);
-    d.addEventListener("cancel", (e) => {
-      e.preventDefault();
-      done(false);
-    });
-    document.body.append(d);
-    d.showModal();
-  });
+      "</p>",
+    actions: [
+      { label: t("msgCancel"), value: false },
+      { label: t("msgApplyChanges"), value: true, kind: "primary" },
+    ],
+  }).then((value) => value === true);
 }
 
 // A recovery point stores the project data and settings only. Version history and the audit log are
@@ -4647,6 +5444,7 @@ function recoveryEntry(b) {
 
 function commitExcelCandidate(plan, guard) {
   if (storageReadBlocked) exchangeFail("msgStorageRecoveryModeBlocksImport");
+  if (!plan.create && projectMeta.archived) exchangeFail("msgProjectArchivedReadOnly");
   if (
     projectId !== guard.projectId ||
     stableJSON(exchangeBase()) !== guard.baseState ||
@@ -4687,7 +5485,7 @@ async function importControlledExcel(file) {
       payload = await readExchangePayload(files, base),
       plan = prepareExchangeCandidate(payload, base);
     if (!plan.create && !plan.changes.length) {
-      alert(t("msgNoChangesToApply"));
+      showMessage(t("msgNoChangesToApply"));
       return;
     }
     if (!(await previewExcel(plan))) return;
@@ -4714,7 +5512,7 @@ async function downloadExchange(mode) {
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     );
   } catch (e) {
-    alert(t("msgExportFailed") + e.message);
+    showError(t("msgExportFailed") + e.message);
   }
 }
 
@@ -4731,13 +5529,13 @@ async function restoreExcelRecovery() {
     recalculateSchedule(b.currentData, b.settings.statusDate);
     validateBundle(b);
     if (b.projectId !== projectId) throw inputError("msgRecoveryProjectMismatch");
-    if (!confirm(t("msgRestoreDataBeforeTheLastExcel"))) return;
+    if (!(await askConfirm(t("msgRestoreDataBeforeTheLastExcel"), { confirmLabel: t("msgRestore") }))) return;
     commitExcelCandidate(
       { candidate: b, create: false, added: 0, changes: exchangeChanges(base.currentData, b.currentData) },
       guard,
     );
   } catch (e) {
-    alert(t("msgRecoveryNotApplied") + e.message);
+    showError(t("msgRecoveryNotApplied") + e.message);
   }
 }
 
@@ -5165,39 +5963,31 @@ function prepareExchangeCandidate(payload, base) {
 }
 
 function exportToExcelXML() {
-  const d = document.createElement("dialog");
-  d.className = "project-dialog exchange-dialog";
-  d.innerHTML =
-    '<h2 class="ui-heading">' +
-    t("msgExcelV3TemplatesAndCopies") +
-    "</h2><p>" +
-    t("msgUpTo10CustomGroupsConfigure") +
-    '</p><div class="exchange-options"><button class="btn btn-primary" data-mode="update">' +
-    t("msgSaveCurrentProjectV3") +
-    '</button><button class="btn" data-mode="create">' +
-    t("msgBlankCreationTemplateV3") +
-    '</button><button class="btn" id="excelRestore" ' +
-    (excelRecoveryPoints.length ? "" : "disabled") +
-    ">" +
-    t("msgRestoreBeforeLastImport") +
-    '</button></div><p class="ui-caption">' +
-    t("msgV1V2ImportsPreserveTheFirst") +
-    '</p><div class="dialog-actions"><button class="btn" id="excelExportClose">' +
-    t("msgClose") +
-    "</button></div>";
-  const close = () => {
-    d.close();
-    d.remove();
-  };
-  d.querySelectorAll("[data-mode]").forEach((b) => (b.onclick = () => downloadExchange(b.dataset.mode)));
-  d.querySelector("#excelRestore").onclick = async () => {
-    close();
-    await restoreExcelRecovery();
-  };
-  d.querySelector("#excelExportClose").onclick = close;
-  d.addEventListener("cancel", () => d.remove());
-  document.body.append(d);
-  d.showModal();
+  return showDialog({
+    title: t("msgExcelV3TemplatesAndCopies"),
+    bodyHtml:
+      '<p class="app-dialog-message">' +
+      t("msgUpTo10CustomGroupsConfigure") +
+      '</p><div class="exchange-options"><button type="button" class="btn btn-primary" data-mode="update">' +
+      t("msgSaveCurrentProjectV3") +
+      '</button><button type="button" class="btn" data-mode="create">' +
+      t("msgBlankCreationTemplateV3") +
+      '</button><button type="button" class="btn" id="excelRestore" ' +
+      (excelRecoveryPoints.length ? "" : "disabled") +
+      ">" +
+      t("msgRestoreBeforeLastImport") +
+      '</button></div><p class="ui-caption">' +
+      t("msgV1V2ImportsPreserveTheFirst") +
+      "</p>",
+    actions: [{ label: t("msgClose"), value: null }],
+    onOpen(d) {
+      d.querySelectorAll("[data-mode]").forEach((b) => (b.onclick = () => downloadExchange(b.dataset.mode)));
+      d.querySelector("#excelRestore").onclick = () => {
+        closeAppDialog(d, null);
+        restoreExcelRecovery();
+      };
+    },
+  });
 }
 
 // ---- src/app/js/views.js ----
@@ -5226,7 +6016,8 @@ function getVisibleRows() {
       }
     });
 
-    if (matchingMainTasks.length === 0) return;
+    // Empty phases stay visible (so new phases can be filled); a person filter hides phases without matches.
+    if (matchingMainTasks.length === 0 && fltPerson !== "ALL") return;
 
     rows.push({ level: 0, type: "Family", obj: fam, fam });
     if (!fam.collapsed) {
@@ -5285,6 +6076,203 @@ function roundedOrthogonalPath(points, radius) {
   return d + " L " + p[p.length - 1].join(" ");
 }
 
+// ---- WBS table columns ----
+// Column widths are fixed except the name column, which takes the remaining width of the left pane.
+const INLINE_LABELS = { start: "lblMdStart", days: "lblMdDays", pct: "lblMdPct" };
+const BASE_COLUMNS = [
+  { key: "wbs", label: "thWbs", width: 56, always: true },
+  { key: "name", label: "thName", width: 0, min: 150, always: true },
+  { key: "pred", label: "thPred", width: 64, wide: true },
+  { key: "prio", label: "thPrio", width: 44, optional: true },
+  { key: "start", label: "thStart", width: 108 },
+  { key: "finish", label: "thFinish", width: 104 },
+  { key: "days", label: "thDays", width: 52 },
+  { key: "pct", label: "thPct", width: 56 },
+  { key: "people", label: "thPeople", width: 130, wide: true },
+];
+const COLUMN_PREF_KEY = "project-web-tool:columns";
+const SPLIT_PREF_KEY = "project-web-tool:split";
+let columnPrefs = null;
+
+function readPref(key) {
+  try {
+    return JSON.parse(localStorage.getItem(key) || "null");
+  } catch (e) {
+    return null;
+  }
+}
+
+function writePref(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (e) {}
+}
+
+function allColumns() {
+  return [
+    ...BASE_COLUMNS,
+    ...groups().map((g) => ({ key: g.id, labelText: g.name, width: 120, group: true, optional: true })),
+  ];
+}
+
+// Defaults: wide screens show the core columns plus predecessor and a combined people column;
+// narrow screens keep dates, duration and progress. Separate group columns and priority are opt-in
+// (priority is shown as a badge next to the name and on the Gantt bar).
+function defaultColumnVisible(column) {
+  if (column.always) return true;
+  if (column.optional) return false;
+  if (column.wide) return (window.innerWidth || 1440) >= 1280;
+  return true;
+}
+
+function columnVisible(column) {
+  if (column.always) return true;
+  const pref = (columnPrefs ??= readPref(COLUMN_PREF_KEY) || {});
+  return column.key in pref ? !!pref[column.key] : defaultColumnVisible(column);
+}
+
+function visibleColumns() {
+  return allColumns().filter(columnVisible);
+}
+
+function setColumnVisible(key, visible) {
+  columnPrefs = { ...(columnPrefs ?? readPref(COLUMN_PREF_KEY) ?? {}), [key]: visible };
+  writePref(COLUMN_PREF_KEY, columnPrefs);
+  renderTableHeader();
+  renderGanttAndTable();
+}
+
+function columnLabel(column) {
+  return column.labelText ?? t(column.label);
+}
+
+function renderTableHeader() {
+  document.getElementById("wbsTheadRow").innerHTML = visibleColumns()
+    .map((c) => "<th>" + escapeHtml(columnLabel(c)) + "</th>")
+    .join("");
+  renderColumnPicker();
+}
+
+function renderColumnPicker() {
+  const host = document.getElementById("columnPicker");
+  if (!host) return;
+  host.innerHTML = allColumns()
+    .filter((c) => !c.always)
+    .map(
+      (c) =>
+        '<label class="check-field"><input type="checkbox" data-column="' +
+        escapeHtml(c.key) +
+        '"' +
+        (columnVisible(c) ? " checked" : "") +
+        ' onchange="setColumnVisible(this.dataset.column, this.checked)"> ' +
+        escapeHtml(columnLabel(c)) +
+        "</label>",
+    )
+    .join("");
+}
+
+function applyColumnLayout(columns = visibleColumns()) {
+  const pane = document.getElementById("leftPane");
+  const fixed = columns.reduce((sum, c) => sum + c.width, 0);
+  const nameColumn = columns.find((c) => c.key === "name");
+  const nameWidth = Math.max(nameColumn.min, (pane?.clientWidth || 0) - fixed - 2);
+  const widths = columns.map((c) => (c.key === "name" ? nameWidth : c.width));
+  const total = widths.reduce((a, b) => a + b, 0);
+  for (const table of document.querySelectorAll("#leftHeader table,#wbsBodyTable")) {
+    table.querySelector("colgroup").innerHTML = widths.map((w) => '<col style="width:' + w + 'px">').join("");
+    table.style.width = total + "px";
+  }
+}
+
+function defaultSplitPercent() {
+  return 64;
+}
+
+function applySplit(percent) {
+  const pane = document.getElementById("leftPane");
+  const value = percent || readPref(SPLIT_PREF_KEY) || defaultSplitPercent();
+  if (pane) pane.style.width = Math.min(80, Math.max(30, value)) + "%";
+}
+
+function peoplePillsHtml(item) {
+  const pills = groups()
+    .flatMap((g) =>
+      splitPeople(item[g.id]).map(
+        (p) =>
+          `<span class="pill pill-person" style="--pill-color:${g.color}" title="${escapeHtml(g.name + ": " + p)}">${escapeHtml(shortenName(p))}</span>`,
+      ),
+    )
+    .join("");
+  return pills || '<span class="muted-dash">-</span>';
+}
+
+function nameCellHtml(r, item) {
+  const toggle = (type) =>
+    `<button type="button" class="tree-toggle" aria-expanded="${!item.collapsed}" aria-label="${escapeHtml(t(item.collapsed ? "msgExpandRow" : "msgCollapseRow", item.name))}" data-focus-key="toggle:${escapeHtml(item.wbs)}" onclick="event.stopPropagation();toggleCollapse('${type}','${item.wbs}')">${item.collapsed ? "+" : "−"}</button>`;
+  const showPrioBadge = r.type === "Sub-task" && item.prio && !columnVisible(BASE_COLUMNS[3]);
+  const prio = showPrioBadge
+    ? `<span class="prio-badge prio-${item.prio}" title="${t("thPrio")} ${item.prio}">P${item.prio}</span>`
+    : "";
+  if (r.type === "Family")
+    return `${toggle("Family")}<span class="name-text">${escapeHtml(item.name)}</span>`;
+  if (r.type === "Main Task")
+    return `<span class="indent-1"></span>${toggle("Main Task")}<span class="name-text" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</span>`;
+  return `<span class="indent-2" aria-hidden="true">·</span>${prio}<span class="name-text" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</span>`;
+}
+
+function baselineBadge(baseMap, item) {
+  if (!baseMap || !baseMap.has(item.wbs)) return "";
+  const baseIt = baseMap.get(item.wbs).item;
+  if (!baseIt.finish || !item.finish) return "";
+  const slip = diffDays(baseIt.finish, item.finish) - 1;
+  if (slip > 0)
+    return `<span class="diff-tag diff-delay" title="Baseline: ${baseIt.finish}">+${slip}d</span>`;
+  if (slip < 0) return `<span class="diff-tag diff-early" title="Baseline: ${baseIt.finish}">${slip}d</span>`;
+  return "";
+}
+
+// Re-render after the current event so focus has already moved (Tab / Enter), then restore it.
+let renderTimer = null,
+  suppressInlineChanges = false;
+function scheduleRender() {
+  if (typeof setTimeout !== "function") return renderAll();
+  clearTimeout(renderTimer);
+  renderTimer = setTimeout(() => {
+    renderTimer = null;
+    renderAllKeepingFocus();
+  }, 0);
+}
+
+function renderAllKeepingFocus(key) {
+  const active = document.activeElement;
+  const focusKey = key || active?.dataset?.focusKey;
+  // Keep anything typed into the focused field before this render ran.
+  const typing = active?.tagName === "INPUT" && active.value !== active.defaultValue;
+  const typed = typing
+    ? { value: active.value, start: active.selectionStart, end: active.selectionEnd }
+    : null;
+  // Removing a focused input can fire "change" for a half-typed value; ignore it, the value is carried over.
+  suppressInlineChanges = true;
+  try {
+    renderAll();
+  } finally {
+    suppressInlineChanges = false;
+  }
+  if (!focusKey) return;
+  const target = [...document.querySelectorAll("[data-focus-key]")].find(
+    (el) => el.dataset.focusKey === focusKey,
+  );
+  if (!target) return;
+  target.focus({ preventScroll: true });
+  if (target.tagName !== "INPUT") return;
+  if (typed) {
+    target.value = typed.value;
+    target.setSelectionRange(typed.start, typed.end);
+    // A value set by script does not fire "change" on blur, so commit it explicitly.
+    target.addEventListener("blur", () => target.dispatchEvent(new Event("change")), { once: true });
+  } else target.select();
+}
+
 function renderGanttAndTable() {
   const rows = getVisibleRows();
   const baseMap = getSelectedBaselineMap();
@@ -5311,94 +6299,45 @@ function renderGanttAndTable() {
   const dayWidth = Number(document.getElementById("ganttZoomSlider").value) || 24;
   const totalWidth = totalTimelineDays * dayWidth;
 
+  const columns = visibleColumns();
+  const readOnly = !!projectMeta.archived;
   rows.forEach((r) => {
     const tr = document.createElement("tr");
     const item = r.obj;
+    const isSub = r.type === "Sub-task";
     tr.className =
       r.type === "Family" ? "row-family" : r.type === "Main Task" ? "row-maintask" : "row-subtask";
     tr.dataset.wbs = item.wbs;
-    tr.ondblclick = () => openEditModal(r.type, item.wbs);
-
-    let nameCellHtml = "";
-    if (r.type === "Family") {
-      const icon = item.collapsed ? "+" : "−";
-      nameCellHtml = `<span class="tree-toggle" onclick="event.stopPropagation();toggleCollapse('Family','${item.wbs}')">${icon}</span><span>${escapeHtml(item.wbs)}. ${escapeHtml(item.name)}</span>`;
-    } else if (r.type === "Main Task") {
-      const icon = item.collapsed ? "+" : "−";
-      nameCellHtml = `<span style="padding-left:10px"></span><span class="tree-toggle" onclick="event.stopPropagation();toggleCollapse('Main Task','${item.wbs}')">${icon}</span><span title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</span>`;
-    } else {
-      nameCellHtml = `<span style="padding-left:28px;color:var(--text-muted)">·</span> <span title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</span>`;
-    }
-
-    const prioHtml = item.prio
-      ? `<span class="prio-badge prio-${item.prio}">${item.prio}</span>`
-      : `<span style="color:var(--text-muted)">-</span>`;
-    const predHtml =
-      r.type === "Sub-task"
-        ? item.pred
-          ? `<span style="color:var(--sage-dark)">${escapeHtml(item.pred)}${item.lag ? (item.lag > 0 ? `+${item.lag}d` : `${item.lag}d`) : ""}</span>`
-          : `<span style="color:var(--border-soft)">-</span>`
-        : `<span style="font-size:10.5px;color:var(--text-muted)">${t("autoRollup")}</span>`;
-
-    const startHtml =
-      r.type === "Sub-task"
-        ? `<input type="date" class="inline-input" aria-label="${escapeHtml(item.wbs)} ${t("lblMdStart")}" value="${item.start || ""}" onchange="inlineUpdateSubtask('${item.wbs}','start',this.value)">`
-        : `<span>${item.start || "TBC"}</span>`;
-
-    // Baseline finish variance badge
-    let diffBadge = "";
-    if (baseMap && baseMap.has(item.wbs)) {
-      const baseIt = baseMap.get(item.wbs).item;
-      if (baseIt.finish && item.finish) {
-        const slip = diffDays(baseIt.finish, item.finish) - 1;
-        if (slip > 0)
-          diffBadge = `<span class="diff-tag diff-delay" title="Baseline: ${baseIt.finish}">+${slip}d</span>`;
-        else if (slip < 0)
-          diffBadge = `<span class="diff-tag diff-early" title="Baseline: ${baseIt.finish}">${slip}d</span>`;
-      }
-    }
-    const finishHtml = `<span>${item.finish || "TBC"}</span>${diffBadge}`;
-
-    const daysHtml =
-      r.type === "Sub-task"
-        ? `<input type="number" class="inline-input" aria-label="${escapeHtml(item.wbs)} ${t("lblMdDays")}" style="text-align:center" min="1" value="${item.days || ""}" placeholder="-" onchange="inlineUpdateSubtask('${item.wbs}','days',this.value)">`
-        : `<span>${item.days || "-"}</span>`;
-
-    const pctHtml =
-      r.type === "Sub-task"
-        ? `<input type="number" class="inline-input" aria-label="${escapeHtml(item.wbs)} ${t("lblMdPct")}" style="text-align:center" min="0" max="100" value="${item.pct || 0}" onchange="inlineUpdateSubtask('${item.wbs}','pct',this.value)">`
-        : `<span>${item.pct || 0}%</span>`;
-
-    tr.innerHTML = `
-      <td style="text-align:center">${escapeHtml(item.wbs)}</td>
-      <td>${nameCellHtml}</td>
-      <td style="text-align:center">${predHtml}</td>
-      <td style="text-align:center">${prioHtml}</td>
-      <td style="text-align:center">${startHtml}</td>
-      <td style="text-align:center">${finishHtml}</td>
-      <td style="text-align:center">${daysHtml}</td>
-      <td style="text-align:center">${pctHtml}</td>
-      ${groupCells(item)}
-    `;
+    tr.ondblclick = (e) => {
+      if (!e.target.closest("input,button")) openEditModal(r.type, item.wbs);
+    };
+    if (isSub && item.status?.code === "delay") tr.classList.add("is-delayed");
+    const inline = (field, value, extra) =>
+      `<input type="text" class="inline-input${field === "start" ? " date-text" : ""}" data-field="${field}" data-focus-key="${escapeHtml(item.wbs)}:${field}" aria-label="${escapeHtml(item.wbs)} ${t(INLINE_LABELS[field])}" value="${escapeHtml(String(value ?? ""))}"${readOnly ? " disabled" : ""} ${extra} onchange="inlineUpdateSubtask('${item.wbs}','${field}',this.value)">`;
+    const cells = {
+      wbs: `<td class="cell-center">${escapeHtml(item.wbs)}</td>`,
+      name: `<td>${nameCellHtml(r, item)}</td>`,
+      pred: `<td class="cell-center">${
+        isSub
+          ? item.pred
+            ? `<span class="pred-ref">${escapeHtml(item.pred)}${item.lag ? (item.lag > 0 ? `+${item.lag}d` : `${item.lag}d`) : ""}</span>`
+            : '<span class="muted-dash">-</span>'
+          : `<span class="rollup-note">${t("autoRollup")}</span>`
+      }</td>`,
+      prio: `<td class="cell-center">${item.prio ? `<span class="prio-badge prio-${item.prio}">${item.prio}</span>` : '<span class="muted-dash">-</span>'}</td>`,
+      start: `<td class="cell-center">${isSub ? inline("start", item.start, 'inputmode="numeric" maxlength="10" placeholder="YYYY-MM-DD"') : `<span class="cell-date">${item.start || "TBC"}</span>`}</td>`,
+      finish: `<td class="cell-center"><span class="cell-date">${item.finish || "TBC"}</span>${baselineBadge(baseMap, item)}</td>`,
+      days: `<td class="cell-center">${isSub ? inline("days", item.days || "", 'inputmode="numeric" placeholder="-"') : `<span>${item.days || "-"}</span>`}</td>`,
+      pct: `<td class="cell-center">${isSub ? inline("pct", item.pct || 0, 'inputmode="decimal"') : `<span>${item.pct || 0}%</span>`}</td>`,
+      people: `<td>${peoplePillsHtml(item)}</td>`,
+    };
+    tr.innerHTML = columns
+      .map((c) => (c.group ? `<td>${renderPills(item[c.key], "pill-group1")}</td>` : cells[c.key]))
+      .join("");
     tbody.appendChild(tr);
   });
-
-  for (const table of document.querySelectorAll("#leftHeader table,#wbsBodyTable")) {
-    table.querySelector("colgroup").innerHTML = [
-      58,
-      245,
-      64,
-      46,
-      132,
-      105,
-      50,
-      52,
-      ...groups().map(() => 130),
-    ]
-      .map((w) => '<col style="width:' + w + 'px">')
-      .join("");
-    table.style.width = 752 + groups().length * 130 + "px";
-  }
+  applyColumnLayout(columns);
+  document.getElementById("emptyState").hidden = projectData.length > 0;
 
   // Render Right Gantt Header
   const headerTrack = document.getElementById("ganttHeaderTrack");
@@ -5491,32 +6430,46 @@ function renderGanttAndTable() {
 
         const pct = Math.min(100, Math.max(0, Number(item.pct) || 0));
 
+        const delayed = item.status?.code === "delay";
+        const prioMark = item.prio ? `<span class="bar-prio prio-${item.prio}">P${item.prio}</span>` : "";
         if (r.type === "Family" || r.type === "Main Task") {
-          const sumClass = r.type === "Family" ? "family-bar" : "maintask-bar";
-          const leadText = splitPeople(item.group1).map(shortenName).join(", ");
+          const sumClass =
+            (r.type === "Family" ? "family-bar" : "maintask-bar") + (delayed ? " is-delayed" : "");
+          const leadText = groups()
+            .flatMap((g) => splitPeople(item[g.id]).map(shortenName))
+            .filter((p, i, all) => all.indexOf(p) === i)
+            .slice(0, 4)
+            .join(", ");
           barHtml += `
             <div class="gantt-bar-summary ${sumClass}" data-wbs="${escapeHtml(item.wbs)}" style="left:${left}px;width:${width}px;background:${groupColor(item)}"
                  title="${escapeHtml(item.wbs)} ${escapeHtml(item.name)} (${item.start} ~ ${item.finish}, ${item.days}d) | ${escapeHtml(groupNamesLabel())}"
                  ondblclick="openEditModal('${r.type}','${item.wbs}')">
               <div class="summary-progress" style="width:${pct}%"></div>
-              <span class="bar-label" style="top:-5px">${escapeHtml(item.wbs)} (${item.days}d) ${leadText ? "· " + escapeHtml(leadText) : ""}</span>
+              <span class="bar-label" style="top:-5px">${delayed ? `<span class="bar-delay">${t("st_delay")}</span>` : ""}${escapeHtml(item.wbs)} (${item.days}d) ${leadText ? "· " + escapeHtml(leadText) : ""}</span>
             </div>`;
         } else {
-          const shortLead = shortenName(item.group1 || "");
+          const people = groups()
+            .map((g) => splitPeople(item[g.id]).map(shortenName).join(", "))
+            .filter(Boolean)
+            .join(" · ");
+          const statusText = item.status?.text || "";
+          const description = `${item.wbs} ${item.name}, ${item.start} – ${item.finish} (${item.days}${t("daysUnit")}), ${statusText}${item.prio ? ", P" + item.prio : ""}`;
           barHtml += `
-            <div class="gantt-bar-subtask" style="left:${left}px;width:${width}px;background:${groupColor(item)}"
-                 data-wbs="${item.wbs}"
-                 onmousedown="startBarDrag(event, '${item.wbs}', 'move', ${dayWidth})"
+            <div class="gantt-bar-subtask${delayed ? " is-delayed" : ""}${readOnly ? " is-readonly" : ""}" style="left:${left}px;width:${width}px;background:${groupColor(item)}"
+                 data-wbs="${item.wbs}" data-focus-key="bar:${escapeHtml(item.wbs)}" tabindex="0" role="button"
+                 aria-label="${escapeHtml(description + ". " + t("msgBarKeyboardHint"))}"
+                 onpointerdown="startBarDrag(event, '${item.wbs}', 'move', ${dayWidth})"
+                 onkeydown="onBarKeydown(event, '${item.wbs}')"
                  ondblclick="event.stopPropagation();openEditModal('Sub-task','${item.wbs}')"
-                 title="${escapeHtml(item.wbs)} ${escapeHtml(item.name)} | ${item.start} ~ ${item.finish} (${item.days}${t("daysUnit")}) | ${escapeHtml(
+                 title="${escapeHtml(description)} | ${escapeHtml(
                    groups()
                      .map((g) => g.name + ": " + (item[g.id] || ""))
                      .join(" / "),
-                 )} | ${escapeHtml(groupNamesLabel())}">
+                 )}">
               <div class="subtask-progress" style="width:${pct}%"></div>
               <span style="position:relative;z-index:2;padding-left:6px;font-size:10px;color:#fff;overflow:hidden;text-overflow:ellipsis">${pct > 0 ? pct + "%" : ""}</span>
-              <div class="bar-resize-handle" onmousedown="event.stopPropagation();startBarDrag(event, '${item.wbs}', 'resize', ${dayWidth})"></div>
-              <span class="bar-label">${escapeHtml(item.wbs)} ${shortLead ? "· " + escapeHtml(shortLead) : ""}</span>
+              <div class="bar-resize-handle" onpointerdown="event.stopPropagation();startBarDrag(event, '${item.wbs}', 'resize', ${dayWidth})"></div>
+              <span class="bar-label">${prioMark}${delayed ? `<span class="bar-delay">${t("st_delay")}</span>` : ""}${escapeHtml(item.wbs)} ${people ? "· " + escapeHtml(people) : ""}</span>
             </div>`;
         }
       }
@@ -5640,6 +6593,17 @@ function renderMainTaskCards() {
     `<div style="padding:30px;text-align:center;color:var(--text-secondary)">${t("emptyFilter")}</div>`;
 }
 
+function onStatusDateChange(input) {
+  const value = input.value.trim();
+  if (value && !parseDate(value)) {
+    input.value = projectSettings.statusDate;
+    showError(t("msgDateFormat"));
+    return;
+  }
+  input.value = value || today();
+  renderAll();
+}
+
 function filterByPersonAndGoGantt(personKey) {
   document.getElementById("fltPerson").value = personKey;
   switchView("gantt");
@@ -5653,7 +6617,7 @@ function toggleCollapse(type, wbs) {
       if (type === "Main Task" && mt.wbs === wbs) mt.collapsed = !mt.collapsed;
     });
   });
-  renderAll();
+  renderAllKeepingFocus("toggle:" + wbs);
 }
 
 function expandCollapseAll(level) {
@@ -5725,8 +6689,7 @@ function toggleSidebar() {
   } catch (e) {}
   refreshSidebar();
   renderProjectControls();
-  document.getElementById("uiTitle").textContent = projectMeta.name;
-  document.title = projectMeta.name;
+  applyColumnLayout();
 }
 
 function switchView(viewName) {
@@ -5738,8 +6701,7 @@ function switchView(viewName) {
   document.getElementById("view-people").classList.toggle("active", viewName === "people");
   refreshSidebar();
   renderProjectControls();
-  document.getElementById("uiTitle").textContent = projectMeta.name;
-  document.title = projectMeta.name;
+  applyColumnLayout();
 }
 
 const ACTION_ICONS = {
@@ -5751,6 +6713,8 @@ const ACTION_ICONS = {
   btnImportXls: '<path d="M12 3v12M8 11l4 4 4-4M4 15v6h16v-6"/>',
   btnExportXls: '<path d="M12 16V4M8 8l4-4 4 4M4 15v6h16v-6"/>',
   btnExportJson: '<path d="m3 7 9-4 9 4v10l-9 4-9-4V7Zm0 0 9 4 9-4M12 11v10M7 5l9 4"/>',
+  btnHistory: '<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>',
+  btnAddPhase: '<path d="M4 6h16M4 12h10M4 18h6M17 15v6M14 18h6"/>',
 };
 
 function renderActionButton(id, key) {
@@ -5773,12 +6737,12 @@ function applyStaticI18n() {
     '<svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg><span class="action-label">' +
     t("msgMoreActions") +
     '</span><svg class="action-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 10 4 4 4-4"/></svg>';
-  document.getElementById("uiTitle").textContent = t("uiTitle");
-  document.getElementById("uiSubtitle").textContent = t("uiSubtitle");
   document.getElementById("lblKpiSpan").textContent = t("lblKpiSpan");
   document.getElementById("lblKpiCounts").textContent = t("lblKpiCounts");
   document.getElementById("lblKpiProg").textContent = t("lblKpiProg");
   renderActionButton("btnSaveVer", "btnSaveVer");
+  renderActionButton("btnHistory", "btnHistory");
+  renderActionButton("btnAddPhase", "btnAddPhase");
   renderActionButton("btnAddSub", "btnAddSub");
   renderActionButton("btnAddMain", "btnAddMain");
   renderActionButton("btnImportXls", "btnImportXls");
@@ -5814,21 +6778,41 @@ function applyStaticI18n() {
     <span>${t("legendTitle")}</span>
     ${groupLegend()}
     <span class="legend-dot"><span class="swatch" style="background:#9AABB8;height:4px"></span>${t("legBase")}</span>
+    <span class="legend-dot"><span class="swatch swatch-delayed"></span>${t("legDelayed")}</span>
+    <span class="legend-dot"><span class="bar-prio prio-1">P1</span>${t("legPriority")}</span>
 
   `;
   document.getElementById("legendTipBox").textContent = t("legTip");
 
-  document.getElementById("wbsTheadRow").innerHTML = `
-    <th>${t("thWbs")}</th>
-    <th>${t("thName")}</th>
-    <th>${t("thPred")}</th>
-    <th>${t("thPrio")}</th>
-    <th>${t("thStart")}</th>
-    <th>${t("thFinish")}</th>
-    <th>${t("thDays")}</th>
-    <th>${t("thPct")}</th>
-    ${groupHeaders()}
-  `;
+  renderTableHeader();
+  document.getElementById("lblColumns").textContent = t("lblColumns");
+  for (const [id, key] of [
+    ["emptyTitle", "msgEmptyTitle"],
+    ["emptyIntro", "msgEmptyIntro"],
+    ["emptyStep1", "msgEmptyStep1"],
+    ["emptyStep2", "msgEmptyStep2"],
+    ["emptyStep3", "msgEmptyStep3"],
+    ["emptyAddPhase", "msgAddPhaseTitle"],
+    ["emptyImport", "msgEmptyImport"],
+    ["emptyDemo", "msgEmptyDemo"],
+    ["mdMoveUp", "msgMoveUp"],
+    ["mdMoveDown", "msgMoveDown"],
+  ])
+    document.getElementById(id).textContent = t(key);
+  document.getElementById("btnUndo").innerHTML =
+    '<svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3"/></svg><span>' +
+    escapeHtml(t("msgUndo")) +
+    "</span>";
+  document.getElementById("btnRedo").innerHTML =
+    '<svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 14 5-5-5-5M20 9H10a6 6 0 0 0 0 12h3"/></svg><span>' +
+    escapeHtml(t("msgRedo")) +
+    "</span>";
+  for (const button of document.querySelectorAll(".date-picker-btn")) {
+    button.innerHTML =
+      '<svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="1"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>';
+    button.setAttribute("aria-label", t("msgPickDate"));
+    button.title = t("msgPickDate");
+  }
 
   document.getElementById("peopleSecTitle1").textContent = t("peopleSecTitle1");
   document.getElementById("peopleSecSub1").textContent = t("peopleSecSub1");
@@ -5851,7 +6835,8 @@ function applyStaticI18n() {
     (id) => (document.getElementById(id).textContent = t(id)),
   );
   document.getElementById("verNoteInput").placeholder = t("verNotePlaceholder");
-  document.querySelectorAll(".btn-icon").forEach((button) => {
+  document.querySelectorAll("[data-dialog-close].btn-icon").forEach((button) => {
+    button.innerHTML = CLOSE_ICON;
     button.setAttribute("aria-label", t("closeLabel"));
     button.title = t("closeLabel");
   });
@@ -5865,8 +6850,7 @@ function applyStaticI18n() {
   document.documentElement.lang = curLang === "zh" ? "zh-CN" : "en";
   refreshSidebar();
   renderProjectControls();
-  document.getElementById("uiTitle").textContent = projectMeta.name;
-  document.title = projectMeta.name;
+  applyColumnLayout();
 }
 
 function populateTopFilters() {
@@ -5926,7 +6910,8 @@ function updateTopKpis() {
   const sMin = starts[0] || "TBC";
   const fMax = finishes[finishes.length - 1] || "TBC";
   const totDays = sMin !== "TBC" && fMax !== "TBC" ? diffDays(sMin, fMax) : 0;
-  document.getElementById("kpiSpan").textContent = `${sMin} ~ ${fMax.slice(5)} (${totDays}d)`;
+  document.getElementById("kpiSpan").textContent =
+    sMin === "TBC" ? "TBC" : `${sMin} ~ ${fMax} (${totDays}${t("daysUnit")})`;
   document.getElementById("kpiCounts").textContent = I18N[curLang].kpiFmtCounts(
     projectData.length,
     mtCount,
@@ -5945,42 +6930,73 @@ function renderAll() {
   renderProjectControls();
 }
 
+const PROJECT_MENU = [
+  ["new", "btnNewProject"],
+  ["demo", "btnDemoProject"],
+  ["duplicate", "btnDuplicateProject"],
+  ["settings", "btnProjectSettings"],
+  ["archive", "btnArchiveProject"],
+  ["delete", "btnDeleteProject"],
+];
+
+// Header: project name first; switcher, project menu, undo/redo and save status on one stable row.
 function renderProjectControls() {
-  const box = document.getElementById("projectControls");
-  if (!box) return;
-  const labels = [
-    "lblProject",
-    "btnNewProject",
-    "btnDemoProject",
-    "btnDuplicateProject",
-    "btnProjectSettings",
-    "btnArchiveProject",
-    "btnAddPhase",
-  ].map((key) => t(key));
-  box.innerHTML =
-    '<label class="ui-caption" for="projectSelect">' +
-    labels[0] +
-    '</label><select class="ui-control ui-select" id="projectSelect" onchange="switchProject(this.value)">' +
-    Object.values(workspace.projects)
-      .map(
-        (b) =>
-          '<option value="' +
-          escapeHtml(b.projectId) +
-          '" ' +
-          (b.projectId === projectId ? "selected" : "") +
-          ">" +
-          escapeHtml(b.metadata.name) +
-          (b.metadata.archived ? " • " + t("msgArchived") : "") +
-          "</option>",
-      )
-      .join("") +
-    "</select>" +
-    labels
-      .slice(1)
-      .map((v, i) => '<button class="btn" onclick="projectAction(' + i + ')">' + v + "</button>")
-      .join("") +
-    statusCaption();
+  const select = document.getElementById("projectSelect");
+  if (!select) return;
+  const projects = Object.values(workspace.projects);
+  const option = (b) =>
+    '<option value="' +
+    escapeHtml(b.projectId) +
+    '"' +
+    (b.projectId === projectId ? " selected" : "") +
+    ">" +
+    escapeHtml(b.metadata.name) +
+    "</option>";
+  const active = projects.filter((b) => !b.metadata.archived),
+    archived = projects.filter((b) => b.metadata.archived);
+  select.innerHTML =
+    active.map(option).join("") +
+    (archived.length
+      ? '<optgroup label="' +
+        escapeHtml(t("msgArchivedProjects")) +
+        '">' +
+        archived.map(option).join("") +
+        "</optgroup>"
+      : "");
+  select.setAttribute("aria-label", t("lblProject"));
+  document.getElementById("lblProjectSelect").textContent = t("lblProject");
+  document.getElementById("projectMenuLabel").textContent = t("msgProjectMenu");
+  document.getElementById("projectMenuList").innerHTML = PROJECT_MENU.map(
+    ([action, key]) =>
+      '<button type="button" role="menuitem" class="menu-item' +
+      (action === "delete" ? " is-danger" : "") +
+      '" onclick="closeMenus();projectAction(\'' +
+      action +
+      "')\">" +
+      escapeHtml(action === "archive" && projectMeta.archived ? t("msgRestoreProject") : t(key)) +
+      "</button>",
+  ).join("");
+  document.getElementById("uiTitle").textContent = projectMeta.name;
+  document.title = projectMeta.name;
+  document.getElementById("archivedBadge").hidden = !projectMeta.archived;
+  document.getElementById("archivedBadge").textContent = t("msgArchived");
+  const notice = document.getElementById("archivedNotice");
+  notice.hidden = !projectMeta.archived;
+  if (projectMeta.archived)
+    notice.innerHTML =
+      '<span class="save-banner-text">' +
+      escapeHtml(t("msgArchivedNotice")) +
+      '</span><button type="button" class="btn" onclick="projectAction(\'archive\')">' +
+      escapeHtml(t("msgRestoreProject")) +
+      "</button>";
+  document.body.classList.toggle("is-archived", !!projectMeta.archived);
+  document.getElementById("projectStatus").outerHTML = statusCaption();
+  refreshUndoButtons();
   updateSaveBanner();
+}
+
+function closeMenus() {
+  document.querySelectorAll("details.menu[open]").forEach((menu) => (menu.open = false));
 }
 
 // Header status: where data lives, plus storage usage (spelled out once usage passes half the limit).
@@ -5995,7 +7011,7 @@ function statusCaption() {
         ? usageText
         : t("msgDataStoredInThisBrowser");
   return (
-    '<span class="ui-caption" role="status" title="' +
+    '<span id="projectStatus" class="ui-caption project-status" role="status" title="' +
     escapeHtml(usageText) +
     '">' +
     escapeHtml(text) +
@@ -6154,27 +7170,380 @@ function renderPeopleView() {
     "</tbody>";
 }
 
-// ---- src/app/js/editing.js ----
-function transactionalEdit(edit) {
-  const candidate = JSON.parse(JSON.stringify(projectData));
-  try {
-    edit(candidate);
-    validateProject(candidate);
-    recalculateSchedule(candidate);
-  } catch (e) {
-    alert(e.message);
-    return false;
-  }
-  projectData = candidate;
+// ---- src/app/js/history.js ----
+// Undo / redo for the current browser session, and the versions & change log dialog.
+// Undo steps hold the task data and version list before a change. They are kept in memory only and
+// are cleared when another project is opened.
+
+const UNDO_LIMIT = 50;
+let undoStack = [],
+  redoStack = [];
+
+function undoSnapshot(label) {
+  return { label, data: copy(projectData), versions: copy(versionList), activeVersionTag };
+}
+
+function pushUndo(label) {
+  undoStack.push(undoSnapshot(label));
+  if (undoStack.length > UNDO_LIMIT) undoStack.shift();
+  redoStack = [];
+  refreshUndoButtons();
+}
+
+function clearUndoHistory() {
+  undoStack = [];
+  redoStack = [];
+  refreshUndoButtons();
+}
+
+function applySnapshot(snapshot) {
+  projectData = copy(snapshot.data);
+  versionList = copy(snapshot.versions);
+  activeVersionTag = snapshot.activeVersionTag;
+  if (!versionList.some((v) => v.tag === document.getElementById("fltBaseline").value))
+    document.getElementById("fltBaseline").value = "NONE";
+}
+
+function stepHistory(from, to, auditAction) {
+  if (!from.length || projectMeta.archived) return false;
+  const snapshot = from.pop();
+  to.push(undoSnapshot(snapshot.label));
+  applySnapshot(snapshot);
+  recordAudit("-", auditAction, snapshot.label || "");
+  refreshUndoButtons();
+  renderAll();
   return true;
 }
 
+function undo() {
+  return stepHistory(undoStack, redoStack, "Undo");
+}
+
+function redo() {
+  return stepHistory(redoStack, undoStack, "Redo");
+}
+
+function refreshUndoButtons() {
+  const undoButton = document.getElementById("btnUndo"),
+    redoButton = document.getElementById("btnRedo");
+  if (!undoButton || !redoButton) return;
+  const last = undoStack.at(-1),
+    next = redoStack.at(-1);
+  undoButton.disabled = !last || projectMeta.archived;
+  redoButton.disabled = !next || projectMeta.archived;
+  undoButton.title = last ? t("msgUndoNamed", last.label) + " (Ctrl+Z)" : t("msgUndo") + " (Ctrl+Z)";
+  redoButton.title = next
+    ? t("msgRedoNamed", next.label) + " (Ctrl+Shift+Z)"
+    : t("msgRedo") + " (Ctrl+Shift+Z)";
+}
+
+// ---- Versions & change log ----
+
+function setBaseline(tag) {
+  document.getElementById("fltBaseline").value = tag;
+  selectedBaselineTag = tag;
+  renderAll();
+}
+
+async function restoreVersion(tag) {
+  const version = versionList.find((v) => v.tag === tag);
+  if (!version) return false;
+  const confirmed = await askConfirm(t("msgRestoreVersionConfirm", tag), {
+    title: t("msgRestoreVersionTitle"),
+    confirmLabel: t("msgRestore"),
+  });
+  if (!confirmed) return false;
+  const ok = transactionalEdit(
+    (data) => {
+      data.splice(0, data.length, ...copy(version.data));
+    },
+    { label: t("msgUndoRestoreVersion", tag) },
+  );
+  if (!ok) return false;
+  activeVersionTag = tag;
+  recordAudit("-", "Restore version", tag);
+  renderAll();
+  return true;
+}
+
+async function deleteVersion(tag) {
+  try {
+    assertEditable();
+  } catch (e) {
+    showMessage(e.message);
+    return false;
+  }
+  const confirmed = await askConfirm(t("msgDeleteVersionConfirm", tag), {
+    title: t("msgDeleteVersionTitle"),
+    confirmLabel: t("msgDeleteAction"),
+    danger: true,
+  });
+  if (!confirmed) return false;
+  pushUndo(t("msgUndoDeleteVersion", tag));
+  versionList = versionList.filter((v) => v.tag !== tag);
+  if (document.getElementById("fltBaseline").value === tag)
+    document.getElementById("fltBaseline").value = "NONE";
+  recordAudit("-", "Delete version", tag);
+  renderAll();
+  return true;
+}
+
+function versionsTableHtml() {
+  if (!versionList.length) return '<p class="empty-note">' + t("msgNoVersionsYet") + "</p>";
+  const baseline = document.getElementById("fltBaseline").value;
+  const head = ["vColTag", "vColTime", "vColAuthor", "vColNote", "vColSpan", "vColProg", "vColAct"]
+    .map((k) => "<th>" + t(k) + "</th>")
+    .join("");
+  const rows = versionList
+    .map((v) => {
+      const tag = escapeHtml(v.tag);
+      const isBaseline = v.tag === baseline;
+      return (
+        "<tr><td><strong>" +
+        tag +
+        "</strong>" +
+        (v.tag === activeVersionTag
+          ? ' <span class="pill pill-group1">' + t("msgCurrentBase") + "</span>"
+          : "") +
+        '</td><td class="cell-date">' +
+        escapeHtml(v.time) +
+        "</td><td>" +
+        escapeHtml(v.author) +
+        "</td><td>" +
+        escapeHtml(v.note) +
+        "</td><td>" +
+        escapeHtml(v.span || "") +
+        "</td><td>" +
+        escapeHtml(v.progress || "") +
+        '</td><td class="row-actions"><button type="button" class="btn" data-version-action="baseline" data-tag="' +
+        tag +
+        '"' +
+        (isBaseline ? " disabled" : "") +
+        ">" +
+        t(isBaseline ? "msgIsBaseline" : "vBtnSetBase") +
+        '</button><button type="button" class="btn" data-version-action="restore" data-tag="' +
+        tag +
+        '">' +
+        t("vBtnRestore") +
+        '</button><button type="button" class="btn btn-danger" data-version-action="delete" data-tag="' +
+        tag +
+        '">' +
+        t("msgDeleteAction") +
+        "</button></td></tr>"
+      );
+    })
+    .join("");
+  return (
+    '<div class="table-scroll"><table class="data-grid"><thead><tr>' +
+    head +
+    "</tr></thead><tbody>" +
+    rows +
+    "</tbody></table></div>"
+  );
+}
+
+function auditTableHtml() {
+  if (!auditLog.length) return '<p class="empty-note">' + t("msgNoChangesYet") + "</p>";
+  const head = ["logColTime", "logColVer", "logColWbs", "logColAction", "logColDetail"]
+    .map((k) => "<th>" + t(k) + "</th>")
+    .join("");
+  const rows = auditLog
+    .map(
+      (a) =>
+        '<tr><td class="cell-date">' +
+        escapeHtml(a.time) +
+        "</td><td>" +
+        escapeHtml(a.ver) +
+        "</td><td>" +
+        escapeHtml(a.wbs) +
+        "</td><td>" +
+        escapeHtml(a.action) +
+        "</td><td>" +
+        escapeHtml(a.detail) +
+        "</td></tr>",
+    )
+    .join("");
+  return (
+    '<p class="ui-caption">' +
+    t("msgAuditLimit", auditLog.length) +
+    '</p><div class="table-scroll"><table class="data-grid"><thead><tr>' +
+    head +
+    "</tr></thead><tbody>" +
+    rows +
+    "</tbody></table></div>"
+  );
+}
+
+function openHistoryDialog(initialTab = "versions") {
+  let tab = initialTab;
+  const draw = (d) => {
+    for (const button of d.querySelectorAll("[role=tab]")) {
+      const selected = button.dataset.tab === tab;
+      button.setAttribute("aria-selected", String(selected));
+      button.tabIndex = selected ? 0 : -1;
+    }
+    d.querySelector("#historyPanel").innerHTML = tab === "versions" ? versionsTableHtml() : auditTableHtml();
+  };
+  return showDialog({
+    id: "historyDialog",
+    title: t("msgHistoryTitle"),
+    size: "wide",
+    bodyHtml:
+      '<div class="tabs" role="tablist"><button type="button" role="tab" id="historyTabVersions" data-tab="versions" aria-controls="historyPanel">' +
+      t("msgVersionsTab", versionList.length) +
+      '</button><button type="button" role="tab" id="historyTabLog" data-tab="log" aria-controls="historyPanel">' +
+      t("msgChangeLogTab", auditLog.length) +
+      '</button></div><div id="historyPanel" role="tabpanel"></div>',
+    actions: [
+      {
+        label: t("btnSaveVer").replace(/^[^A-Za-z㐀-鿿]+/u, ""),
+        align: "start",
+        onClick: (d) => (closeAppDialog(d, null), openVersionModal(), false),
+      },
+      { label: t("msgClose"), value: null },
+    ],
+    onOpen(d) {
+      draw(d);
+      d.querySelector(".tabs").addEventListener("click", (e) => {
+        const button = e.target.closest("[role=tab]");
+        if (!button) return;
+        tab = button.dataset.tab;
+        draw(d);
+        button.focus();
+      });
+      d.querySelector(".tabs").addEventListener("keydown", (e) => {
+        if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+        tab = tab === "versions" ? "log" : "versions";
+        draw(d);
+        d.querySelector('[data-tab="' + tab + '"]').focus();
+      });
+      d.querySelector("#historyPanel").addEventListener("click", async (e) => {
+        const button = e.target.closest("[data-version-action]");
+        if (!button) return;
+        const tag = button.dataset.tag,
+          action = button.dataset.versionAction;
+        if (action === "baseline") setBaseline(tag);
+        if (action === "restore") await restoreVersion(tag);
+        if (action === "delete") await deleteVersion(tag);
+        d.querySelector("#historyTabVersions").textContent = t("msgVersionsTab", versionList.length);
+        d.querySelector("#historyTabLog").textContent = t("msgChangeLogTab", auditLog.length);
+        draw(d);
+      });
+    },
+  });
+}
+
+// ---- src/app/js/editing.js ----
+// Editing: tasks, phases, projects, Gantt drag and keyboard moves.
+// Every change to project data goes through transactionalEdit, which validates a candidate copy,
+// records an undo step and only then replaces the live data.
+
+function assertEditable() {
+  if (projectMeta.archived) throw inputError("msgProjectArchivedReadOnly");
+}
+
+function transactionalEdit(edit, { label = "", onError = showError } = {}) {
+  try {
+    assertEditable();
+    const candidate = copy(projectData);
+    edit(candidate);
+    validateProject(candidate);
+    recalculateSchedule(candidate);
+    pushUndo(label);
+    projectData = candidate;
+    return true;
+  } catch (e) {
+    onError(e.message);
+    return false;
+  }
+}
+
+function findParentList(data, wbs) {
+  for (const family of data) {
+    if (family.wbs === wbs) return { list: data, item: family, level: "Family" };
+    for (const main of family.mainTasks) {
+      if (main.wbs === wbs) return { list: family.mainTasks, item: main, level: "Main Task", parent: family };
+      const task = main.subtasks.find((s) => s.wbs === wbs);
+      if (task) return { list: main.subtasks, item: task, level: "Sub-task", parent: main };
+    }
+  }
+  return null;
+}
+
+// Renames an item and every descendant whose WBS starts with "<old>.", and updates predecessors.
+function renameWbs(data, oldWbs, newWbs) {
+  if (oldWbs === newWbs) return;
+  const renames = new Map([[oldWbs, newWbs]]);
+  for (const it of allItems(data)) {
+    if (it.wbs.startsWith(oldWbs + ".")) renames.set(it.wbs, newWbs + it.wbs.slice(oldWbs.length));
+  }
+  for (const it of allItems(data)) {
+    if (renames.has(it.wbs)) it.wbs = renames.get(it.wbs);
+    if (it.pred && renames.has(it.pred)) it.pred = renames.get(it.pred);
+  }
+}
+
+function moveWithinParent(wbs, direction) {
+  let moved = false;
+  const ok = transactionalEdit(
+    (data) => {
+      const found = findParentList(data, wbs);
+      if (!found) throw inputError("msgTaskNotFound");
+      const from = found.list.indexOf(found.item),
+        to = from + direction;
+      if (to < 0 || to >= found.list.length) return;
+      found.list.splice(from, 1);
+      found.list.splice(to, 0, found.item);
+      moved = true;
+    },
+    { label: t("msgUndoMove", wbs) },
+  );
+  if (ok && moved) {
+    recordAudit(wbs, "Move", direction < 0 ? "up" : "down");
+    renderAll();
+  }
+  return ok && moved;
+}
+
+// ---- Gantt: pointer drag and keyboard moves share one change function ----
+
 let dragState = null;
 
+function applyBarChange(wbs, mode, delta) {
+  const st = findSubtaskByWbs(wbs);
+  if (!st || !st.start || !delta) return false;
+  const origStart = st.start,
+    origDays = Number(st.days) || 1,
+    nextStart = addDays(origStart, delta),
+    nextDays = Math.max(1, origDays + delta);
+  if (mode === "resize" && nextDays === origDays) return false;
+  const ok = transactionalEdit(
+    (data) => {
+      const task = allItems(data).find((x) => x.wbs === wbs);
+      if (mode === "move") {
+        task.start = nextStart;
+        if (task.pred) {
+          const pred = allItems(data).find((x) => x.wbs === task.pred);
+          if (pred?.finish) task.lag = diffDays(pred.finish, task.start) - 2;
+        }
+      } else task.days = nextDays;
+    },
+    { label: t(mode === "move" ? "msgUndoReschedule" : "msgUndoResize", wbs) },
+  );
+  if (ok)
+    recordAudit(
+      wbs,
+      mode === "move" ? "Drag Move / 拖拽改期" : "Resize Days / 调整工期",
+      mode === "move" ? `Start: ${origStart} → ${nextStart}` : `Days: ${origDays}d → ${nextDays}d`,
+    );
+  return ok;
+}
+
 function startBarDrag(e, wbs, mode, dayWidth) {
-  if (e.button !== 0) return;
+  if (e.button !== 0 || projectMeta.archived) return;
   const st = findSubtaskByWbs(wbs);
   if (!st || !st.start) return;
+  e.preventDefault();
   const barEl = e.currentTarget.closest(".gantt-bar-subtask");
   dragState = {
     wbs,
@@ -6185,320 +7554,301 @@ function startBarDrag(e, wbs, mode, dayWidth) {
     origStart: st.start,
     origDays: Number(st.days) || 1,
     origLeft: parseFloat(barEl.style.left),
-    origWidth: parseFloat(barEl.style.width),
     barEl,
     deltaDays: 0,
   };
-  document.addEventListener("mousemove", onBarDragMove);
-  document.addEventListener("mouseup", onBarDragEnd);
+  document.addEventListener("pointermove", onBarDragMove);
+  document.addEventListener("pointerup", onBarDragEnd);
+  document.addEventListener("pointercancel", onBarDragEnd);
 }
 
 function onBarDragMove(e) {
   if (!dragState) return;
-  const dx = e.clientX - dragState.startX;
-  const dDays = Math.round(dx / dragState.dayWidth);
+  const dDays = Math.round((e.clientX - dragState.startX) / dragState.dayWidth);
   dragState.deltaDays = dDays;
   const tooltip = document.getElementById("dragTooltip");
   tooltip.style.display = "block";
   tooltip.style.left = e.clientX + 14 + "px";
   tooltip.style.top = e.clientY - 28 + "px";
-
   if (dragState.mode === "move") {
     dragState.barEl.style.left = dragState.origLeft + dDays * dragState.dayWidth + "px";
     const newStart = addDays(dragState.origStart, dDays);
     const newFinish = addDays(newStart, dragState.origDays - 1);
-    tooltip.textContent = `${dragState.wbs}: ${newStart} ~ ${newFinish} (${dragState.origDays}${t("daysUnit")})`;
+    const lagNote =
+      dragState.st.pred && dDays ? " · " + t("msgLagChange", (dDays > 0 ? "+" : "") + dDays) : "";
+    tooltip.textContent = `${dragState.wbs}: ${newStart} ~ ${newFinish} (${dragState.origDays}${t("daysUnit")})${lagNote}`;
   } else {
     const newDays = Math.max(1, dragState.origDays + dDays);
     dragState.barEl.style.width = newDays * dragState.dayWidth + "px";
-    const newFinish = addDays(dragState.origStart, newDays - 1);
-    tooltip.textContent = `${dragState.wbs}: ${newDays}${t("daysUnit")} (-> ${newFinish})`;
+    tooltip.textContent = `${dragState.wbs}: ${newDays}${t("daysUnit")} (→ ${addDays(dragState.origStart, newDays - 1)})`;
   }
 }
 
 function onBarDragEnd() {
   if (!dragState) return;
-  const { st, mode, deltaDays, origStart, origDays } = dragState;
+  const { wbs, mode, deltaDays } = dragState;
+  dragState = null;
   document.getElementById("dragTooltip").style.display = "none";
-  document.removeEventListener("mousemove", onBarDragMove);
-  document.removeEventListener("mouseup", onBarDragEnd);
-
+  document.removeEventListener("pointermove", onBarDragMove);
+  document.removeEventListener("pointerup", onBarDragEnd);
+  document.removeEventListener("pointercancel", onBarDragEnd);
   if (deltaDays !== 0) {
-    if (mode === "move") {
-      const nextStart = addDays(origStart, deltaDays);
-      recordAudit(st.wbs, "Drag Move / 拖拽改期", `Start: ${origStart} → ${nextStart}`);
-      st.start = nextStart;
-      if (st.pred) {
-        const predTask = findSubtaskByWbs(st.pred);
-        if (predTask && predTask.finish) {
-          st.lag = diffDays(predTask.finish, st.start) - 2;
-        }
-      }
-    } else if (mode === "resize") {
-      const nextDays = Math.max(1, origDays + deltaDays);
-      recordAudit(st.wbs, "Resize Days / 调整工期", `Days: ${origDays}d → ${nextDays}d`);
-      st.days = nextDays;
-    }
-    recalculateSchedule();
+    applyBarChange(wbs, mode, deltaDays);
     renderAll();
   }
-  dragState = null;
 }
 
-function openVersionModal() {
-  // Suggest next minor version tag automatically
-  const nums = versionList.map((v) => parseFloat(v.tag.replace(/^V/i, ""))).filter((n) => !isNaN(n));
-  const nextVer = nums.length ? "V" + (Math.max(...nums) + 0.1).toFixed(1) : "V1.0";
-  document.getElementById("verTagInput").value = nextVer;
-  document.getElementById("verNoteInput").value = "";
-  document.getElementById("versionModal").classList.add("open");
-}
-
-function closeVersionModal() {
-  document.getElementById("versionModal").classList.remove("open");
-}
-
-function confirmSaveVersion() {
-  const tag = document.getElementById("verTagInput").value.trim() || "V1.0";
-  const author = document.getElementById("verAuthorInput").value.trim() || "PM";
-  const note = document.getElementById("verNoteInput").value.trim() || "Schedule & resource update";
-  const span = document.getElementById("kpiSpan").textContent;
-  const progress = document.getElementById("kpiProgress").textContent;
-
-  if (!/^[A-Za-z0-9._ -]+$/.test(tag)) {
-    alert(t("msgInvalidVersionTag"));
+// Arrow keys move a focused bar by one day; Shift+Arrow changes its duration; Enter opens it.
+function onBarKeydown(e, wbs) {
+  if (e.key === "Enter" || e.key === " ") {
+    e.preventDefault();
+    openEditModal("Sub-task", wbs);
     return;
   }
-  if (versionList.some((v) => v.tag === tag)) {
-    alert(t("msgVersionTagAlreadyExists"));
-    return;
-  }
-  versionList.unshift({
-    tag,
-    time: nowTimestamp(),
-    author,
-    note,
-    span,
-    progress,
-    data: compactData(projectData),
-  });
-  activeVersionTag = tag;
-  saveState();
-
-  recordAudit("-", "Save Version / 保存版本快照", `${tag} (${author}): ${note}`);
-  closeVersionModal();
-  renderAll();
+  if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+  e.preventDefault();
+  if (applyBarChange(wbs, e.shiftKey ? "resize" : "move", e.key === "ArrowLeft" ? -1 : 1))
+    renderAllKeepingFocus("bar:" + wbs);
 }
 
-function inlineUpdateSubtask(wbs, field, val) {
-  if (!["start", "days", "pct"].includes(field)) return;
+// ---- Inline table edits ----
+
+function inlineUpdateSubtask(wbs, field, rawValue) {
+  if (!["start", "days", "pct"].includes(field) || suppressInlineChanges) return;
+  const val = String(rawValue ?? "").trim();
   const oldVal = findSubtaskByWbs(wbs)?.[field];
-  if (
-    transactionalEdit((data) => {
+  if (String(oldVal ?? "") === val) return;
+  const ok = transactionalEdit(
+    (data) => {
       const st = allItems(data).find((s) => s.wbs === wbs);
       if (!st) throw inputError("msgTaskNotFound");
+      if (field === "start" && val && !parseDate(val)) throw inputError("msgDateFormat");
       st[field] = field === "start" ? val : field === "days" && val === "" ? null : Number(val);
       if (field === "start" && st.pred) {
         const pred = allItems(data).find((s) => s.wbs === st.pred);
         if (!val || !pred?.finish) throw inputError("msgStartIsDeterminedByThePredecessor");
         st.lag = diffDays(pred.finish, val) - 2;
       }
-    })
-  )
-    recordAudit(wbs, "Inline Edit (" + field + ")", String(oldVal) + " → " + val);
-  renderAll();
+    },
+    { label: t("msgUndoEdit", wbs) },
+  );
+  if (ok) recordAudit(wbs, "Inline Edit (" + field + ")", String(oldVal) + " → " + val);
+  // Render after focus has moved (Tab / Enter), then put focus back on the same field.
+  scheduleRender();
 }
 
-function populatePredOptions(excludeWbs) {
-  const sel = document.getElementById("mdPred");
-  let html = `<option value="">${t("noPredOpt")}</option>`;
-  projectData.forEach((fam) => {
-    fam.mainTasks.forEach((mt) => {
-      mt.subtasks.forEach((st) => {
-        if (st.wbs !== excludeWbs) {
-          html += `<option value="${escapeHtml(st.wbs)}">${escapeHtml(st.wbs)} - ${escapeHtml(st.name.slice(0, 36))} (${st.finish || "TBC"})</option>`;
-        }
-      });
+// ---- Version snapshot dialog ----
+
+function openVersionModal() {
+  const nums = versionList.map((v) => parseFloat(v.tag.replace(/^V/i, ""))).filter((n) => !isNaN(n));
+  document.getElementById("verTagInput").value = nums.length
+    ? "V" + (Math.max(...nums) + 0.1).toFixed(1)
+    : "V1.0";
+  document.getElementById("verNoteInput").value = "";
+  openAppDialog(document.getElementById("versionModal"));
+}
+
+function closeVersionModal() {
+  closeAppDialog(document.getElementById("versionModal"), null);
+}
+
+function confirmSaveVersion() {
+  const dialog = document.getElementById("versionModal");
+  try {
+    assertEditable();
+    const tag = document.getElementById("verTagInput").value.trim() || "V1.0";
+    const author = document.getElementById("verAuthorInput").value.trim() || "PM";
+    const note = document.getElementById("verNoteInput").value.trim() || "Schedule & resource update";
+    if (!VERSION_TAG_PATTERN.test(tag)) throw inputError("msgInvalidVersionTag");
+    if (versionList.some((v) => v.tag === tag)) throw inputError("msgVersionTagAlreadyExists");
+    pushUndo(t("msgUndoSaveVersion", tag));
+    versionList.unshift({
+      tag,
+      time: nowTimestamp(),
+      author,
+      note,
+      span: document.getElementById("kpiSpan").textContent,
+      progress: document.getElementById("kpiProgress").textContent,
+      data: compactData(projectData),
     });
-  });
-  sel.innerHTML = html;
+    activeVersionTag = tag;
+    recordAudit("-", "Save Version / 保存版本快照", `${tag} (${author}): ${note}`);
+    closeVersionModal();
+    renderAll();
+  } catch (e) {
+    setDialogError(dialog, e.message);
+  }
+}
+
+// ---- Task dialog ----
+
+function populatePredOptions(excludeWbs) {
+  let html = `<option value="">${t("noPredOpt")}</option>`;
+  for (const fam of projectData)
+    for (const mt of fam.mainTasks)
+      for (const st of mt.subtasks)
+        if (st.wbs !== excludeWbs)
+          html += `<option value="${escapeHtml(st.wbs)}">${escapeHtml(st.wbs)} - ${escapeHtml(st.name.slice(0, 36))} (${st.finish || "TBC"})</option>`;
+  document.getElementById("mdPred").innerHTML = html;
 }
 
 function onModalTypeChange() {
   const type = document.getElementById("mdType").value;
   const parentSel = document.getElementById("mdParent");
-  const subFields = document.getElementById("mdSubtaskFields");
   if (type === "Main Task") {
     document.getElementById("mdParentLabel").textContent = t("lblMdParentFam");
     parentSel.innerHTML = projectData
-      .map((f) => `<option value="${f.wbs}">${f.wbs}. ${escapeHtml(f.name)}</option>`)
+      .map((f) => `<option value="${escapeHtml(f.wbs)}">${escapeHtml(f.wbs)}. ${escapeHtml(f.name)}</option>`)
       .join("");
-    subFields.style.display = "none";
   } else {
     document.getElementById("mdParentLabel").textContent = t("lblMdParentMain");
-    let opts = "";
-    projectData.forEach((f) => {
-      f.mainTasks.forEach((mt) => {
-        opts += `<option value="${mt.wbs}">${mt.wbs} - ${escapeHtml(mt.name.slice(0, 40))}</option>`;
-      });
-    });
-    parentSel.innerHTML = opts;
-    subFields.style.display = "grid";
+    parentSel.innerHTML = projectData
+      .flatMap((f) => f.mainTasks)
+      .map(
+        (mt) =>
+          `<option value="${escapeHtml(mt.wbs)}">${escapeHtml(mt.wbs)} - ${escapeHtml(mt.name.slice(0, 40))}</option>`,
+      )
+      .join("");
   }
+  document.getElementById("mdSubtaskFields").hidden = type === "Main Task";
+}
+
+function setTaskDialogMode(mode) {
+  const editing = mode === "edit";
+  document.getElementById("mdMode").value = mode;
+  document.getElementById("mdType").disabled = editing;
+  for (const id of ["mdDeleteBtn", "mdMoveUp", "mdMoveDown"]) document.getElementById(id).hidden = !editing;
 }
 
 function openAddModal(defaultType) {
-  document.getElementById("mdMode").value = "add";
+  try {
+    assertEditable();
+    if (defaultType === "Main Task" && !projectData.length) throw inputError("msgAddPhaseFirst");
+    if (defaultType === "Sub-task" && !projectData.some((f) => f.mainTasks.length))
+      throw inputError("msgAddMainTaskFirst");
+  } catch (e) {
+    showMessage(e.message);
+    return;
+  }
+  setTaskDialogMode("add");
   document.getElementById("mdOrigWbs").value = "";
   document.getElementById("modalTitle").textContent =
     defaultType === "Main Task" ? t("mdAddMain") : t("mdAddSub");
   document.getElementById("mdType").value = defaultType;
-  document.getElementById("mdType").disabled = false;
-  document.getElementById("mdParentWrap").style.display = "flex";
-  document.getElementById("mdDeleteBtn").style.display = "none";
   onModalTypeChange();
   populatePredOptions("");
-
-  document.getElementById("mdWbs").value = "";
+  const parent = document.getElementById("mdParent");
+  parent.selectedIndex = Math.max(0, parent.options.length - 1);
+  document.getElementById("mdWbs").value = suggestChildWbs(parent.value, defaultType);
+  parent.onchange = () =>
+    (document.getElementById("mdWbs").value = suggestChildWbs(
+      parent.value,
+      document.getElementById("mdType").value,
+    ));
   document.getElementById("mdName").value = "";
-  document.getElementById("mdPrio").value = "1";
+  document.getElementById("mdPrio").value = "2";
   document.getElementById("mdPred").value = "";
   document.getElementById("mdLag").value = "0";
   document.getElementById("mdStart").value = today();
   document.getElementById("mdDays").value = "7";
   document.getElementById("mdFinish").value = addDays(today(), 6);
   document.getElementById("mdPct").value = "0";
-
-  renderGroupInputs(
-    document.getElementById("mdType").value === "Sub-task" &&
-      document.getElementById("mdMode").value === "edit"
-      ? findSubtaskByWbs(document.getElementById("mdOrigWbs").value)
-      : {},
-  );
-  document.getElementById("taskModal").classList.add("open");
+  renderGroupInputs({});
+  openAppDialog(document.getElementById("taskModal"));
+  document.getElementById("mdName").focus();
 }
 
 function openEditModal(type, wbs) {
-  if (type === "Family") return;
-  document.getElementById("mdMode").value = "edit";
+  if (type === "Family") {
+    editPhase(wbs);
+    return;
+  }
+  const found = findParentList(projectData, wbs);
+  if (!found) return;
+  setTaskDialogMode("edit");
   document.getElementById("mdOrigWbs").value = wbs;
   document.getElementById("mdType").value = type;
-  document.getElementById("mdType").disabled = true;
-  document.getElementById("mdParentWrap").style.display = "none";
-  document.getElementById("mdDeleteBtn").style.display = "inline-flex";
   onModalTypeChange();
-
-  if (type === "Main Task") {
-    let foundMt = null;
-    projectData.forEach((f) =>
-      f.mainTasks.forEach((m) => {
-        if (m.wbs === wbs) foundMt = m;
-      }),
-    );
-    if (!foundMt) return;
-    document.getElementById("modalTitle").textContent = `${t("mdEditMain")} [${foundMt.wbs}]`;
-    document.getElementById("mdWbs").value = foundMt.wbs;
-    document.getElementById("mdName").value = foundMt.name;
-    document.getElementById("mdPrio").value = foundMt.prio || "";
-  } else {
-    const st = findSubtaskByWbs(wbs);
-    if (!st) return;
+  document.getElementById("mdParent").value = found.parent.wbs;
+  document.getElementById("mdParent").onchange = null;
+  const item = found.item;
+  document.getElementById("modalTitle").textContent =
+    `${t(type === "Main Task" ? "mdEditMain" : "mdEditSub")} [${item.wbs}]`;
+  document.getElementById("mdWbs").value = item.wbs;
+  document.getElementById("mdName").value = item.name;
+  document.getElementById("mdPrio").value = item.prio || "";
+  if (type === "Sub-task") {
     populatePredOptions(wbs);
-    document.getElementById("modalTitle").textContent = `${t("mdEditSub")} [${st.wbs}]`;
-    document.getElementById("mdWbs").value = st.wbs;
-    document.getElementById("mdName").value = st.name;
-    document.getElementById("mdPrio").value = st.prio || "";
-    document.getElementById("mdPred").value = st.pred || "";
-    document.getElementById("mdLag").value = st.lag || 0;
-    document.getElementById("mdStart").value = st.start || "";
-    document.getElementById("mdDays").value = st.days || "";
-    document.getElementById("mdFinish").value = st.finish || "";
-    document.getElementById("mdPct").value = st.pct || 0;
+    document.getElementById("mdPred").value = item.pred || "";
+    document.getElementById("mdLag").value = item.lag || 0;
+    document.getElementById("mdStart").value = item.start || "";
+    document.getElementById("mdDays").value = item.days || "";
+    document.getElementById("mdFinish").value = item.finish || "";
+    document.getElementById("mdPct").value = item.pct || 0;
+    renderGroupInputs(item);
   }
-  renderGroupInputs(
-    document.getElementById("mdType").value === "Sub-task" &&
-      document.getElementById("mdMode").value === "edit"
-      ? findSubtaskByWbs(document.getElementById("mdOrigWbs").value)
-      : {},
-  );
-  document.getElementById("taskModal").classList.add("open");
+  const index = found.list.indexOf(item);
+  document.getElementById("mdMoveUp").disabled = index === 0;
+  document.getElementById("mdMoveDown").disabled = index === found.list.length - 1;
+  openAppDialog(document.getElementById("taskModal"));
 }
 
 function onModalPredChange() {
   const predWbs = document.getElementById("mdPred").value;
   const lag = Number(document.getElementById("mdLag").value || 0);
-  if (predWbs) {
-    const predTask = findSubtaskByWbs(predWbs);
-    if (predTask && predTask.finish) {
-      document.getElementById("mdStart").value = addDays(predTask.finish, 1 + lag);
-      onModalStartOrDaysChange("start");
-    }
+  const predTask = predWbs && findSubtaskByWbs(predWbs);
+  if (predTask?.finish) {
+    document.getElementById("mdStart").value = addDays(predTask.finish, 1 + lag);
+    onModalStartOrDaysChange();
   }
 }
 
 function onModalStartOrDaysChange() {
-  const s = document.getElementById("mdStart").value;
+  const s = document.getElementById("mdStart").value.trim();
   const d = Number(document.getElementById("mdDays").value || 0);
-  if (s && d > 0) {
-    document.getElementById("mdFinish").value = addDays(s, d - 1);
-  } else {
-    document.getElementById("mdFinish").value = "";
-  }
+  document.getElementById("mdFinish").value = parseDate(s) && d > 0 ? addDays(s, d - 1) : "";
 }
 
 function saveModalTask() {
+  const dialog = document.getElementById("taskModal");
   const value = (id) => document.getElementById(id).value.trim();
   const mode = value("mdMode"),
     type = value("mdType"),
     wbs = value("mdWbs"),
     name = value("mdName"),
-    orig = value("mdOrigWbs");
+    orig = value("mdOrigWbs"),
+    parentWbs = value("mdParent");
   if (!name || !wbs) {
-    alert(t("msgWbsAndNameAreRequired"));
+    setDialogError(dialog, t("msgWbsAndNameAreRequired"));
     return;
   }
-  const ok = transactionalEdit((data) => {
-    const items = allItems(data);
-    if (items.some((it) => it.wbs === wbs && (mode === "add" || it.wbs !== orig)))
-      throw inputError("msgDuplicateWbs2");
-    if (type === "Main Task") {
-      if (mode === "add") {
-        const parent = data.find((f) => f.wbs === value("mdParent"));
-        if (!parent) throw inputError("msgParentNotFound");
-        parent.mainTasks.push({
-          wbs,
-          name,
-          collapsed: false,
-          subtasks: [
-            {
-              wbs: wbs + ".1",
-              name: name + " - 1",
-              start: "",
-              days: null,
-              pct: 0,
-              pred: "",
-              lag: 0,
-              prio: null,
-              group1: "",
-              group2: "",
-              group3: "",
-            },
-          ],
-        });
-      } else {
-        const mt = data.flatMap((f) => f.mainTasks).find((m) => m.wbs === orig);
-        if (!mt) throw inputError("msgTaskNotFound");
-        const renames = new Map([[orig, wbs]]);
-        mt.subtasks.forEach((s) => {
-          if (s.wbs.startsWith(orig + ".")) renames.set(s.wbs, wbs + s.wbs.slice(orig.length));
-        });
-        items.forEach((it) => {
-          if (renames.has(it.wbs)) it.wbs = renames.get(it.wbs);
-          if (renames.has(it.pred)) it.pred = renames.get(it.pred);
-        });
-        mt.name = name;
+  if (type === "Sub-task" && value("mdStart") && !parseDate(value("mdStart"))) {
+    setDialogError(dialog, t("msgDateFormat"));
+    return;
+  }
+  const ok = transactionalEdit(
+    (data) => {
+      if (allItems(data).some((it) => it.wbs === wbs && (mode === "add" || it.wbs !== orig)))
+        throw inputError("msgDuplicateWbs2");
+      const parents = type === "Main Task" ? data : data.flatMap((f) => f.mainTasks);
+      const parent = parents.find((p) => p.wbs === parentWbs);
+      if (!parent) throw inputError("msgParentNotFound");
+      const children = type === "Main Task" ? parent.mainTasks : parent.subtasks;
+      if (type === "Main Task") {
+        if (mode === "add") {
+          children.push({ wbs, name, collapsed: false, subtasks: [] });
+          return;
+        }
+        const found = findParentList(data, orig);
+        if (!found) throw inputError("msgTaskNotFound");
+        found.item.name = name;
+        renameWbs(data, orig, wbs);
+        if (found.parent !== parent) {
+          found.list.splice(found.list.indexOf(found.item), 1);
+          children.push(found.item);
+        }
+        return;
       }
-    } else {
       const input = {
         wbs,
         name,
@@ -6511,93 +7861,313 @@ function saveModalTask() {
         ...readGroupInputs(),
       };
       if (mode === "add") {
-        const mt = data.flatMap((f) => f.mainTasks).find((m) => m.wbs === value("mdParent"));
-        if (!mt) throw inputError("msgParentNotFound");
-        mt.subtasks.push(input);
-      } else {
-        const st = data.flatMap((f) => f.mainTasks.flatMap((m) => m.subtasks)).find((s) => s.wbs === orig);
-        if (!st) throw inputError("msgTaskNotFound");
-        Object.assign(st, input);
-        items.forEach((it) => {
-          if (it.pred === orig) it.pred = wbs;
-        });
+        children.push(input);
+        return;
       }
-    }
-  });
+      const found = findParentList(data, orig);
+      if (!found) throw inputError("msgTaskNotFound");
+      Object.assign(found.item, input);
+      for (const it of allItems(data)) if (it.pred === orig) it.pred = wbs;
+      if (found.parent !== parent) {
+        found.list.splice(found.list.indexOf(found.item), 1);
+        children.push(found.item);
+      }
+    },
+    {
+      label: t(mode === "add" ? "msgUndoAdd" : "msgUndoEdit", wbs),
+      onError: (message) => setDialogError(dialog, message),
+    },
+  );
   if (!ok) return;
   recordAudit(wbs, mode === "add" ? "Add task" : "Update task", name);
-  closeModal();
+  closeAppDialog(dialog, true);
   renderAll();
 }
 
-function deleteModalTask() {
+function moveModalTask(direction) {
+  const wbs = document.getElementById("mdOrigWbs").value;
+  if (!moveWithinParent(wbs, direction)) return;
+  const found = findParentList(projectData, wbs);
+  const index = found.list.indexOf(found.item);
+  document.getElementById("mdMoveUp").disabled = index === 0;
+  document.getElementById("mdMoveDown").disabled = index === found.list.length - 1;
+}
+
+// Items outside `removed` that still point at a removed task as predecessor.
+function blockingDependents(data, removed) {
+  return allItems(data).filter((s) => !removed.has(s.wbs) && removed.has(s.pred));
+}
+
+async function deleteModalTask() {
+  const dialog = document.getElementById("taskModal");
   const id = document.getElementById("mdOrigWbs").value;
-  const type = document.getElementById("mdType").value;
-  const removed = new Set([id]);
-  if (type === "Main Task")
-    projectData.forEach((f) =>
-      f.mainTasks.filter((m) => m.wbs === id).forEach((m) => m.subtasks.forEach((s) => removed.add(s.wbs))),
-    );
-  const dependents = allItems(projectData).filter((s) => !removed.has(s.wbs) && removed.has(s.pred));
+  const found = findParentList(projectData, id);
+  if (!found) return;
+  const removed = new Set([
+    id,
+    ...(found.level === "Main Task" ? found.item.subtasks.map((s) => s.wbs) : []),
+  ]);
+  const dependents = blockingDependents(projectData, removed);
   if (dependents.length) {
-    alert(t("msgRemoveTheseDependenciesBeforeDeletion") + dependents.map((s) => s.wbs).join(", "));
+    setDialogError(
+      dialog,
+      t("msgRemoveTheseDependenciesBeforeDeletion") + dependents.map((s) => s.wbs).join(", "),
+    );
     return;
   }
-  if (!confirm(t("msgDelete") + id + "?")) return;
-  if (
-    !transactionalEdit((data) =>
-      data.forEach((f) => {
-        if (type === "Main Task") f.mainTasks = f.mainTasks.filter((m) => m.wbs !== id);
-        else f.mainTasks.forEach((m) => (m.subtasks = m.subtasks.filter((s) => s.wbs !== id)));
-      }),
-    )
-  )
-    return;
+  const children = found.level === "Main Task" ? found.item.subtasks.length : 0;
+  const confirmed = await askConfirm(
+    children ? t("msgDeleteMainTaskWithChildren", id, children) : t("msgDeleteTask", id),
+    {
+      title: t("mdDeleteBtn"),
+      confirmLabel: t("msgDeleteAction"),
+      danger: true,
+    },
+  );
+  if (!confirmed) return;
+  const ok = transactionalEdit(
+    (data) => {
+      const target = findParentList(data, id);
+      target.list.splice(target.list.indexOf(target.item), 1);
+    },
+    { label: t("msgUndoDelete", id), onError: (message) => setDialogError(dialog, message) },
+  );
+  if (!ok) return;
   recordAudit(id, "Delete task", id);
-  closeModal();
+  closeAppDialog(dialog, true);
   renderAll();
 }
 
 function closeModal() {
-  document.getElementById("taskModal").classList.remove("open");
+  closeAppDialog(document.getElementById("taskModal"), null);
 }
 
-function projectAction(action) {
+// ---- WBS suggestions ----
+
+function nextNumber(values) {
+  const nums = values.map((v) => Number(v)).filter((n) => Number.isInteger(n) && n > 0);
+  return String(nums.length ? Math.max(...nums) + 1 : 1);
+}
+
+function suggestPhaseWbs() {
+  return nextNumber(projectData.map((f) => f.wbs));
+}
+
+function suggestChildWbs(parentWbs, type) {
+  const parent = (type === "Main Task" ? projectData : projectData.flatMap((f) => f.mainTasks)).find(
+    (p) => p.wbs === parentWbs,
+  );
+  if (!parent) return "";
+  const children = type === "Main Task" ? parent.mainTasks : parent.subtasks;
+  const suffixes = children.map((c) =>
+    c.wbs.startsWith(parentWbs + ".") ? c.wbs.slice(parentWbs.length + 1) : "",
+  );
+  return parentWbs + "." + nextNumber(suffixes);
+}
+
+// ---- Phases ----
+
+async function addPhase() {
   try {
-    if (action === 0 || action === 1) {
-      const name = prompt(t("msgProjectName"));
-      if (!name?.trim()) return;
-      addProject(newProject(name.trim(), action === 1 ? syntheticData() : []));
-    }
-    if (action === 2) {
-      const name = prompt(t("msgNameOfDuplicate"), projectMeta.name + " " + "copy");
-      if (!name?.trim()) return;
-      const b = currentBundle();
-      assignProjectIdentity(b, crypto.randomUUID());
-      b.metadata = { name: name.trim(), archived: false, customName: true };
-      addProject(b);
-    }
-    if (action === 3) openProjectSettings();
-    if (action === 4) {
-      const previous = projectMeta.archived;
-      projectMeta.archived = !previous;
-      if (!saveState()) projectMeta.archived = previous;
-      renderProjectControls();
-    }
-    if (action === 5) {
-      const wbs = prompt(t("msgPhaseWbs"));
-      if (!wbs?.trim()) return;
-      const name = prompt(t("msgPhaseName"));
-      if (!name?.trim()) return;
-      if (transactionalEdit((data) => data.push({ wbs: wbs.trim(), name: name.trim(), mainTasks: [] }))) {
-        recordAudit(wbs, "Add phase", name);
-        renderAll();
-      }
-    }
+    assertEditable();
   } catch (e) {
-    alert(e.message);
+    showMessage(e.message);
+    return;
+  }
+  const values = await askForm({
+    title: t("msgAddPhaseTitle"),
+    intro: t("msgAddPhaseIntro"),
+    fields: [
+      { name: "wbs", label: t("lblMdWbs"), value: suggestPhaseWbs(), required: true },
+      { name: "name", label: t("msgPhaseName"), value: "", required: true },
+    ],
+    submitLabel: t("msgAddPhaseTitle"),
+    validate(v) {
+      const candidate = copy(projectData);
+      candidate.push({ wbs: v.wbs, name: v.name, mainTasks: [] });
+      validateProject(candidate);
+    },
+  });
+  if (!values) return;
+  if (
+    transactionalEdit((data) => data.push({ wbs: values.wbs, name: values.name, mainTasks: [] }), {
+      label: t("msgUndoAdd", values.wbs),
+    })
+  ) {
+    recordAudit(values.wbs, "Add phase", values.name);
+    renderAll();
   }
 }
+
+function editPhase(wbs) {
+  const phase = projectData.find((f) => f.wbs === wbs);
+  if (!phase) return;
+  const readValues = (d) => ({
+    wbs: d.querySelector("#phaseWbs").value.trim(),
+    name: d.querySelector("#phaseName").value.trim(),
+  });
+  return showDialog({
+    title: t("msgEditPhaseTitle", wbs),
+    bodyHtml:
+      '<div class="form-grid two-col"><div class="form-field"><label for="phaseWbs">' +
+      t("lblMdWbs") +
+      '</label><input id="phaseWbs" value="' +
+      escapeHtml(phase.wbs) +
+      '"></div><div class="form-field"><label for="phaseName">' +
+      t("msgPhaseName") +
+      '</label><input id="phaseName" value="' +
+      escapeHtml(phase.name) +
+      '"></div></div><p class="ui-caption">' +
+      t("msgPhaseRenameHint") +
+      "</p>",
+    actions: [
+      {
+        label: t("msgDeleteAction"),
+        kind: "danger",
+        align: "start",
+        async onClick(d) {
+          if (await deletePhase(wbs)) closeAppDialog(d, null);
+          return false;
+        },
+      },
+      { label: t("msgMoveUp"), align: "start", onClick: () => (moveWithinParent(wbs, -1), false) },
+      { label: t("msgMoveDown"), align: "start", onClick: () => (moveWithinParent(wbs, 1), false) },
+      { label: t("msgCancel"), value: null },
+      {
+        label: t("msgSave"),
+        kind: "primary",
+        onClick(d) {
+          const v = readValues(d);
+          if (!v.wbs || !v.name) throw inputError("msgWbsAndNameAreRequired");
+          let error = "";
+          const ok = transactionalEdit(
+            (data) => {
+              if (v.wbs !== wbs && allItems(data).some((it) => it.wbs === v.wbs))
+                throw inputError("msgDuplicateWbs2");
+              data.find((f) => f.wbs === wbs).name = v.name;
+              renameWbs(data, wbs, v.wbs);
+            },
+            { label: t("msgUndoEdit", wbs), onError: (message) => (error = message) },
+          );
+          if (!ok) throw new Error(error);
+          recordAudit(v.wbs, "Update phase", v.name);
+          renderAll();
+        },
+      },
+    ],
+  });
+}
+
+async function deletePhase(wbs) {
+  const phase = projectData.find((f) => f.wbs === wbs);
+  if (!phase) return false;
+  const removed = new Set(allItems([phase]).map((x) => x.wbs));
+  const dependents = blockingDependents(projectData, removed);
+  if (dependents.length) {
+    await showMessage(
+      t("msgRemoveTheseDependenciesBeforeDeletion") + dependents.map((s) => s.wbs).join(", "),
+    );
+    return false;
+  }
+  const count = removed.size - 1;
+  const confirmed = await askConfirm(
+    count ? t("msgDeletePhaseWithChildren", phase.name, count) : t("msgDeleteTask", phase.name),
+    {
+      title: t("msgDeletePhaseTitle"),
+      confirmLabel: t("msgDeleteAction"),
+      danger: true,
+    },
+  );
+  if (!confirmed) return false;
+  if (
+    !transactionalEdit(
+      (data) =>
+        data.splice(
+          data.findIndex((f) => f.wbs === wbs),
+          1,
+        ),
+      { label: t("msgUndoDelete", wbs) },
+    )
+  )
+    return false;
+  recordAudit(wbs, "Delete phase", phase.name);
+  renderAll();
+  return true;
+}
+
+// ---- Projects ----
+
+async function projectAction(action) {
+  try {
+    if (action === "new" || action === "demo") {
+      const values = await askForm({
+        title: t(action === "demo" ? "btnDemoProject" : "btnNewProject"),
+        fields: [
+          {
+            name: "name",
+            label: t("msgProjectName"),
+            value: action === "demo" ? "Fictional demo" : "",
+            required: true,
+          },
+        ],
+        submitLabel: t("msgCreate"),
+      });
+      if (values) addProject(newProject(values.name, action === "demo" ? syntheticData() : []));
+    }
+    if (action === "duplicate") {
+      const values = await askForm({
+        title: t("btnDuplicateProject"),
+        fields: [
+          { name: "name", label: t("msgNameOfDuplicate"), value: projectMeta.name + " copy", required: true },
+        ],
+        submitLabel: t("btnDuplicateProject"),
+      });
+      if (!values) return;
+      const b = currentBundle();
+      assignProjectIdentity(b, crypto.randomUUID());
+      b.metadata = { name: values.name, archived: false, customName: true };
+      addProject(b);
+    }
+    if (action === "settings") openProjectSettings();
+    if (action === "archive") toggleArchive();
+    if (action === "delete") await deleteCurrentProject();
+    if (action === "phase") await addPhase();
+  } catch (e) {
+    showError(e.message);
+  }
+}
+
+function toggleArchive() {
+  const previous = projectMeta.archived;
+  projectMeta.archived = !previous;
+  if (!saveState()) projectMeta.archived = previous;
+  else recordAudit("-", previous ? "Restore project" : "Archive project", projectMeta.name);
+  clearUndoHistory();
+  renderAll();
+}
+
+async function deleteCurrentProject() {
+  const values = await askForm({
+    title: t("msgDeleteProjectTitle"),
+    intro: t("msgDeleteProjectIntro", projectMeta.name),
+    fields: [{ name: "backup", type: "checkbox", label: t("msgDownloadBackupFirst"), value: true }],
+    submitLabel: t("msgDeleteProjectAction"),
+  });
+  if (!values) return;
+  if (values.backup) exportVersionBundle();
+  removeProject(projectId);
+}
+
+// Fills the current empty project with the fictional example (from the empty-state guide).
+function loadDemoIntoProject() {
+  if (projectData.length) return;
+  if (transactionalEdit((data) => data.push(...syntheticData()), { label: t("btnDemoProject") })) {
+    recordAudit("-", "Load fictional demo", "");
+    renderAll();
+  }
+}
+
+// ---- Group inputs and project settings ----
 
 function renderGroupInputs(item = {}) {
   const host = document.getElementById("taskGroupInputs");
@@ -6605,7 +8175,7 @@ function renderGroupInputs(item = {}) {
   host.innerHTML = groups()
     .map(
       (g) =>
-        '<div class="form-field full"><label for="md_' +
+        '<div class="form-field"><label for="md_' +
         g.id +
         '">' +
         escapeHtml(g.name) +
@@ -6626,61 +8196,31 @@ function readGroupInputs() {
 }
 
 function openProjectSettings() {
-  document.getElementById("projectSettingsDialog")?.remove();
-  const d = document.createElement("dialog");
-  d.id = "projectSettingsDialog";
-  d.className = "project-dialog";
-  d.innerHTML =
-    '<h2 class="ui-heading">' +
-    t("msgProjectSettingsAndGroups") +
-    '</h2><label for="settingName">' +
-    t("msgProjectName") +
-    '</label><input id="settingName"><label for="settingPeople">' +
-    t("msgPeopleSemicolonSeparated") +
-    '</label><input id="settingPeople"><p class="ui-caption">' +
-    t("msgUpTo10GroupsIdsAre") +
-    '</p><div id="settingGroups"></div><button class="btn" id="addSettingGroup">' +
-    t("msgAddGroup") +
-    '</button><label for="settingAliases">' +
-    t("msgPeopleAliasesJson") +
-    '</label><textarea id="settingAliases"></textarea><p id="settingsError" role="alert" class="ui-caption"></p><div class="dialog-actions"><button class="btn" id="settingsCancel">' +
-    t("msgCancel") +
-    '</button><button class="btn btn-primary" id="settingsSave">' +
-    t("msgSave") +
-    "</button></div>";
-  document.body.append(d);
-  d.querySelector("#settingName").value = projectMeta.name;
-  d.querySelector("#settingPeople").value = projectSettings.people.join("; ");
-  d.querySelector("#settingAliases").value = JSON.stringify(projectSettings.personAliases, null, 2);
   let draft = copy(groups());
-  const sync = () => {
+  const sync = (d) => {
     d.querySelectorAll("[data-group-id]").forEach((row) => {
-      const g = draft.find((g) => g.id === row.dataset.groupId);
+      const g = draft.find((x) => x.id === row.dataset.groupId);
       g.name = row.querySelector("[data-name]").value;
       g.color = row.querySelector("[data-color]").value;
     });
   };
-  const draw = () => {
+  const draw = (d) => {
     d.querySelector("#settingGroups").innerHTML = draft
       .map(
-        (g) =>
+        (g, i) =>
           '<div data-group-id="' +
           g.id +
           '" class="settings-group-row"><span class="ui-caption">' +
-          g.id +
+          t("msgGroupSlot", i + 1) +
           '</span><input data-name aria-label="' +
-          g.id +
-          " " +
-          t("msgName") +
+          escapeHtml(t("msgGroupSlot", i + 1) + " " + t("msgName")) +
           '" maxlength="60" value="' +
           escapeHtml(g.name) +
           '"><input data-color aria-label="' +
-          g.id +
-          " " +
-          t("msgColor") +
+          escapeHtml(t("msgGroupSlot", i + 1) + " " + t("msgColor")) +
           '" type="color" value="' +
           g.color +
-          '"><button class="btn" data-remove="' +
+          '"><button type="button" class="btn" data-remove="' +
           g.id +
           '">' +
           t("msgRemove") +
@@ -6691,54 +8231,83 @@ function openProjectSettings() {
     d.querySelectorAll("[data-remove]").forEach(
       (button) =>
         (button.onclick = () => {
-          sync();
+          sync(d);
           draft = draft.filter((g) => g.id !== button.dataset.remove);
-          draw();
+          draw(d);
         }),
     );
   };
-  draw();
-  d.querySelector("#addSettingGroup").onclick = () => {
-    sync();
-    const id = GROUP_IDS.find((id) => !draft.some((g) => g.id === id));
-    if (id) {
-      draft.push({ id, name: id.replace("group", "Group "), color: GROUP_COLORS[GROUP_IDS.indexOf(id)] });
-      draw();
-    }
-  };
-  const close = () => {
-    d.close();
-    d.remove();
-  };
-  d.querySelector("#settingsCancel").onclick = close;
-  d.addEventListener("cancel", () => d.remove());
-  d.querySelector("#settingsSave").onclick = () => {
-    try {
-      if (storageReadBlocked) throw inputError("msgStoragePausedExportABackupAnd");
-      sync();
-      const b = currentBundle();
-      b.metadata.name = d.querySelector("#settingName").value.trim();
-      b.metadata.customName = true;
-      b.settings.groups = draft.map((g) => ({ ...g, name: g.name.trim() }));
-      b.settings.people = d
-        .querySelector("#settingPeople")
-        .value.split(";")
-        .map((p) => p.trim())
-        .filter(Boolean);
-      b.settings.personAliases = JSON.parse(d.querySelector("#settingAliases").value);
-      validateBundle(b);
-      const next = copy(workspace);
-      next.projects[projectId] = b;
-      commitWorkspace(next);
-      selectBundle(b);
-      applyStaticI18n();
-      renderAll();
-      close();
-    } catch (e) {
-      d.querySelector("#settingsError").textContent = e.message;
-    }
-  };
-  d.showModal();
+  return showDialog({
+    title: t("msgProjectSettingsAndGroups"),
+    size: "wide",
+    bodyHtml:
+      '<div class="form-grid"><div class="form-field full"><label for="settingName">' +
+      t("msgProjectName") +
+      '</label><input id="settingName" value="' +
+      escapeHtml(projectMeta.name) +
+      '"></div><div class="form-field full"><label for="settingPeople">' +
+      t("msgPeopleSemicolonSeparated") +
+      '</label><input id="settingPeople" value="' +
+      escapeHtml(projectSettings.people.join("; ")) +
+      '"></div></div><h3 class="ui-heading settings-subhead">' +
+      t("msgGroupsHeading") +
+      '</h3><p class="ui-caption">' +
+      t("msgUpTo10GroupsIdsAre") +
+      '</p><div id="settingGroups"></div><button type="button" class="btn" id="addSettingGroup">' +
+      t("msgAddGroup") +
+      '</button><div class="form-field full no-enter-submit"><label for="settingAliases">' +
+      t("msgPeopleAliasesJson") +
+      '</label><textarea id="settingAliases" rows="5">' +
+      escapeHtml(JSON.stringify(projectSettings.personAliases, null, 2)) +
+      "</textarea></div>",
+    actions: [
+      { label: t("msgCancel"), value: null },
+      {
+        label: t("msgSave"),
+        kind: "primary",
+        onClick(d) {
+          if (storageReadBlocked) throw inputError("msgStoragePausedExportABackupAnd");
+          sync(d);
+          const b = currentBundle();
+          b.metadata.name = d.querySelector("#settingName").value.trim();
+          b.metadata.customName = true;
+          b.settings.groups = draft.map((g) => ({ ...g, name: g.name.trim() }));
+          b.settings.people = d
+            .querySelector("#settingPeople")
+            .value.split(";")
+            .map((p) => p.trim())
+            .filter(Boolean);
+          try {
+            b.settings.personAliases = JSON.parse(d.querySelector("#settingAliases").value || "{}");
+          } catch (e) {
+            throw inputError("msgAliasesJsonInvalid");
+          }
+          validateBundle(b);
+          const next = copy(workspace);
+          next.projects[projectId] = b;
+          commitWorkspace(next);
+          selectBundle(b);
+          applyStaticI18n();
+          renderAll();
+        },
+      },
+    ],
+    onOpen(d) {
+      draw(d);
+      d.querySelector("#addSettingGroup").onclick = () => {
+        sync(d);
+        const id = GROUP_IDS.find((x) => !draft.some((g) => g.id === x));
+        if (id) {
+          draft.push({
+            id,
+            name: "Group " + (GROUP_IDS.indexOf(id) + 1),
+            color: GROUP_COLORS[GROUP_IDS.indexOf(id)],
+          });
+          draw(d);
+        }
+      };
+    },
+  });
 }
 
 // ---- src/app/js/boot.js ----
@@ -6769,24 +8338,94 @@ document.getElementById("rightPane").addEventListener(
   { passive: false },
 );
 
-// Split Pane Resizer
+// Split pane resizer (the chosen width is remembered in this browser).
 const resizer = document.getElementById("paneResizer");
-const leftPane = document.getElementById("leftPane");
-resizer.addEventListener("mousedown", (e) => {
+resizer.addEventListener("pointerdown", (e) => {
   e.preventDefault();
   resizer.classList.add("dragging");
+  const rect = document.getElementById("view-gantt").getBoundingClientRect();
+  let percent = null;
   const moveFn = (ev) => {
-    const pct = Math.min(78, Math.max(30, (ev.clientX / window.innerWidth) * 100));
-    leftPane.style.width = pct + "%";
+    percent = Math.min(80, Math.max(30, ((ev.clientX - rect.left) / rect.width) * 100));
+    applySplit(percent);
+    applyColumnLayout();
   };
   const upFn = () => {
     resizer.classList.remove("dragging");
-    document.removeEventListener("mousemove", moveFn);
-    document.removeEventListener("mouseup", upFn);
+    document.removeEventListener("pointermove", moveFn);
+    document.removeEventListener("pointerup", upFn);
+    if (percent) writePref(SPLIT_PREF_KEY, Math.round(percent));
   };
-  document.addEventListener("mousemove", moveFn);
-  document.addEventListener("mouseup", upFn);
+  document.addEventListener("pointermove", moveFn);
+  document.addEventListener("pointerup", upFn);
 });
+window.addEventListener("resize", () => applyColumnLayout());
+
+// Inline table inputs: Enter commits and moves to the same field on the next row (Shift+Enter: previous).
+document.getElementById("wbsTbody").addEventListener("keydown", (e) => {
+  const input = e.target.closest(".inline-input");
+  if (!input || e.key !== "Enter") return;
+  e.preventDefault();
+  const fields = [...document.querySelectorAll('.inline-input[data-field="' + input.dataset.field + '"]')];
+  const next = fields[fields.indexOf(input) + (e.shiftKey ? -1 : 1)];
+  if (next) next.focus();
+  else input.blur();
+});
+
+// Date fields: ISO text input plus a button that opens the browser's date picker.
+const datePickerProxy = document.createElement("input");
+datePickerProxy.type = "date";
+datePickerProxy.className = "date-proxy";
+datePickerProxy.tabIndex = -1;
+datePickerProxy.setAttribute("aria-hidden", "true");
+document.addEventListener("click", (e) => {
+  const button = e.target.closest(".date-picker-btn");
+  if (!button) return;
+  const field = document.getElementById(button.dataset.dateFor);
+  button.after(datePickerProxy);
+  datePickerProxy.value = parseDate(field.value.trim()) ? field.value.trim() : today();
+  datePickerProxy.onchange = () => {
+    field.value = datePickerProxy.value;
+    field.dispatchEvent(new Event("change", { bubbles: true }));
+    field.focus();
+  };
+  try {
+    datePickerProxy.showPicker();
+  } catch (err) {
+    field.focus();
+  }
+});
+
+// Undo / redo shortcuts (not while typing in a field or when a dialog is open).
+document.addEventListener("keydown", (e) => {
+  if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+  if (document.querySelector("dialog[open]")) return;
+  if (e.target.closest("input:not([type=checkbox]),textarea,select")) return;
+  const key = e.key.toLowerCase();
+  if (key === "z" && !e.shiftKey) {
+    e.preventDefault();
+    undo();
+  } else if ((key === "z" && e.shiftKey) || key === "y") {
+    e.preventDefault();
+    redo();
+  }
+});
+
+// Menus close on outside click and Esc.
+document.addEventListener("click", (e) => {
+  for (const menu of document.querySelectorAll("details.menu[open]"))
+    if (!menu.contains(e.target)) menu.open = false;
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  const menu = document.querySelector("details.menu[open]");
+  if (menu) {
+    menu.open = false;
+    menu.querySelector("summary").focus();
+  }
+});
+
+for (const d of document.querySelectorAll("dialog.app-dialog")) enhanceDialog(d);
 
 // Bind existing visible labels to their controls without changing the workflow.
 document.querySelectorAll(".form-field,.filter-item").forEach((field) => {
@@ -6811,6 +8450,7 @@ try {
   sidebarCollapsed = localStorage.getItem("project-web-tool:sidebar") === "true";
 } catch (e) {}
 // Boot application
+applySplit();
 loadState();
 applyStaticI18n();
 renderAll();

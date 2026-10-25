@@ -132,6 +132,9 @@ function validateProject(data) {
   return { subs, order };
 }
 
+// Version tags: letters (any script), digits, spaces, dots, underscores and hyphens.
+const VERSION_TAG_PATTERN = /^[\p{L}\p{N}._ -]+$/u;
+
 function validateVersions(list) {
   if (!Array.isArray(list)) throw inputError("msgInvalidVersionHistory");
   const tags = new Set();
@@ -139,7 +142,7 @@ function validateVersions(list) {
     if (
       !v ||
       typeof v.tag !== "string" ||
-      !/^[A-Za-z0-9._ -]+$/.test(v.tag) ||
+      !VERSION_TAG_PATTERN.test(v.tag) ||
       tags.has(v.tag) ||
       !["time", "author", "note"].every((k) => typeof v[k] === "string")
     )
