@@ -1,6 +1,6 @@
 # Current status
 
-Updated: 2026-10-17 (Asia/Shanghai).
+Updated: 2026-10-25 (Asia/Shanghai).
 
 ## Implemented
 
@@ -10,7 +10,13 @@ Updated: 2026-10-17 (Asia/Shanghai).
 - Controlled Excel v3, protected calculated cells, explicit 21/22-field mappings, group configuration, preview, source revision checks and downloads as new files. Legacy 14-column spreadsheet import remains positionally compatible; source-specific aliases have been removed. Legacy JSON requires a declared three-slot mapping.
 - Public source allowlist and irreversible identifier fingerprints with submission/push hooks. Historical source files, old templates, development images, raw audit records and old Git backups have been removed under explicit user authorization. The public repository was deleted and recreated under the same name, with a new repository identity and clean Git history; only the 13 reviewed files were uploaded.
 
-## Current change: stable sidebar icons
+## Current change: English-first repository
+
+- README and public release conventions now present English first, followed by Simplified Chinese. Existing Chinese guidance is retained in the same allowlisted files.
+- Initial HTML language and fallback labels use English. English remains the default interface language; saved Chinese preferences and user-entered text are preserved. Excel continues to provide English data sheets and separate Chinese instructions.
+- Validation: all 47 automated checks, privacy scanning and release generation passed. Static checks confirm English HTML, unchanged application JavaScript, English-first documents and retained Chinese guidance. The repository has no lint, typecheck or build scripts; those pnpm commands report missing commands. No new browser or native Excel visual acceptance is claimed.
+
+## Previous change: stable sidebar icons
 
 - Unified expanded/collapsed pane padding and icon alignment. Heading, view and language buttons keep 44 px height in both states; icon centers remain 28 px from the pane's left edge. Single-line navigation labels prevent language-dependent row growth.
 - Reviewed the CSS box geometry for the toggle, active/inactive view buttons and language button. All 47 automated checks and privacy checks pass. Source and public-release copies are synchronized.
@@ -35,3 +41,19 @@ Updated: 2026-10-17 (Asia/Shanghai).
 - Browser data is stored per origin/browser; file cleanup cannot erase other browser profiles, external downloads, the parent directory or third-party clones. Existing user data and project backups are not silently erased by the application.
 - Group names and personnel aliases are project configuration; aliases remain JSON-edited. No cloud sync, authentication, collaboration, work calendars, multi-predecessor scheduling or resource-capacity calculation.
 - Anonymous checks cover the seven known historical commits and source endpoints. Other platform caches and third-party copies are outside these verified endpoints.
+
+## 简体中文
+
+更新：2026-10-25（Asia/Shanghai）。
+
+### 本次变更：英语优先
+
+- README 和公开发布约定以英语为主，随后保留完整中文说明。
+- HTML 初始语言标记及初始文案改为英文；继续保留中文切换、已保存的语言偏好和用户原文。Excel 数据表维持英文，中文说明保留在 Instructions_zh。
+- 不改变排程、存储、导入导出及项目配置逻辑。47 项自动检查、隐私扫描和发布生成通过；静态检查确认英文初始语言、应用脚本未变和中文说明完整保留。仓库未定义 lint、typecheck、build，相关 pnpm 命令提示不存在。本次未进行新的浏览器或原生 Excel 视觉验收。
+
+### 功能与限制
+
+支持离线项目、三级任务、自然日 FS/Lag 排程、加权进度、甘特图、任务卡片、人员统计、1–10 个自定义组、版本快照和恢复点。Excel v3 提供受控交换，兼容旧格式；JSON 迁移要求明确的旧字段映射。
+
+数据按浏览器和来源存储，请定期导出 JSON。人员别名仍通过 JSON 配置；尚无云同步、登录、多人协作、工作日历、多前置任务或资源容量计算。历史验证记录及详细限制见上方英文段落。

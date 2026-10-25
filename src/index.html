@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -910,70 +910,70 @@ table.wbs-table th,table.data-grid th {font-family:var(--font-ui);font-size:var(
 </head>
 <body>
 
-<div class="app-shell"><aside id="projectSidebar" class="toolbar" aria-label="项目视图与筛选 / Project views and filters">
+<div class="app-shell"><aside id="projectSidebar" class="toolbar" aria-label="Project views and filters / 项目视图与筛选">
   <div class="sidebar-heading">
     <button type="button" id="sidebarToggle" class="sidebar-toggle" onclick="toggleSidebar()" aria-controls="sidebarContent" aria-expanded="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-    <span class="sidebar-heading-label" id="sidebarHeadingLabel">项目导航</span>
+    <span class="sidebar-heading-label" id="sidebarHeadingLabel">Project navigation</span>
   </div>
   <div id="sidebarContent" class="sidebar-content">
   <div class="view-tabs">
-    <button class="view-tab active" id="tab-gantt" onclick="switchView('gantt')">1. WBS 甘特图</button>
-    <button class="view-tab" id="tab-cards" onclick="switchView('cards')">2. 主-子任务卡片</button>
-    <button class="view-tab" id="tab-people" onclick="switchView('people')">3. 人员参与统计</button>
+    <button class="view-tab active" id="tab-gantt" onclick="switchView('gantt')">1. WBS & Gantt Chart</button>
+    <button class="view-tab" id="tab-cards" onclick="switchView('cards')">2. Main ↔ Sub-task Cards</button>
+    <button class="view-tab" id="tab-people" onclick="switchView('people')">3. People Participation</button>
   </div>
 
   <details class="action-menu" id="actionMenu" open><summary id="actionMenuLabel"></summary><div class="header-actions">
- <input aria-label="导入项目文件 / Import project file" type="file" id="excelFileInput" accept=".xlsx,.json" style="display:none" onchange="handleFileImport(event)">
- <details class="sidebar-action-group sidebar-filters" id="taskActions"><summary id="taskActionsLabel">任务操作</summary><div class="group-actions"><button class="btn" id="btnAddMain" onclick="openAddModal('Main Task')">＋ 主任务</button><button class="btn" id="btnAddSub" onclick="openAddModal('Sub-task')">＋ 子任务</button></div></details>
- <details class="sidebar-action-group sidebar-filters" id="dataActions"><summary id="dataActionsLabel">数据与版本</summary><div class="group-actions"><button class="btn" id="btnImportXls" onclick="document.getElementById('excelFileInput').click()">📥 导入</button><button class="btn" title="标准 .xlsx 模板 / Standard .xlsx template" id="btnExportXls" onclick="exportToExcelXML()">📤 导出 Excel</button><button class="btn btn-primary" id="btnSaveVer" onclick="openVersionModal()">📌 保存新版本</button><button class="btn" id="btnExportJson" onclick="exportVersionBundle()">💾 导出版本包</button></div></details>
+ <input aria-label="Import project file / 导入项目文件" type="file" id="excelFileInput" accept=".xlsx,.json" style="display:none" onchange="handleFileImport(event)">
+ <details class="sidebar-action-group sidebar-filters" id="taskActions"><summary id="taskActionsLabel">Task actions</summary><div class="group-actions"><button class="btn" id="btnAddMain" onclick="openAddModal('Main Task')">＋ Main Task</button><button class="btn" id="btnAddSub" onclick="openAddModal('Sub-task')">＋ Sub-task</button></div></details>
+ <details class="sidebar-action-group sidebar-filters" id="dataActions"><summary id="dataActionsLabel">Data & versions</summary><div class="group-actions"><button class="btn" id="btnImportXls" onclick="document.getElementById('excelFileInput').click()">📥 Import</button><button class="btn" title="Standard .xlsx template / 标准 .xlsx 模板" id="btnExportXls" onclick="exportToExcelXML()">📤 Export Excel</button><button class="btn btn-primary" id="btnSaveVer" onclick="openVersionModal()">📌 Save Version</button><button class="btn" id="btnExportJson" onclick="exportVersionBundle()">💾 Export Bundle</button></div></details>
  </div></details>
-<details class="sidebar-filters" id="sidebarFilters"><summary id="sidebarFiltersLabel">筛选与显示</summary><div class="filter-group">
+<details class="sidebar-filters" id="sidebarFilters"><summary id="sidebarFiltersLabel">Filters & display</summary><div class="filter-group">
     <div class="filter-item">
-      <label id="lblFltFam">模块:</label>
+      <label id="lblFltFam">Family:</label>
       <select id="fltFamily" onchange="renderAll()"></select>
     </div>
     <div class="filter-item">
-      <label id="lblFltPerson">人员:</label>
+      <label id="lblFltPerson">Person:</label>
       <select id="fltPerson" onchange="renderAll()"></select>
     </div>
     <div class="filter-item">
-      <label id="lblFltRole">角色:</label>
+      <label id="lblFltRole">Role:</label>
       <select id="fltRole" onchange="renderAll()"></select>
     </div>
     <div class="filter-item">
-      <label id="lblBaselineCmp">对比基线:</label>
+      <label id="lblBaselineCmp">Baseline Diff:</label>
       <select id="fltBaseline" onchange="renderAll()"></select>
     </div>
     <div class="filter-item">
-      <label id="lblStatusDate">基准日:</label>
+      <label id="lblStatusDate">Status Date:</label>
       <input type="date" id="statusDateInput" value="" onchange="renderAll()">
     </div>
     <div class="filter-item">
-      <label id="lblZoom">缩放:</label>
-      <div class="zoom-control" title="Ctrl + 鼠标滚轮无级缩放">
+      <label id="lblZoom">Zoom:</label>
+      <div class="zoom-control" title="Ctrl+Wheel to zoom / Ctrl + 鼠标滚轮缩放">
         <button class="zoom-btn" onclick="stepZoom(-4)">−</button>
         <input type="range" id="ganttZoomSlider" class="zoom-slider" min="10" max="48" step="2" value="24" oninput="onZoomSliderChange(this.value)">
         <button class="zoom-btn" onclick="stepZoom(4)">＋</button>
         <span id="zoomPctLabel" style="font-size:10.5px;min-width:34px;text-align:center">100%</span>
       </div>
     </div>
-    <button class="btn" id="btnExpandAll" onclick="expandCollapseAll(2)">展开全部</button>
-    <button class="btn" id="btnCollapseSub" onclick="expandCollapseAll(1)">仅主任务</button>
+    <button class="btn" id="btnExpandAll" onclick="expandCollapseAll(2)">Expand All</button>
+    <button class="btn" id="btnCollapseSub" onclick="expandCollapseAll(1)">Main Tasks Only</button>
   </div></details></div>
-<div class="sidebar-bottom"><button class="btn btn-lang" id="btnLangToggle" onclick="toggleLanguage()">🌐 EN / 中文</button></div></aside><main class="main-column"><header class="top-header">
+<div class="sidebar-bottom"><button class="btn btn-lang" id="btnLangToggle" onclick="toggleLanguage()">🌐 切换中文</button></div></aside><main class="main-column"><header class="top-header">
   <div class="brand-area">
     <div class="brand-title">
       <div id="projectControls" class="project-controls"></div><h1 class="ui-title" id="uiTitle">Project Workspace — Project Management System</h1>
-      <p id="uiSubtitle">Task and people linkage</p>
+      <p id="uiSubtitle">Task and people linkage · Export Bundle to back up browser data</p>
     </div>
   </div>
   <div class="kpi-strip">
     <div class="kpi-card">
-      <div class="lbl" id="lblKpiSpan">Timeline</div>
+      <div class="lbl" id="lblKpiSpan">Timeline Span</div>
       <div class="val" id="kpiSpan">TBC</div>
     </div>
     <div class="kpi-card">
-      <div class="lbl" id="lblKpiCounts">WBS Structure</div>
+      <div class="lbl" id="lblKpiCounts">WBS Hierarchy</div>
       <div class="val" id="kpiCounts">-</div>
     </div>
     <div class="kpi-card">
@@ -1048,15 +1048,15 @@ table.wbs-table th,table.data-grid th {font-family:var(--font-ui);font-size:var(
   <div class="full-view" id="view-people">
     <div class="section-card">
       <div class="section-card-hdr">
-        <span class="ui-heading" id="peopleSecTitle1">人员与组参与总览</span>
-        <span class="ui-caption" id="peopleSecSub1"></span>
+        <span class="ui-heading" id="peopleSecTitle1">People & Support Participation Summary</span>
+        <span class="ui-caption" id="peopleSecSub1">Click 'Filter in Gantt' on any row to inspect that person's schedule on the timeline</span>
       </div>
       <table class="data-grid" id="peopleSummaryTable"></table>
     </div>
 
     <div class="section-card">
       <div class="section-card-hdr">
-        <span class="ui-heading" id="peopleSecTitle2">主任务 × 核心人员角色分配矩阵</span>
+        <span class="ui-heading" id="peopleSecTitle2">Main Tasks × Key Personnel Assignment Matrix (RACI)</span>
       </div>
       <table class="data-grid" id="raciMatrixTable"></table>
     </div>
@@ -1075,30 +1075,30 @@ table.wbs-table th,table.data-grid th {font-family:var(--font-ui);font-size:var(
 <div class="modal-backdrop" id="taskModal">
   <div class="modal-box">
     <div class="modal-hdr">
-      <span class="ui-heading" id="modalTitle">编辑任务</span>
-      <button class="btn btn-icon" aria-label="关闭" onclick="closeModal()"><svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button>
+      <span class="ui-heading" id="modalTitle">Edit task</span>
+      <button class="btn btn-icon" aria-label="Close" onclick="closeModal()"><svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="mdMode">
       <input type="hidden" id="mdOrigWbs">
 
       <div class="form-field">
-        <label id="lblMdType">任务层级 (Level)</label>
+        <label id="lblMdType">Task Level</label>
         <select id="mdType" onchange="onModalTypeChange()">
           <option value="Sub-task">Sub-task</option>
           <option value="Main Task">Main Task</option>
         </select>
       </div>
       <div class="form-field" id="mdParentWrap">
-        <label id="mdParentLabel">所属主任务</label>
+        <label id="mdParentLabel">Parent main task</label>
         <select id="mdParent"></select>
       </div>
       <div class="form-field">
-        <label id="lblMdWbs">WBS 编号</label>
+        <label id="lblMdWbs">WBS Code</label>
         <input type="text" id="mdWbs" placeholder="1.1.5 / 2.5">
       </div>
       <div class="form-field">
-        <label id="lblMdPrio">优先级 (Priority)</label>
+        <label id="lblMdPrio">Priority</label>
         <select id="mdPrio">
           <option value="1">1 (High)</option>
           <option value="2">2 (Medium)</option>
@@ -1107,54 +1107,54 @@ table.wbs-table th,table.data-grid th {font-family:var(--font-ui);font-size:var(
         </select>
       </div>
       <div class="form-field full">
-        <label id="lblMdName">任务名称 / 描述</label>
+        <label id="lblMdName">Task / Sub-task Description</label>
         <input type="text" id="mdName">
       </div>
 
       <div id="mdSubtaskFields" style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
         <div class="form-field">
-          <label id="lblMdPred">前置任务 WBS (Predecessor FS)</label>
+          <label id="lblMdPred">Predecessor WBS (Finish-to-Start)</label>
           <select id="mdPred" onchange="onModalPredChange()"></select>
         </div>
         <div class="form-field">
-          <label id="lblMdLag">延隔天数 Lag (Days)</label>
+          <label id="lblMdLag">Lag (Calendar Days)</label>
           <input type="number" id="mdLag" value="0" onchange="onModalPredChange()">
         </div>
         <div class="form-field">
-          <label id="lblMdStart">开始日期 (Starting Date)</label>
+          <label id="lblMdStart">Starting Date</label>
           <input type="date" id="mdStart" onchange="onModalStartOrDaysChange('start')">
         </div>
         <div class="form-field">
-          <label id="lblMdDays">工期天数 (Days)</label>
+          <label id="lblMdDays">Duration (Days)</label>
           <input type="number" id="mdDays" min="1" value="7" onchange="onModalStartOrDaysChange('days')">
         </div>
         <div class="form-field">
-          <label id="lblMdFinish">交付日期 (Delivery Date)</label>
+          <label id="lblMdFinish">Delivery Date (Auto)</label>
           <input type="date" id="mdFinish" readonly style="background:var(--bg-page)">
         </div>
         <div class="form-field">
-          <label id="lblMdPct">完成百分比 (% Complete)</label>
+          <label id="lblMdPct">% Complete (0~100)</label>
           <input type="number" id="mdPct" min="0" max="100" value="0">
         </div>
         <div hidden>        <div class="form-field full">
-          <label id="lblMdLeader">负责人 Leader (People)</label>
+          <label id="lblMdLeader">Leader (Primary Owner)</label>
           <input type="text" id="mdLeader">
         </div>
         <div class="form-field full">
-          <label id="lblMdGroup2">Support Team 1 (用 ; 分隔多人)</label>
+          <label id="lblMdGroup2">Support Team 1 (separate multiple with ;)</label>
           <input type="text" id="mdGroup2">
         </div>
         <div class="form-field full">
-          <label id="lblMdGroup3">Support Team 2 (用 ; 分隔多人)</label>
+          <label id="lblMdGroup3">Support Team 2 (separate multiple with ;)</label>
           <input type="text" id="mdGroup3">
         </div></div><div id="taskGroupInputs" class="form-field full"></div>
       </div>
     </div>
     <div class="modal-ftr">
-      <button class="btn btn-danger" id="mdDeleteBtn" onclick="deleteModalTask()">删除</button>
+      <button class="btn btn-danger" id="mdDeleteBtn" onclick="deleteModalTask()">Delete Task</button>
       <div style="display:flex;gap:8px;margin-left:auto">
-        <button class="btn" id="mdCancelBtn" onclick="closeModal()">取消</button>
-        <button class="btn btn-primary" id="mdSaveBtn" onclick="saveModalTask()">保存</button>
+        <button class="btn" id="mdCancelBtn" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" id="mdSaveBtn" onclick="saveModalTask()">Save & Recalculate</button>
       </div>
     </div>
   </div>
@@ -1164,28 +1164,28 @@ table.wbs-table th,table.data-grid th {font-family:var(--font-ui);font-size:var(
 <div class="modal-backdrop" id="versionModal">
   <div class="modal-box" style="width:480px">
     <div class="modal-hdr">
-      <span class="ui-heading" id="verModalTitle">📌 保存新版本快照 (Save Version Snapshot)</span>
-      <button class="btn btn-icon" aria-label="关闭" onclick="closeVersionModal()"><svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button>
+      <span class="ui-heading" id="verModalTitle">Save version snapshot</span>
+      <button class="btn btn-icon" aria-label="Close" onclick="closeVersionModal()"><svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button>
     </div>
     <div class="modal-body">
       <div class="form-field">
-        <label id="lblVerTag">版本号 (Version Tag)</label>
+        <label id="lblVerTag">Version tag</label>
         <input type="text" id="verTagInput" placeholder="V1.7">
       </div>
       <div class="form-field">
-        <label id="lblVerAuthor">更新人 (Updated By)</label>
+        <label id="lblVerAuthor">Updated by</label>
         <input type="text" id="verAuthorInput" value="PM">
       </div>
       <div class="form-field full">
-        <label id="lblVerNote">版本变更说明 (Release / Change Notes)</label>
-        <textarea id="verNoteInput" rows="3" placeholder="简述本次排期、人员或任务调整内容..."></textarea>
+        <label id="lblVerNote">Change notes</label>
+        <textarea id="verNoteInput" rows="3" placeholder="Briefly describe schedule, people or task changes..."></textarea>
       </div>
     </div>
     <div class="modal-ftr">
       <div></div>
       <div style="display:flex;gap:8px">
-        <button class="btn" onclick="closeVersionModal()" id="btnVerCancel">取消</button>
-        <button class="btn btn-primary" onclick="confirmSaveVersion()" id="btnVerConfirm">保存版本快照</button>
+        <button class="btn" onclick="closeVersionModal()" id="btnVerCancel">Cancel</button>
+        <button class="btn btn-primary" onclick="confirmSaveVersion()" id="btnVerConfirm">Save version</button>
       </div>
     </div>
   </div>
