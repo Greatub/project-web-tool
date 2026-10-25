@@ -67,7 +67,7 @@ npm run privacy
 npm run release
 ```
 
-Add every new interface string to both languages in `src/app/js/i18n.js`; `npm test` fails when a key is missing in either language.
+Add every new interface string to both languages in `src/app/js/i18n.js`; `npm test` fails when a key is missing in either language. Follow the [source and build contract](docs/PUBLIC.md#source-and-build-contract), [editing and data safety rules](docs/PUBLIC.md#editing-history-and-data-safety-contract), and [validation gates](docs/PUBLIC.md#validation-and-release-acceptance) when changing the application.
 
 `public-release/` is an allowlisted copy for public distribution. Review it before publishing. Original cases, screenshots, old templates and development records were removed from this workspace under prior authorization. Keep user data and browser exports outside the repository; publish from the reviewed copy rather than an entire local working directory.
 
@@ -114,7 +114,7 @@ npm run privacy
 npm run release
 ```
 
-所有界面文字和提示统一写在 `src/app/js/i18n.js`，中英文必须同时提供；缺少任一语言时 `npm test` 会失败。页面顶部显示浏览器存储用量；保存失败时出现红色横幅并保持到再次保存成功，用量超过 80% 时出现黄色提醒。恢复点只保存项目数据和设置，恢复时保留当前的版本快照与审计记录。
+所有界面文字和提示统一写在 `src/app/js/i18n.js`，中英文必须同时提供；缺少任一语言时 `npm test` 会失败。修改应用须遵循[源码与构建规范](docs/PUBLIC.md#源码与构建规范)、[编辑及数据安全规则](docs/PUBLIC.md#编辑历史与数据安全规范)和[验证门禁](docs/PUBLIC.md#验证与发布验收规范)。页面顶部显示浏览器存储用量；保存失败时出现红色横幅并保持到再次保存成功，用量超过 80% 时出现黄色提醒。恢复点只保存项目数据和设置，恢复时保留当前的版本快照与审计记录。
 
 `public-release/` 是面向公开仓库的白名单副本。历史案例、截图、旧模板和开发记录已按授权从当前目录清理；用户数据与浏览器导出不应上传。应从该副本建立公开仓库，避免直接同步整个本地工作目录。
 
