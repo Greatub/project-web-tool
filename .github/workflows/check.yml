@@ -2,7 +2,7 @@ name: Public source checks
 on: [push, pull_request]
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -15,13 +15,14 @@ jobs:
       - run: node scripts/privacy-check.cjs --tracked
       - run: node scripts/privacy-check.cjs --history
   browser-smoke:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       # Playwright is a test-only tool; the app itself still has no dependencies.
+      # The runner is pinned because Playwright 1.55 installs system packages for Ubuntu 24.04.
       - run: npm install --no-save playwright@1.55.0
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
