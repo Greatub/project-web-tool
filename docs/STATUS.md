@@ -10,7 +10,14 @@ Updated: 2026-10-27 (Asia/Shanghai).
 - Controlled Excel v3, protected calculated cells, explicit 21/22-field mappings, group configuration, preview, source revision checks and downloads as new files. Legacy 14-column spreadsheet import remains positionally compatible; source-specific aliases have been removed. Legacy JSON requires a declared three-slot mapping.
 - Public source allowlist and irreversible identifier fingerprints with submission/push hooks. Historical source files, old templates, development images, raw audit records and old Git backups have been removed under explicit user authorization. The public repository was deleted and recreated under the same name, with a new repository identity and clean Git history; only the 13 reviewed files were uploaded.
 
-## Current change: guided workflow and data safety
+## Current change: maintainer handoff
+
+- Added bilingual `docs/HANDOFF.md` with the verified application baseline, operating workflow, source map, file contracts, data-safety/design rules, release procedure, troubleshooting boundaries and prioritized pending work. Linked it from README and explicitly allowlisted it for publication.
+- Application baseline `90168b9` passed [GitHub Actions run 40461697654](https://github.com/Greatub/project-web-tool/actions/runs/40461697654), including 95 logic checks and 30 browser checks. This confirms the final backup-revision correction as well as the guided workflow; manual screenshot/native Project acceptance remains pending.
+- This documentation-only change: build freshness, relative documentation links and privacy checks verified; full logic/history gates run again before push. No new application behavior, schema or exchange format. No new local browser/native desktop verification is claimed.
+- Next: manual bilingual desktop review, native Project XML acceptance; custom calendars remain a proposal and are not implemented. See HANDOFF for the continuation sequence.
+
+## Previous change: guided workflow and data safety
 
 - Added persistent Import / Edit / Export guidance using shared buttons, captions and dialogs. The empty state explains the complete file-to-edit-to-download flow; import guidance distinguishes controlled Excel templates, Project XML and full JSON backups. Export guidance explains which formats include history.
 - Import failures retain the filename and available sheet/cell/row/WBS details, explain that the source is unchanged, offer repair steps and a corrected-file picker. Stale revisions, wrong-project workbooks and formulas have specific advice. Plan validation now reports the original worksheet row after summary rows are filtered.
@@ -104,7 +111,14 @@ Updated: 2026-10-27 (Asia/Shanghai).
 
 更新：2026-10-27（Asia/Shanghai）。
 
-### 本次变更：操作引导与数据安全状态
+### 本次变更：维护交接文档
+
+- 新增中英文 `docs/HANDOFF.md`，包含已验证应用基线、操作流程、源码入口、文件交换、安全与设计约定、发布步骤、已知限制及后续优先级；README 增加入口，公开白名单明确允许该文件。
+- 最终应用基线 `90168b9` 的 CI 40461697654 通过 95 项逻辑和 30 项浏览器检查，覆盖最后的备份摘要修正。人工截图及原生 Project 验收仍待完成。
+- 本次仅更新文档及发布规则，检查构建一致性、文档相对链接和脱敏；推送前再次执行逻辑与历史扫描门禁。不改变应用、schema 或交换格式，不宣称新的本地浏览器及原生桌面验收。
+- 后续先人工复核中英文桌面及原生 Project XML；自定义日历仍为待开发提案。
+
+### 上次变更：操作引导与数据安全状态
 
 - 增加持续可见的导入、修改、导出入口和完整操作指引，复用按钮、说明文字及统一对话框；导出说明区分 Excel/XML 字段交换与完整 JSON 备份。
 - 导入失败保留文件名及可用的表、单元格、行号或 WBS 定位，提供修正建议及重选文件入口；过期版本、项目不匹配、公式分别提示。修复过滤汇总行后 Plan 报错行号偏移的问题。

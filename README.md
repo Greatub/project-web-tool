@@ -6,6 +6,8 @@
 
 An offline project management web tool. Public source: [Greatub/project-web-tool](https://github.com/Greatub/project-web-tool).
 
+Maintainers: start with the [handoff guide](docs/HANDOFF.md) for the verified baseline, source map, safety contracts and next steps.
+
 ### Quick start
 
 Open `src/index.html` in a modern Edge or Chrome browser. No installation, dependencies or server are required. You can also serve `src/` as a static website.
@@ -86,6 +88,8 @@ See [Current status](docs/STATUS.md) for scope and verification and [Public rele
 ## 简体中文
 
 英语为仓库主要语言，简体中文为第二语言。下方保留中文说明；界面语言可在侧栏底部切换，已保存的语言偏好及用户输入原文保留。
+
+维护交接请先阅读[交接文档](docs/HANDOFF.md)，包含验证基线、源码入口、安全约定与后续工作。
 
 公开源码：[Greatub/project-web-tool](https://github.com/Greatub/project-web-tool)。
 

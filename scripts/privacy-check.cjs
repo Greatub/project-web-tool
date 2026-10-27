@@ -21,6 +21,7 @@ const PUBLIC_FILES = [
   "src/app/js/boot.js",
   "docs/PUBLIC.md",
   "docs/STATUS.md",
+  "docs/HANDOFF.md",
   "scripts/build.cjs",
   "scripts/privacy-check.cjs",
   "scripts/release.cjs",

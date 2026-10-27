@@ -25,6 +25,7 @@
 /docs/*
 !/docs/PUBLIC.md
 !/docs/STATUS.md
+!/docs/HANDOFF.md
 !/scripts/
 /scripts/*
 !/scripts/build.cjs
