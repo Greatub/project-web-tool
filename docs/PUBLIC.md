@@ -55,7 +55,7 @@ Gantt bars remain keyboard-focusable: arrow keys move by one calendar day, Shift
 
 ### Validation and release acceptance
 
-Use Node.js 22+ and Python 3 for logic checks (the browser app has no runtime dependencies). The current baseline has 86 logic checks and a 26-check browser smoke suite; record the actual counts and results for each change rather than treating these numbers as fixed requirements.
+Use Node.js 22+ and Python 3 for logic checks (the browser app has no runtime dependencies). The current baseline has 87 logic checks and a 27-check browser smoke suite; record the actual counts and results for each change rather than treating these numbers as fixed requirements.
 
 | Gate | Command and acceptance |
 | --- | --- |
@@ -120,7 +120,8 @@ Microsoft Project XML (MSPDI) is supported for current fields only. Import previ
 - Dates use midnight whole-day boundaries; Finish is exclusive (the midnight after the web finish date). Duration encodes 24 hours per calendar day with DurationFormat=8. Only one local FS predecessor is allowed; LinkLag is signed calendar days × 14400 (tenths of minutes), with LagFormat=8.
 - PercentComplete is an integer 0–100. Priorities High/Medium/Normal export as 900/500/100. Other input values map by >500/=500/<500, with a preview notice.
 - Text1–Text10 field IDs explicitly map group1–group10. UID 0 summary Notes carry the ProjectWorkspaceMSPDI v1 mapping and group names/colors/slots. Task exchange notes preserve inactive Lag without a predecessor. Keep these notes and field definitions. Standard resource assignment names from external files map to Group 1, explicitly disclosed in the preview; work/capacity is not imported.
-- Limits: 2 MB UTF-8, 2000 tasks, 255 characters per project/task name or per group assignment field. Invalid XML, DTDs, duplicate/missing references, working-duration calendars, partial days, milestones, date constraints, task calendars, leveling delays, non-FS/multiple predecessors and inconsistent schedules reject before saving. Summary values are recalculated and previewed.
+- Limits: 2 MB UTF-8, 2000 tasks, 255 characters per project/task name or per group assignment field. Invalid XML, DTDs, duplicate/missing references, non-FS/multiple predecessors, finish-scheduled projects and inconsistent schedules reject before saving.
+- Calendar-day conversion: working calendars are disrupted by irregular holidays, so the tool schedules in calendar days only. Sub-tasks with working-time durations, times of day, milestones, date constraints, task calendars or leveling delays keep the file's start and finish dates; duration becomes the inclusive calendar-day span, a milestone becomes a 1-day task, and the Lag of a converted link is derived from the dates (start − predecessor finish − 1). Each conversion is listed in the preview with the original and converted values. Files exported by this tool import exactly, without conversion. Summary values are recalculated and previewed.
 - Only current fields are exchanged. Original notes, costs, work, capacity, other custom fields, versions, audit and recovery points are not preserved. Unknown dates/durations remain absent, but Project may fill them on opening.
 
 Implementation follows Microsoft's [Project XML reference](https://learn.microsoft.com/en-us/office-project/xml-data-interchange/project-xml-data-interchange-schema-reference), [elapsed duration units](https://learn.microsoft.com/en-us/office-project/xml-data-interchange/durationformat-element), [LinkLag units](https://learn.microsoft.com/en-us/office-project/xml-data-interchange/linklag-element) and [custom field IDs](https://learn.microsoft.com/en-us/office/vba/api/project.pjcustomfield). Real XML roundtrip checks and mapped-field schema-subset checks are separate from native Project desktop acceptance, which is still pending.
@@ -174,7 +175,7 @@ Implementation follows Microsoft's [Project XML reference](https://learn.microso
 
 ## 验证与发布验收规范
 
-逻辑检查使用 Node.js 22+ 和 Python 3，网页无运行依赖。目前基线为 86 项逻辑检查和 26 项浏览器冒烟检查；每次记录实际执行的数量和结果，不将数量固定为验收条件。
+逻辑检查使用 Node.js 22+ 和 Python 3，网页无运行依赖。目前基线为 87 项逻辑检查和 27 项浏览器冒烟检查；每次记录实际执行的数量和结果，不将数量固定为验收条件。
 
 | 检查 | 命令与验收要求 |
 | --- | --- |
@@ -243,7 +244,7 @@ v1.0 无项目身份和源版本摘要，只允许明确选择目标后更新既
 
 支持阶段→主任务→子任务的三级树，任务按层级顺序排列，不根据 WBS 字符串猜父级。需要唯一 WBS 和 UID。最多 2000 条任务、2 MB XML；名称和单个组人员字段最多 255 字符，超限拒绝导出，不截断。未定日期、工期、优先级可留空，但 Project 桌面程序可能自动补值，重新导入前应核对。
 
-工期必须为正整数经过自然日，子任务开始和完成时刻必须为午夜。拒绝工作日历工期、非整日、里程碑、非 FS 或多前置、跨项目依赖、日期约束、任务日历、资源平衡延迟、循环/缺失引用、超过三级或不足三级的任务树，以及源日期与本工具排程冲突。汇总日期、进度和状态按本工具规则重算并在预览展示。外部标准资源分配名称映射到 Group 1，预览明确提示；这不表示导入工时、资源容量或费用。原备注、成本、工时、其他自定义字段和未支持功能不保留。
+本工具只按日历日排程（工作日历会因不规则节假日被打乱）。使用工作日历工期、非午夜时刻、里程碑、日期约束、任务日历或资源平衡延迟的子任务换算为日历日：保留文件中的开始和完成日期，工期取两者之间的日历天数（含首尾），里程碑转为 1 天任务，相关链接的 Lag 由日期推算（开始 − 前置完成 − 1）；预览逐条列出原值和换算值。本工具导出的文件原样导入，不做换算。拒绝非 FS 或多前置、跨项目依赖、按完成日期排程、循环/缺失引用、超过三级或不足三级的任务树，以及源日期与本工具排程冲突。汇总日期、进度和状态按本工具规则重算并在预览展示。外部标准资源分配名称映射到 Group 1，预览明确提示；这不表示导入工时、资源容量或费用。原备注、成本、工时、其他自定义字段和未支持功能不保留。
 
 未设置前置时仍填写的 Lag 通过任务备注中的 v1 扩展保留，避免丢失暂未生效的输入值。应保留本工具导出的项目/任务交换备注和组字段定义，否则组配置无法完整恢复。不自动猜测其他来源 Text 字段的业务含义。XML 先检查大小、禁止 DTD/实体声明，再用 XML 解析器读取，校验候选数据后复用预览与原子保存；失败和取消不修改现有项目。
 

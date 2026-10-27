@@ -22,7 +22,10 @@ fs.mkdirSync(shots, { recursive: true });
 let checks = 0;
 
 async function openApp(browser, { width = 1440, height = 900 } = {}) {
-  const context = await browser.newContext({ viewport: { width, height }, reducedMotion: "reduce" });
+  const context = await browser.newContext({
+    viewport: { width, height },
+    reducedMotion: "reduce",
+  });
   const page = await context.newPage();
   page.setDefaultTimeout(10000);
   const errors = [];
@@ -83,7 +86,9 @@ const headerHeight = (page) =>
         assert.ok(await page.locator("#emptyState").isVisible());
         assert.match(await page.locator("#uiTitle").textContent(), /Untitled project/);
         blankHeader = await headerHeight(page);
-        await page.screenshot({ path: path.join(shots, `blank-${width}.png`) });
+        await page.screenshot({
+          path: path.join(shots, `blank-${width}.png`),
+        });
       });
 
       await check(
@@ -95,7 +100,9 @@ const headerHeight = (page) =>
           assert.equal(await page.locator(".gantt-bar-subtask").count(), 2);
           assert.equal(await page.locator("svg.dep-svg path").count(), 1);
           assert.equal(await headerHeight(page), blankHeader);
-          await page.screenshot({ path: path.join(shots, `gantt-${width}.png`) });
+          await page.screenshot({
+            path: path.join(shots, `gantt-${width}.png`),
+          });
         },
       );
 
@@ -166,7 +173,9 @@ const headerHeight = (page) =>
       const bar = await page.locator('.gantt-bar-subtask[data-wbs="1.1.1"]').boundingBox();
       await page.mouse.move(bar.x + 10, bar.y + bar.height / 2);
       await page.mouse.down();
-      await page.mouse.move(bar.x + 10 + 48, bar.y + bar.height / 2, { steps: 5 });
+      await page.mouse.move(bar.x + 10 + 48, bar.y + bar.height / 2, {
+        steps: 5,
+      });
       await page.mouse.up();
       assert.equal(await page.evaluate(() => findSubtaskByWbs("1.1.1").start), "2026-10-27");
       await page.click("#btnUndo");
@@ -248,7 +257,9 @@ const headerHeight = (page) =>
         await page.waitForFunction(() => findSubtaskByWbs("5.1.1").pct === 90);
         await page.evaluate(() => void openHistoryDialog());
         assert.equal(await page.locator("#historyPanel tbody tr").count(), 1);
-        await page.screenshot({ path: path.join(shots, "history-versions.png") });
+        await page.screenshot({
+          path: path.join(shots, "history-versions.png"),
+        });
         await page.locator("#historyPanel").getByRole("button", { name: "Restore" }).click();
         await page.locator("dialog[open]").last().getByRole("button", { name: "Restore" }).click();
         await page.waitForFunction(() => findSubtaskByWbs("5.1.1").pct === 40);
@@ -352,12 +363,70 @@ const headerHeight = (page) =>
           await preview.locator("tbody tr").count(),
           await page.evaluate(() => allItems(projectData).length),
         );
-        await page.screenshot({ path: path.join(shots, "project-xml-preview.png") });
+        await page.screenshot({
+          path: path.join(shots, "project-xml-preview.png"),
+        });
         await preview.getByRole("button", { name: "Apply changes" }).click();
         assert.equal(await page.evaluate(() => Object.keys(workspace.projects).length), projects + 1);
         assert.equal(
           await page.evaluate(() => stableJSON(groupExchangeRows(projectData, projectSettings).slice(1))),
           source,
+        );
+        fs.rmSync(file);
+      },
+    );
+
+    await check(
+      "a Microsoft Project working-time file imports as calendar days with its dates kept",
+      async () => {
+        const task = (uid, wbs, level, name, start, finish, extra = "") =>
+          `<Task><UID>${uid}</UID><Name>${name}</Name><WBS>${wbs}</WBS><OutlineLevel>${level}</OutlineLevel><Summary>${level < 3 ? 1 : 0}</Summary><Start>${start}</Start><Finish>${finish}</Finish><DurationFormat>7</DurationFormat>${extra}</Task>`;
+        const xml =
+          '<?xml version="1.0" encoding="UTF-8"?><Project xmlns="http://schemas.microsoft.com/project"><Name>plan.xml</Name><Title>Working-time plan</Title><ScheduleFromStart>1</ScheduleFromStart><Tasks>' +
+          "<Task><UID>0</UID><Name>Working-time plan</Name><OutlineLevel>0</OutlineLevel><Summary>1</Summary></Task>" +
+          task(1, "1", 1, "Phase", "2030-01-03T08:00:00", "2030-01-07T17:00:00") +
+          task(2, "1.1", 2, "Build", "2030-01-03T08:00:00", "2030-01-07T17:00:00") +
+          task(
+            3,
+            "1.1.1",
+            3,
+            "Draft",
+            "2030-01-03T08:00:00",
+            "2030-01-04T17:00:00",
+            "<Duration>PT16H0M0S</Duration>",
+          ) +
+          task(
+            4,
+            "1.1.2",
+            3,
+            "Review",
+            "2030-01-07T08:00:00",
+            "2030-01-07T17:00:00",
+            "<Duration>PT8H0M0S</Duration><PredecessorLink><PredecessorUID>3</PredecessorUID><Type>1</Type></PredecessorLink>",
+          ) +
+          "</Tasks></Project>";
+        const file = path.join(shots, "working-time.xml");
+        fs.writeFileSync(file, xml);
+        await page.setInputFiles("#excelFileInput", file);
+        const preview = openDialog(page);
+        await preview.getByRole("button", { name: "Apply changes" }).waitFor();
+        assert.match(await preview.textContent(), /2 sub-tasks used working time/);
+        assert.equal(await preview.locator("tbody tr", { hasText: "Converted to calendar days" }).count(), 2);
+        await page.screenshot({
+          path: path.join(shots, "project-xml-working-time.png"),
+        });
+        await preview.getByRole("button", { name: "Apply changes" }).click();
+        assert.equal(await page.locator("#uiTitle").textContent(), "Working-time plan");
+        assert.deepEqual(
+          await page.evaluate(() =>
+            allItems(projectData)
+              .filter((x) => x.pred !== undefined)
+              .map((x) => [x.start, x.finish, x.days, x.lag]),
+          ),
+          [
+            ["2030-01-03", "2030-01-04", 2, 0],
+            ["2030-01-07", "2030-01-07", 1, 2],
+          ],
         );
         fs.rmSync(file);
       },

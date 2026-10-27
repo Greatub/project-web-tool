@@ -42,7 +42,7 @@ See the [Excel v3.0 contract](docs/PUBLIC.md#excel-v30-controlled-exchange) for 
 
 Use **Import** to read a Microsoft Project XML (`.xml`) file, preview the mapped fields and create an independent project. Use **Data & versions → Export Project XML** to download a new file; source files are never overwritten. Native `.mpp` requires conversion to XML in Microsoft Project first.
 
-The limited mapping supports three task levels, calendar dates, positive whole elapsed-day durations, single FS links, signed whole-day Lag, integer progress, priorities and ten custom groups. Group assignments use Text1–Text10; retain project/task exchange notes for configuration and inactive Lag. Unsupported hierarchy, working calendars, milestones, date constraints, multi-predecessor/non-FS links and schedule conflicts are rejected. Other Project data is not retained. Native Project open/save compatibility still needs desktop acceptance. See the [Project XML contract](docs/PUBLIC.md#project-xml-exchange).
+The limited mapping supports three task levels, calendar dates, positive whole elapsed-day durations, single FS links, signed whole-day Lag, integer progress, priorities and ten custom groups. Group assignments use Text1–Text10; retain project/task exchange notes for configuration and inactive Lag. Files that use working time, times of day, milestones, date constraints, task calendars or leveling delays are converted to calendar days: the file's start and finish dates are kept, durations and Lag become calendar days (weekends and holidays count), and every converted task is listed in the preview. Unsupported hierarchy, multi-predecessor/non-FS links and finish-scheduled projects are still rejected. Other Project data is not retained. Native Project open/save compatibility still needs desktop acceptance. See the [Project XML contract](docs/PUBLIC.md#project-xml-exchange).
 
 ### Development and validation
 
@@ -66,7 +66,7 @@ Development checks require Node.js 22+ and Python 3 (standard-library XML parsin
 
 ```sh
 npm run build        # regenerate src/index.html from src/app/
-npm test             # build freshness check + 86 logic checks (Node.js + Python 3)
+npm test             # build freshness check + 87 logic checks (Node.js + Python 3)
 npm run test:e2e     # browser smoke test; needs: npm install --no-save playwright && npx playwright install chromium
 npm run format       # optional: Prettier formatting for sources and tests
 npm run privacy
@@ -108,7 +108,7 @@ Excel 数据表和 Instructions 固定为英文、Arial 9 号；新增 Instructi
 
 ## Project XML 导入与导出
 
-在“导入”中选择 XML，预览后创建独立项目；通过“数据与版本 → 导出 Project XML”另存当前字段。源文件只读；不直接读写 MPP。支持三级结构、整自然日、单一 FS 前置、Lag、进度、优先级及 10 个组，不支持的排程规则会拒绝，不静默转换。Microsoft Project 桌面打开/另存仍待实测。详见 [Project XML 交换规范](docs/PUBLIC.md#project-xml-交换)。
+在“导入”中选择 XML，预览后创建独立项目；通过“数据与版本 → 导出 Project XML”另存当前字段。源文件只读；不直接读写 MPP。支持三级结构、单一 FS 前置、Lag、进度、优先级及 10 个组。使用工作日历、时刻、里程碑、日期约束、任务日历或资源平衡延迟的文件统一换算为日历日：保留文件中的开始/完成日期，工期和 Lag 按日历日计（含周末和节假日），预览逐条列出换算。不支持的层级、非 FS/多前置和按完成日期排程的项目仍拒绝。Microsoft Project 桌面打开/另存仍待实测。详见 [Project XML 交换规范](docs/PUBLIC.md#project-xml-交换)。
 
 ## 开发与验证
 
@@ -118,7 +118,7 @@ Excel 数据表和 Instructions 固定为英文、Arial 9 号；新增 Instructi
 
 ```sh
 npm run build        # 由 src/app/ 重新生成 src/index.html
-npm test             # 构建一致性检查 + 86 项逻辑检查（Node.js + Python 3）
+npm test             # 构建一致性检查 + 87 项逻辑检查（Node.js + Python 3）
 npm run test:e2e     # 浏览器冒烟测试；需先 npm install --no-save playwright && npx playwright install chromium
 npm run privacy
 npm run release

@@ -633,7 +633,12 @@ function exchangeChanges(before, after) {
   for (const row of exchangeRows(after).slice(1)) {
     const prev = old.get(row[0]);
     if (!prev) {
-      changes.push({ wbs: row[0], field: "New " + row[1], before: "", after: row[2] });
+      changes.push({
+        wbs: row[0],
+        field: "New " + row[1],
+        before: "",
+        after: row[2],
+      });
       continue;
     }
     for (let col = 2; col < 14; col++)
@@ -961,7 +966,11 @@ async function importControlledExcel(file) {
   excelImportBusy = true;
   try {
     const base = exchangeBase(),
-      guard = { projectId, baseState: stableJSON(base), stored: localStorage.getItem(WORKSPACE_KEY) };
+      guard = {
+        projectId,
+        baseState: stableJSON(base),
+        stored: localStorage.getItem(WORKSPACE_KEY),
+      };
     if (file.size > 20 * 1024 * 1024) throw inputError("msgWorkbookExceeds20Mb");
     const files = await unzipXlsxBuffer(await file.arrayBuffer()),
       payload = await readExchangePayload(files, base),
@@ -1003,7 +1012,11 @@ async function restoreExcelRecovery() {
     const point = excelRecoveryPoints[0];
     if (!point) throw inputError("msgNoExcelRecoveryPoint");
     const base = exchangeBase(),
-      guard = { projectId, baseState: stableJSON(base), stored: localStorage.getItem(WORKSPACE_KEY) },
+      guard = {
+        projectId,
+        baseState: stableJSON(base),
+        stored: localStorage.getItem(WORKSPACE_KEY),
+      },
       b = copy(point.bundle);
     b.versionHistory = copy(versionList);
     b.auditLog = copy(auditLog);
@@ -1011,9 +1024,19 @@ async function restoreExcelRecovery() {
     recalculateSchedule(b.currentData, b.settings.statusDate);
     validateBundle(b);
     if (b.projectId !== projectId) throw inputError("msgRecoveryProjectMismatch");
-    if (!(await askConfirm(t("msgRestoreDataBeforeTheLastExcel"), { confirmLabel: t("msgRestore") }))) return;
+    if (
+      !(await askConfirm(t("msgRestoreDataBeforeTheLastExcel"), {
+        confirmLabel: t("msgRestore"),
+      }))
+    )
+      return;
     commitExcelCandidate(
-      { candidate: b, create: false, added: 0, changes: exchangeChanges(base.currentData, b.currentData) },
+      {
+        candidate: b,
+        create: false,
+        added: 0,
+        changes: exchangeChanges(base.currentData, b.currentData),
+      },
       guard,
     );
   } catch (e) {
@@ -1070,7 +1093,11 @@ function parseExcelGroups(rows) {
     if (r[0] !== GROUP_IDS[i] || r.length !== 4 || !["Yes", "No"].includes(r[1]))
       throw inputError("msgGroupsDoNotChangeIdsOr");
     if (r[1] === "Yes")
-      list.push({ id: r[0], name: typeof r[2] === "string" ? r[2].trim() : "", color: r[3] });
+      list.push({
+        id: r[0],
+        name: typeof r[2] === "string" ? r[2].trim() : "",
+        color: r[3],
+      });
   });
   validateGroups(list);
   return list;
@@ -1361,7 +1388,12 @@ function prepareGroupedExchange(payload, base) {
       throw inputError("msgNewtasksSummaryRowsAcceptAC");
   }
   const adapter = {
-    meta: { ...m, version: 2, columns: EXCEL_HEADERS, newColumns: NEW_TASK_HEADERS },
+    meta: {
+      ...m,
+      version: 2,
+      columns: EXCEL_HEADERS,
+      newColumns: NEW_TASK_HEADERS,
+    },
     project: payload.project,
     plan: [EXCEL_HEADERS, ...payload.plan.slice(1).map((r) => r.slice(0, 14))],
     newTasks: [NEW_TASK_HEADERS, ...payload.newTasks.slice(1).map((r) => [...r.slice(0, 14), r[21]])],
@@ -1409,7 +1441,13 @@ function prepareGroupedExchange(payload, base) {
     ["Project Name", base.metadata.name, candidate.metadata.name],
     ["Status Date", base.settings.statusDate, candidate.settings.statusDate],
   ])
-    if (old !== value) result.changes.unshift({ wbs: "Project", field, before: old, after: value });
+    if (old !== value)
+      result.changes.unshift({
+        wbs: "Project",
+        field,
+        before: old,
+        after: value,
+      });
   return result;
 }
 
@@ -1550,6 +1588,19 @@ function mspDuration(value, format) {
     mspReject("mspDurationMustBePositiveWholeCalendarDaysMilestones");
   return days;
 }
+const MSP_ELAPSED_FORMATS = [4, 6, 8, 10, 12];
+// Fallback for a task without dates: working duration in whole days (at least one).
+function mspWorkingDays(value, minutesPerDay) {
+  if (!value) return null;
+  const match = /^P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?$/.exec(value);
+  if (!match) throw inputError("mspUnsupportedProjectDuration0", value);
+  const minutes =
+    Number(match[1] || 0) * 1440 +
+    Number(match[2] || 0) * 60 +
+    Number(match[3] || 0) +
+    Number(match[4] || 0) / 60;
+  return Math.max(1, Math.ceil(minutes / Math.max(1, minutesPerDay)));
+}
 function readProjectXML(text) {
   if (
     typeof text !== "string" ||
@@ -1639,15 +1690,9 @@ function readProjectXML(text) {
     };
     if (![1, 2, 3].includes(row.level) || row.level < 3 !== row.summary)
       mspReject("mspUseThreeLevelsPhaseMainTaskSubtaskHierarchy");
-    for (const field of ["Recurring", "Milestone", "IsSubproject", "ExternalTask"])
+    for (const field of ["Recurring", "IsSubproject", "ExternalTask"])
       if (["1", "true"].includes(mspValue(n, field)))
         throw inputError("mspUnsupportedTaskFeature0", field + " (" + row.wbs + ")");
-    if (
-      mspNumber(n, "ConstraintType", 0) !== 0 ||
-      mspValue(n, "CalendarUID", "-1") !== "-1" ||
-      mspNumber(n, "LevelingDelay", 0) !== 0
-    )
-      mspReject("mspTaskCalendarsDateConstraintsAndLevelingDelaysAre");
     const links = mspChildren(n, "PredecessorLink");
     if (links.length > 1) throw inputError("mspMultiplePredecessorsAreUnsupported0", row.wbs);
     if (links.length) {
@@ -1660,10 +1705,13 @@ function readProjectXML(text) {
         throw inputError("mspOnlyLocalSubtaskFsLinksAreSupported");
       row.predUID = mspNumber(link, "PredecessorUID", null);
       const lag = mspNumber(link, "LinkLag", 0);
-      if (lag && ![4, 6, 8, 10, 12].includes(mspNumber(link, "LagFormat", null)))
-        throw inputError("mspLagMustUseElapsedUnits");
-      row.lag = lag / 14400;
-      if (!Number.isSafeInteger(row.lag)) throw inputError("mspLagMustBeWholeCalendarDays");
+      if (lag && !MSP_ELAPSED_FORMATS.includes(mspNumber(link, "LagFormat", null))) {
+        // Working-time Lag: the calendar-day Lag is derived from the file's dates (prepareProjectXML).
+        row.lagFromDates = true;
+      } else {
+        row.lag = lag / 14400;
+        if (!Number.isSafeInteger(row.lag)) throw inputError("mspLagMustBeWholeCalendarDays");
+      }
     }
     const taskNotes = mspValue(n, "Notes");
     if (taskNotes.startsWith(MSP_TASK_MARKER)) {
@@ -1673,15 +1721,32 @@ function readProjectXML(text) {
       if (!links.length) row.lag = extra.inactiveLag;
     }
     if (!row.summary) {
-      for (const field of ["Start", "Finish"]) {
-        const value = mspValue(n, field);
-        if (value && !/^\d{4}-\d{2}-\d{2}T00:00:00(?:\.0+)?$/.test(value))
-          mspReject("mspSubtasksRequireMidnightWholeDayBoundariesTimesCannot", row.wbs);
+      // Files saved by this tool use whole elapsed days and import exactly. Anything else (working time,
+      // times of day, date constraints, task calendars, leveling delays, milestones) is converted to
+      // calendar days from the file's own start and finish dates, so imported dates match the file;
+      // the preview lists every converted task.
+      const rawStart = mspValue(n, "Start"),
+        rawFinish = mspValue(n, "Finish"),
+        rawDuration = mspValue(n, "Duration"),
+        format = mspNumber(n, "DurationFormat", mspNumber(root, "DurationFormat", null)),
+        midnight = (v) => !v || /^\d{4}-\d{2}-\d{2}T00:00:00(?:\.0+)?$/.test(v);
+      row.milestone = ["1", "true"].includes(mspValue(n, "Milestone"));
+      const exact =
+        MSP_ELAPSED_FORMATS.includes(format) &&
+        midnight(rawStart) &&
+        midnight(rawFinish) &&
+        !row.milestone &&
+        mspNumber(n, "ConstraintType", 0) === 0 &&
+        mspValue(n, "CalendarUID", "-1") === "-1" &&
+        mspNumber(n, "LevelingDelay", 0) === 0;
+      if (exact) row.days = mspDuration(rawDuration, format);
+      else {
+        row.converted = { start: rawStart, finish: rawFinish };
+        if (row.start && rawFinish) {
+          if (row.sourceFinish < row.start) row.sourceFinish = row.start;
+          row.days = diffDays(row.start, row.sourceFinish);
+        } else row.days = mspWorkingDays(rawDuration, mspNumber(root, "MinutesPerDay", 480));
       }
-      row.days = mspDuration(
-        mspValue(n, "Duration"),
-        mspNumber(n, "DurationFormat", mspNumber(root, "DurationFormat", null)),
-      );
       const priority = mspNumber(n, "Priority", null);
       if (priority !== null) {
         if (priority < 0 || priority > 1000) throw inputError("mspPriorityIsOutside01000");
@@ -1714,7 +1779,8 @@ function readProjectXML(text) {
     rows.push(row);
   }
   return {
-    name: mspText(root, "Name") || mspText(root, "Title") || "Imported project",
+    // Microsoft Project stores the file name in Name and the project title in Title.
+    name: mspText(root, "Title") || mspText(root, "Name") || "Imported project",
     statusDate: mspDate(mspValue(root, "StatusDate")) || today(),
     groups: contract ? copy(contract.groups) : null,
     rows,
@@ -1758,17 +1824,31 @@ function prepareProjectXML(model) {
       main = task;
     } else {
       if (!main) throw inputError("mspSubtaskHasNoMainTask");
-      Object.assign(task, { start: r.start, days: r.days, pct: r.pct, prio: r.prio, pred: "", lag: r.lag });
+      Object.assign(task, {
+        start: r.start,
+        days: r.days,
+        pct: r.pct,
+        prio: r.prio,
+        pred: "",
+        lag: r.lag,
+      });
       for (const id of GROUP_IDS) task[id] = r[id] || "";
       main.subtasks.push(task);
       sourceFinishes.set(r.uid, r.sourceFinish);
     }
   }
+  const rowByUID = new Map(model.rows.map((r) => [r.uid, r]));
   for (const r of model.rows)
     if (r.predUID !== null) {
       const p = byUID.get(r.predUID);
       if (!p || p.mainTasks || p.subtasks) throw inputError("mspPredecessorMustResolveToASubtask");
-      byUID.get(r.uid).pred = p.wbs;
+      const task = byUID.get(r.uid),
+        predRow = rowByUID.get(r.predUID);
+      task.pred = p.wbs;
+      // Keep the file's dates when either side was converted or the Lag was in working time.
+      if ((r.converted || predRow.converted || r.lagFromDates) && r.start && predRow.sourceFinish)
+        task.lag = diffDays(predRow.sourceFinish, r.start) - 2;
+      else if (r.lagFromDates) throw inputError("mspLagMustUseElapsedUnits");
     }
   candidate.currentData = data;
   validateBundle(candidate);
@@ -1800,7 +1880,26 @@ function prepareProjectXML(model) {
             after: shown(key, actual[key]),
           });
   }
-  const changes = exchangeChanges([], data).concat(recalculations);
+  const timeText = (v) => (v ? v.slice(0, 16).replace("T", " ") : "TBC");
+  const conversions = model.rows
+    .filter((r) => r.converted)
+    .map((r) => {
+      const task = byUID.get(r.uid);
+      return {
+        wbs: r.wbs,
+        field: t("mspCalendarConversion"),
+        before: timeText(r.converted.start) + " – " + timeText(r.converted.finish),
+        after:
+          (task.start || "TBC") +
+          " – " +
+          (task.finish || "TBC") +
+          " (" +
+          (task.days ?? "-") +
+          t("daysUnit") +
+          ")",
+      };
+    });
+  const changes = exchangeChanges([], data).concat(conversions, recalculations);
   return {
     candidate,
     create: true,
@@ -1811,6 +1910,10 @@ function prepareProjectXML(model) {
       t("mspCreatesAnIndependentCopyOnlyCurrentFieldsAre"),
       ...(model.hasResources ? [t("mspStandardResourceAssignmentNamesMapToGroup1")] : []),
       ...(model.priorityMapped ? [t("mspProjectPrioritiesWereMappedToHighMediumNormal")] : []),
+      ...(conversions.length ? [t("mspConvertedToCalendarDays", conversions.length)] : []),
+      ...(model.rows.some((r) => r.milestone)
+        ? [t("mspMilestonesConverted", model.rows.filter((r) => r.milestone).length)]
+        : []),
     ],
   };
 }
@@ -1828,7 +1931,12 @@ function buildProjectXML(base = exchangeBase()) {
   for (const value of [b.metadata.name, ...items.map((t) => t.name)])
     if (value.length > 255) throw inputError("mspProjectNamesTaskNamesSupportAtMost255");
   const uid = new Map(items.map((t, i) => [t.wbs, i + 1])),
-    meta = { format: "ProjectWorkspaceMSPDI", version: 1, mapping: MSP_MAPPING, groups: b.settings.groups };
+    meta = {
+      format: "ProjectWorkspaceMSPDI",
+      version: 1,
+      mapping: MSP_MAPPING,
+      groups: b.settings.groups,
+    };
   const rootTask =
     "<Task><UID>0</UID><ID>0</ID>" +
     mspTag("Name", b.metadata.name) +
@@ -1936,7 +2044,11 @@ async function importProjectXML(file) {
   try {
     if (file.size > 2 * 1024 * 1024) throw inputError("mspProjectXmlExceeds2Mb");
     const base = exchangeBase(),
-      guard = { projectId, baseState: stableJSON(base), stored: localStorage.getItem(WORKSPACE_KEY) },
+      guard = {
+        projectId,
+        baseState: stableJSON(base),
+        stored: localStorage.getItem(WORKSPACE_KEY),
+      },
       plan = prepareProjectXML(readProjectXML(await file.text()));
     if (await previewExcel(plan)) commitExcelCandidate(plan, guard);
   } finally {
