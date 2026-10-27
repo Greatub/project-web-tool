@@ -369,7 +369,11 @@ async function handleFileImport(event) {
       addProject(b);
     } else if (file.name.toLowerCase().endsWith(".xlsx")) {
       await importControlledExcel(file);
-    } else throw inputError("msgUseJsonOrXlsx");
+    } else if (file.name.toLowerCase().endsWith(".xml")) {
+      await importProjectXML(file);
+    } else if (file.name.toLowerCase().endsWith(".mpp")) {
+      throw inputError("mspUseXml");
+    } else throw inputError("mspUseJsonXlsxXml");
   } catch (e) {
     showError(t("msgImportNotApplied") + e.message);
   } finally {
@@ -869,7 +873,7 @@ function previewExcel(plan) {
     )
     .join("");
   return showDialog({
-    title: t("msgExcelImportPreview"),
+    title: plan.source === "Project XML" ? t("mspPreviewTitle") : t("msgExcelImportPreview"),
     size: "wide",
     bodyHtml:
       '<p class="app-dialog-message">' +
@@ -877,7 +881,13 @@ function previewExcel(plan) {
         (plan.create ? t("msgCreateProject") : t("msgUpdateProject")) + plan.candidate.metadata.name,
       ) +
       '</p><p class="ui-caption">' +
-      escapeHtml(plan.legacy ? t("msgLegacyV10NoProjectIdentity") : t("msgV20EditableFieldsOnlyRecovery")) +
+      escapeHtml(
+        plan.source === "Project XML"
+          ? plan.notices.join(" ")
+          : plan.legacy
+            ? t("msgLegacyV10NoProjectIdentity")
+            : t("msgV20EditableFieldsOnlyRecovery"),
+      ) +
       '</p><p class="ui-caption">' +
       plan.added +
       t("msgNew") +
@@ -890,7 +900,7 @@ function previewExcel(plan) {
       "</tr></thead><tbody>" +
       rows +
       '</tbody></table></div><p class="ui-caption">' +
-      t("msgTheSourceExcelIsNeverWritten") +
+      (plan.source === "Project XML" ? t("mspReadOnlyCopy") : t("msgTheSourceExcelIsNeverWritten")) +
       "</p>",
     actions: [
       { label: t("msgCancel"), value: false },
@@ -933,7 +943,7 @@ function commitExcelCandidate(plan, guard) {
     time: nowTimestamp(),
     ver: b.activeVersionTag,
     wbs: "-",
-    action: "Excel import",
+    action: plan.source === "Project XML" ? "Project XML import" : "Excel import",
     detail: plan.added + " new; " + plan.changes.length + " field changes",
   });
   b.auditLog = b.auditLog.slice(0, 200);
@@ -1459,5 +1469,507 @@ function exportToExcelXML() {
         restoreExcelRecovery();
       };
     },
+  });
+}
+
+/* Microsoft Project XML: explicit, limited field exchange; source files stay read-only. */
+const MSP_NS = "http://schemas.microsoft.com/project";
+const MSP_TEXT_IDS = [
+  "188743731",
+  "188743734",
+  "188743737",
+  "188743740",
+  "188743743",
+  "188743746",
+  "188743747",
+  "188743748",
+  "188743749",
+  "188743750",
+];
+const MSP_MARKER = "ProjectWorkspace XML v1\n";
+const MSP_TASK_MARKER = "ProjectWorkspace Task v1\n";
+const MSP_MAPPING = {
+  wbs: "WBS",
+  level: "OutlineLevel",
+  name: "Name",
+  start: "Start",
+  finish: "Finish (exclusive)",
+  days: "Duration (24 hours/day)",
+  pct: "PercentComplete",
+  prio: "Priority (900/500/100)",
+  pred: "PredecessorUID (FS)",
+  lag: "LinkLag (14400/day)",
+  groups: GROUP_IDS.map((id, i) => [id, MSP_TEXT_IDS[i]]),
+};
+function mspReject(key, ...args) {
+  throw inputError(key, ...args);
+}
+function mspChildren(node, name) {
+  return [...node.children].filter((n) => n.localName === name && n.namespaceURI === MSP_NS);
+}
+function mspNode(node, name) {
+  const found = mspChildren(node, name);
+  if (found.length > 1) throw inputError("mspDuplicateProjectXmlElement0", name);
+  return found[0];
+}
+function mspText(node, name, fallback = "") {
+  const n = mspNode(node, name);
+  if (n?.children.length) throw inputError("mspExpectedATextField0", name);
+  return n ? n.textContent : fallback;
+}
+function mspValue(node, name, fallback = "") {
+  return mspText(node, name, fallback).trim();
+}
+function mspNumber(node, name, fallback) {
+  const value = mspValue(node, name);
+  if (value === "") return fallback;
+  if (!/^-?\d+$/.test(value) || !Number.isSafeInteger(Number(value)))
+    throw inputError("mspInvalidInteger0", name);
+  return Number(value);
+}
+function mspDate(value, finish = false) {
+  if (!value) return "";
+  if (
+    !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.0+)?$/.test(value) ||
+    !parseDate(value.slice(0, 10)) ||
+    !/^([01]\d|2[0-3]):[0-5]\d:[0-5]\d/.test(value.slice(11))
+  )
+    throw inputError("mspInvalidUnsupportedProjectDate0", value);
+  return finish && /^00:00:00/.test(value.slice(11)) ? addDays(value.slice(0, 10), -1) : value.slice(0, 10);
+}
+function mspDuration(value, format) {
+  if (!value) return null;
+  if (![4, 6, 8, 10, 12].includes(format))
+    mspReject("mspUseElapsedDurationsWorkingCalendarsCannotBeSilently");
+  const match = /^P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?$/.exec(value);
+  if (!match || !match.slice(1).some(Boolean)) throw inputError("mspUnsupportedProjectDuration0", value);
+  const days =
+    Number(match[1] || 0) +
+    (Number(match[2] || 0) * 3600 + Number(match[3] || 0) * 60 + Number(match[4] || 0)) / 86400;
+  if (!Number.isSafeInteger(days) || days < 1 || days > 365000)
+    mspReject("mspDurationMustBePositiveWholeCalendarDaysMilestones");
+  return days;
+}
+function readProjectXML(text) {
+  if (
+    typeof text !== "string" ||
+    text.length > 2 * 1024 * 1024 ||
+    new TextEncoder().encode(text).length > 2 * 1024 * 1024 ||
+    /<!DOCTYPE|<!ENTITY/i.test(text)
+  )
+    mspReject("mspXmlExceeds2MbOrContainsAForbidden");
+  const root = xmlDocument(text, "Project XML").documentElement;
+  if (root.localName !== "Project" || root.namespaceURI !== MSP_NS)
+    mspReject("mspSelectAMicrosoftProjectXmlFile");
+  if ([...root.getElementsByTagNameNS("*", "*")].some((n) => n.namespaceURI !== MSP_NS))
+    throw inputError("mspForeignXmlNamespace");
+  if (["0", "false"].includes(mspValue(root, "ScheduleFromStart", "1")))
+    mspReject("mspFinishScheduledProjectsAreUnsupported");
+  const container = mspNode(root, "Tasks"),
+    nodes = container ? mspChildren(container, "Task") : [];
+  if (nodes.length > 2001) throw inputError("mspProjectXmlSupportsAtMost2000Tasks");
+  const uids = new Set();
+  for (const n of nodes) {
+    const uid = mspNumber(n, "UID", null);
+    if (uid === null || uid < 0 || uids.has(uid)) throw inputError("mspMissingDuplicateTaskUid");
+    uids.add(uid);
+  }
+  const summary = nodes.find((n) => mspNumber(n, "UID", null) === 0);
+  if (
+    summary &&
+    (mspNumber(summary, "OutlineLevel", null) !== 0 || !["1", "true"].includes(mspValue(summary, "Summary")))
+  )
+    throw inputError("mspUid0MustBeTheProjectSummaryNot");
+  const notes = summary ? mspValue(summary, "Notes") : "";
+  let contract = null;
+  if (notes.startsWith(MSP_MARKER)) {
+    contract = JSON.parse(notes.slice(MSP_MARKER.length));
+    if (
+      contract.format !== "ProjectWorkspaceMSPDI" ||
+      contract.version !== 1 ||
+      stableJSON(contract.mapping) !== stableJSON(MSP_MAPPING)
+    )
+      throw inputError("mspUnsupportedProjectXmlContractMapping");
+    validateGroups(contract.groups);
+  }
+  const definitions = mspNode(root, "ExtendedAttributes"),
+    aliases = new Map();
+  for (const n of definitions ? mspChildren(definitions, "ExtendedAttribute") : []) {
+    const id = mspValue(n, "FieldID");
+    if (aliases.has(id)) throw inputError("mspDuplicateCustomFieldDefinition");
+    aliases.set(id, mspValue(n, "Alias"));
+  }
+  const resources = new Map(),
+    resourceRoot = mspNode(root, "Resources");
+  for (const n of resourceRoot ? mspChildren(resourceRoot, "Resource") : []) {
+    const id = mspNumber(n, "UID", null);
+    if (id === null || resources.has(id)) throw inputError("mspInvalidDuplicateResourceUid");
+    resources.set(id, mspValue(n, "Name"));
+  }
+  const assignments = new Map(),
+    assignmentRoot = mspNode(root, "Assignments");
+  for (const a of assignmentRoot ? mspChildren(assignmentRoot, "Assignment") : []) {
+    const id = mspNumber(a, "TaskUID", null),
+      r = mspNumber(a, "ResourceUID", null);
+    if (!uids.has(id) || !resources.has(r) || !resources.get(r))
+      throw inputError("mspUnresolvedResourceAssignment");
+    if (!assignments.has(id)) assignments.set(id, []);
+    assignments.get(id).push(resources.get(r));
+  }
+  const rows = [];
+  let hasResources = false,
+    priorityMapped = false;
+  for (const n of nodes) {
+    const uid = mspNumber(n, "UID", null);
+    if (uid === 0) continue;
+    if (["1", "true"].includes(mspValue(n, "IsNull"))) throw inputError("mspNullTaskRowsAreUnsupported");
+    const row = {
+      uid,
+      wbs: mspValue(n, "WBS") || mspValue(n, "OutlineNumber"),
+      name: mspText(n, "Name"),
+      level: mspNumber(n, "OutlineLevel", null),
+      summary: ["1", "true"].includes(mspValue(n, "Summary")),
+      start: mspDate(mspValue(n, "Start")),
+      sourceFinish: mspDate(mspValue(n, "Finish"), true),
+      days: null,
+      pct: mspNumber(n, "PercentComplete", 0),
+      prio: null,
+      predUID: null,
+      lag: 0,
+    };
+    if (![1, 2, 3].includes(row.level) || row.level < 3 !== row.summary)
+      mspReject("mspUseThreeLevelsPhaseMainTaskSubtaskHierarchy");
+    for (const field of ["Recurring", "Milestone", "IsSubproject", "ExternalTask"])
+      if (["1", "true"].includes(mspValue(n, field)))
+        throw inputError("mspUnsupportedTaskFeature0", field + " (" + row.wbs + ")");
+    if (
+      mspNumber(n, "ConstraintType", 0) !== 0 ||
+      mspValue(n, "CalendarUID", "-1") !== "-1" ||
+      mspNumber(n, "LevelingDelay", 0) !== 0
+    )
+      mspReject("mspTaskCalendarsDateConstraintsAndLevelingDelaysAre");
+    const links = mspChildren(n, "PredecessorLink");
+    if (links.length > 1) throw inputError("mspMultiplePredecessorsAreUnsupported0", row.wbs);
+    if (links.length) {
+      const link = links[0];
+      if (
+        row.summary ||
+        mspNumber(link, "Type", 1) !== 1 ||
+        ["1", "true"].includes(mspValue(link, "CrossProject"))
+      )
+        throw inputError("mspOnlyLocalSubtaskFsLinksAreSupported");
+      row.predUID = mspNumber(link, "PredecessorUID", null);
+      const lag = mspNumber(link, "LinkLag", 0);
+      if (lag && ![4, 6, 8, 10, 12].includes(mspNumber(link, "LagFormat", null)))
+        throw inputError("mspLagMustUseElapsedUnits");
+      row.lag = lag / 14400;
+      if (!Number.isSafeInteger(row.lag)) throw inputError("mspLagMustBeWholeCalendarDays");
+    }
+    const taskNotes = mspValue(n, "Notes");
+    if (taskNotes.startsWith(MSP_TASK_MARKER)) {
+      const extra = JSON.parse(taskNotes.slice(MSP_TASK_MARKER.length));
+      if (extra.version !== 1 || !Number.isSafeInteger(extra.inactiveLag))
+        throw inputError("mspInvalidInactiveLagMapping");
+      if (!links.length) row.lag = extra.inactiveLag;
+    }
+    if (!row.summary) {
+      for (const field of ["Start", "Finish"]) {
+        const value = mspValue(n, field);
+        if (value && !/^\d{4}-\d{2}-\d{2}T00:00:00(?:\.0+)?$/.test(value))
+          mspReject("mspSubtasksRequireMidnightWholeDayBoundariesTimesCannot", row.wbs);
+      }
+      row.days = mspDuration(
+        mspValue(n, "Duration"),
+        mspNumber(n, "DurationFormat", mspNumber(root, "DurationFormat", null)),
+      );
+      const priority = mspNumber(n, "Priority", null);
+      if (priority !== null) {
+        if (priority < 0 || priority > 1000) throw inputError("mspPriorityIsOutside01000");
+        row.prio = priority > 500 ? 1 : priority === 500 ? 2 : 3;
+        priorityMapped ||= ![100, 500, 900].includes(priority);
+      }
+    }
+    const values = new Map();
+    for (const a of mspChildren(n, "ExtendedAttribute")) {
+      const id = mspValue(a, "FieldID");
+      if (values.has(id)) throw inputError("mspDuplicateTaskCustomField");
+      if (MSP_TEXT_IDS.includes(id) && mspValue(a, "ValueGUID") && !mspValue(a, "Value"))
+        throw inputError("mspCustomFieldLookupValuesRequireExplicitTextValues");
+      values.set(id, mspText(a, "Value"));
+    }
+    GROUP_IDS.forEach((id, i) => {
+      const field = MSP_TEXT_IDS[i],
+        mapped = contract || aliases.get(field)?.startsWith("PW " + id + " | ");
+      row[id] = mapped ? values.get(field) || "" : "";
+    });
+    if (row.summary && GROUP_IDS.some((id) => row[id]))
+      throw inputError("mspSummaryGroupAssignmentsAreUnsupported");
+    const people = assignments.get(uid) || [];
+    if (people.length) {
+      if (contract) throw inputError("mspResourceAssignmentsConflictWithTheDeclaredGroupMapping");
+      if (row.summary) throw inputError("mspSummaryResourceAssignmentsAreUnsupported");
+      row.group1 = [...new Set([...(row.group1 ? row.group1.split(";") : []), ...people])].join("; ");
+      hasResources = true;
+    }
+    rows.push(row);
+  }
+  return {
+    name: mspText(root, "Name") || mspText(root, "Title") || "Imported project",
+    statusDate: mspDate(mspValue(root, "StatusDate")) || today(),
+    groups: contract ? copy(contract.groups) : null,
+    rows,
+    hasResources,
+    priorityMapped,
+  };
+}
+function prepareProjectXML(model) {
+  const candidate = newProject(model.name),
+    data = [],
+    byUID = new Map(),
+    sourceFinishes = new Map();
+  candidate.metadata.customName = true;
+  candidate.settings.statusDate = model.statusDate;
+  if (model.groups) candidate.settings.groups = copy(model.groups);
+  else {
+    const used = GROUP_IDS.filter((id) => model.rows.some((r) => r[id]));
+    candidate.settings.groups = used.length
+      ? used.map((id, i) => ({
+          id,
+          name: "Group " + (GROUP_IDS.indexOf(id) + 1),
+          color: defaultGroups()[i % 3].color,
+        }))
+      : defaultGroups();
+  }
+  let phase = null,
+    main = null;
+  for (const r of model.rows) {
+    const task = { wbs: r.wbs, name: r.name };
+    if (byUID.has(r.uid)) throw inputError("mspDuplicateTaskUid");
+    byUID.set(r.uid, task);
+    if (r.level === 1) {
+      task.mainTasks = [];
+      data.push(task);
+      phase = task;
+      main = null;
+    } else if (r.level === 2) {
+      if (!phase) throw inputError("mspMainTaskHasNoPhase");
+      task.subtasks = [];
+      phase.mainTasks.push(task);
+      main = task;
+    } else {
+      if (!main) throw inputError("mspSubtaskHasNoMainTask");
+      Object.assign(task, { start: r.start, days: r.days, pct: r.pct, prio: r.prio, pred: "", lag: r.lag });
+      for (const id of GROUP_IDS) task[id] = r[id] || "";
+      main.subtasks.push(task);
+      sourceFinishes.set(r.uid, r.sourceFinish);
+    }
+  }
+  for (const r of model.rows)
+    if (r.predUID !== null) {
+      const p = byUID.get(r.predUID);
+      if (!p || p.mainTasks || p.subtasks) throw inputError("mspPredecessorMustResolveToASubtask");
+      byUID.get(r.uid).pred = p.wbs;
+    }
+  candidate.currentData = data;
+  validateBundle(candidate);
+  recalculateSchedule(data, candidate.settings.statusDate);
+  const recalculations = [];
+  for (const r of model.rows) {
+    const actual = byUID.get(r.uid);
+    if (r.level === 3) {
+      if (r.sourceFinish && actual.finish !== r.sourceFinish)
+        mspReject("mspFileDatesDoNotMatchCalendarDayScheduling", r.wbs);
+      if (r.start && actual.start !== r.start) mspReject("mspPredecessorAndStartDateDisagree0", r.wbs);
+    } else
+      for (const key of ["start", "days", "pct", "prio"])
+        if (r[key] !== actual[key])
+          recalculations.push({ wbs: r.wbs, field: key, before: r[key] ?? "", after: actual[key] ?? "" });
+  }
+  const changes = groupExchangeRows(data, candidate.settings)
+    .slice(1)
+    .flatMap((row) =>
+      row
+        .slice(2)
+        .map((value, i) => ({
+          wbs: row[0],
+          field: groupExcelHeaders(candidate.settings)[i + 2],
+          before: "",
+          after: value ?? "",
+        })),
+    )
+    .concat(recalculations);
+  return {
+    candidate,
+    create: true,
+    added: model.rows.length,
+    changes,
+    source: "Project XML",
+    notices: [
+      t("mspCreatesAnIndependentCopyOnlyCurrentFieldsAre"),
+      ...(model.hasResources ? [t("mspStandardResourceAssignmentNamesMapToGroup1")] : []),
+      ...(model.priorityMapped ? [t("mspProjectPrioritiesWereMappedToHighMediumNormal")] : []),
+    ],
+  };
+}
+function mspTag(name, value) {
+  return value === null || value === undefined || value === ""
+    ? ""
+    : "<" + name + ">" + escapeHtml(String(value)) + "</" + name + ">";
+}
+function buildProjectXML(base = exchangeBase()) {
+  const b = copy(base);
+  validateBundle(b);
+  recalculateSchedule(b.currentData, b.settings.statusDate);
+  const items = allItems(b.currentData);
+  if (items.length > 2000) throw inputError("mspProjectXmlSupportsAtMost2000Tasks");
+  for (const value of [b.metadata.name, ...items.map((t) => t.name)])
+    if (value.length > 255) throw inputError("mspProjectNamesTaskNamesSupportAtMost255");
+  const uid = new Map(items.map((t, i) => [t.wbs, i + 1])),
+    meta = { format: "ProjectWorkspaceMSPDI", version: 1, mapping: MSP_MAPPING, groups: b.settings.groups };
+  const rootTask =
+    "<Task><UID>0</UID><ID>0</ID>" +
+    mspTag("Name", b.metadata.name) +
+    "<OutlineLevel>0</OutlineLevel><Summary>1</Summary>" +
+    mspTag("Notes", MSP_MARKER + JSON.stringify(meta)) +
+    "</Task>";
+  const tasks = [];
+  b.currentData.forEach((f, fi) => {
+    tasks.push([f, 1, String(fi + 1)]);
+    f.mainTasks.forEach((m, mi) => {
+      tasks.push([m, 2, fi + 1 + "." + (mi + 1)]);
+      m.subtasks.forEach((s, si) => tasks.push([s, 3, fi + 1 + "." + (mi + 1) + "." + (si + 1)]));
+    });
+  });
+  const body = tasks
+    .map(([t, level, outline]) => {
+      if (!Number.isInteger(t.pct || 0))
+        throw inputError("mspProjectPercentcompleteRequiresWholePercentages0", t.wbs);
+      if (t.days != null && Number(t.days) > 365000)
+        throw inputError("mspProjectDurationExceeds365000Days0", t.wbs);
+      if (t.start) mspDate(t.start + "T00:00:00");
+      if (t.finish) mspDate(addDays(t.finish, 1) + "T00:00:00");
+      const summary = level < 3;
+      let result =
+        "<Task>" +
+        mspTag("UID", uid.get(t.wbs)) +
+        mspTag("ID", uid.get(t.wbs)) +
+        mspTag("Name", t.name) +
+        "<Type>1</Type>" +
+        mspTag("WBS", t.wbs) +
+        mspTag("OutlineNumber", outline) +
+        mspTag("OutlineLevel", level) +
+        mspTag("Priority", t.prio ? { 1: 900, 2: 500, 3: 100 }[t.prio] : null) +
+        mspTag("Start", t.start ? t.start + "T00:00:00" : null) +
+        mspTag("Finish", t.finish ? addDays(t.finish, 1) + "T00:00:00" : null) +
+        mspTag("Duration", t.days ? "PT" + t.days * 24 + "H0M0S" : null) +
+        "<DurationFormat>8</DurationFormat><Estimated>0</Estimated><Milestone>0</Milestone>" +
+        mspTag("Summary", summary ? 1 : 0) +
+        mspTag("PercentComplete", t.pct || 0);
+      if (!summary && !t.pred && t.lag)
+        result += mspTag(
+          "Notes",
+          MSP_TASK_MARKER + JSON.stringify({ version: 1, inactiveLag: Number(t.lag) }),
+        );
+      if (t.pred)
+        result +=
+          "<PredecessorLink>" +
+          mspTag("PredecessorUID", uid.get(t.pred)) +
+          "<Type>1</Type><CrossProject>0</CrossProject>" +
+          mspTag("LinkLag", (t.lag || 0) * 14400) +
+          "<LagFormat>8</LagFormat></PredecessorLink>";
+      if (!summary)
+        for (const g of b.settings.groups) {
+          const value = t[g.id] || "";
+          if (value.length > 255) throw inputError("mspGroupAssignmentsSupportAtMost255CharactersPer", t.wbs);
+          result +=
+            "<ExtendedAttribute>" +
+            mspTag("FieldID", MSP_TEXT_IDS[GROUP_IDS.indexOf(g.id)]) +
+            "<Value>" +
+            escapeHtml(value) +
+            "</Value></ExtendedAttribute>";
+        }
+      return result + "</Task>";
+    })
+    .join("");
+  const definitions = b.settings.groups
+    .map(
+      (g) =>
+        "<ExtendedAttribute>" +
+        mspTag("FieldID", MSP_TEXT_IDS[GROUP_IDS.indexOf(g.id)]) +
+        mspTag("FieldName", "Text" + (GROUP_IDS.indexOf(g.id) + 1)) +
+        mspTag("Alias", "PW " + g.id + " | " + g.name) +
+        "</ExtendedAttribute>",
+    )
+    .join("");
+  const starts = items
+    .map((t) => t.start)
+    .filter(Boolean)
+    .sort();
+  const xml =
+    '<?xml version="1.0" encoding="UTF-8"?><Project xmlns="' +
+    MSP_NS +
+    '"><SaveVersion>12</SaveVersion>' +
+    mspTag("Name", b.metadata.name) +
+    "<ScheduleFromStart>1</ScheduleFromStart>" +
+    mspTag("StartDate", (starts[0] || b.settings.statusDate) + "T00:00:00") +
+    "<CurrencyCode>USD</CurrencyCode><DefaultStartTime>00:00:00</DefaultStartTime><DefaultFinishTime>00:00:00</DefaultFinishTime><MinutesPerDay>1440</MinutesPerDay><MinutesPerWeek>10080</MinutesPerWeek><DurationFormat>8</DurationFormat>" +
+    mspTag("StatusDate", b.settings.statusDate + "T00:00:00") +
+    "<ExtendedAttributes>" +
+    definitions +
+    "</ExtendedAttributes><Tasks>" +
+    rootTask +
+    body +
+    "</Tasks></Project>";
+  if (
+    /[\u0000-\u0008\u000b\u000c\u000e-\u001f\ud800-\udfff\ufffe\uffff]/u.test(xml) ||
+    new TextEncoder().encode(xml).length > 2 * 1024 * 1024
+  )
+    throw inputError("mspInvalidXmlCharactersOrXmlExceeds2Mb");
+  return xml;
+}
+async function importProjectXML(file) {
+  if (excelImportBusy) throw new Error(t("mspAnImportIsAlreadyInProgress"));
+  excelImportBusy = true;
+  try {
+    if (file.size > 2 * 1024 * 1024) throw inputError("mspProjectXmlExceeds2Mb");
+    const base = exchangeBase(),
+      guard = { projectId, baseState: stableJSON(base), stored: localStorage.getItem(WORKSPACE_KEY) },
+      plan = prepareProjectXML(readProjectXML(await file.text()));
+    if (await previewExcel(plan)) commitExcelCandidate(plan, guard);
+  } finally {
+    excelImportBusy = false;
+  }
+}
+
+function exportProjectXML() {
+  return showDialog({
+    title: t("mspExportTitle"),
+    bodyHtml:
+      '<p class="app-dialog-message">' +
+      escapeHtml(t("mspExportDescription")) +
+      '</p><p class="ui-caption">' +
+      escapeHtml(t("mspExportDetail")) +
+      "</p>",
+    actions: [
+      { label: t("msgCancel"), value: null },
+      {
+        label: t("mspSaveXml"),
+        kind: "primary",
+        value: true,
+        onClick() {
+          downloadBlob(
+            buildProjectXML(),
+            "Project_" +
+              projectId +
+              "_MSPDI_v1_" +
+              new Date().toISOString().replace(/[:.]/g, "-") +
+              "_" +
+              crypto.randomUUID().slice(0, 8) +
+              ".xml",
+            "application/xml",
+          );
+        },
+      },
+    ],
   });
 }

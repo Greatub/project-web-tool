@@ -1,6 +1,6 @@
 # Current status
 
-Updated: 2026-10-25 (Asia/Shanghai).
+Updated: 2026-10-27 (Asia/Shanghai).
 
 ## Implemented
 
@@ -10,7 +10,15 @@ Updated: 2026-10-25 (Asia/Shanghai).
 - Controlled Excel v3, protected calculated cells, explicit 21/22-field mappings, group configuration, preview, source revision checks and downloads as new files. Legacy 14-column spreadsheet import remains positionally compatible; source-specific aliases have been removed. Legacy JSON requires a declared three-slot mapping.
 - Public source allowlist and irreversible identifier fingerprints with submission/push hooks. Historical source files, old templates, development images, raw audit records and old Git backups have been removed under explicit user authorization. The public repository was deleted and recreated under the same name, with a new repository identity and clean Git history; only the 13 reviewed files were uploaded.
 
-## Current change: project conventions aligned with merged updates
+## Current change: Microsoft Project XML
+
+- Ported onto latest main (`1ae5106`) without overwriting the merged source split, English-first UI, compact storage, undo/history and shared dialogs. XML implementation lives in `src/app/js/exchange.js`; all 59 new messages use the shared bilingual dictionary. Generated `src/index.html` is rebuilt from sources.
+- Import XML via the existing action, review mapped fields and create an independent project. Export Project XML under Data & versions, using the shared dialog/inline errors, SVG button and typography. No new CSS or standalone page. Source files stay read-only and downloads have unique filenames.
+- Explicit v1 mappings cover current fields, elapsed 24-hour durations, one FS predecessor, signed calendar Lag and Text1–Text10 groups. Exchange notes retain group configuration and inactive Lag. Unsupported rules, conflicting schedules, malformed XML/DTDs and truncation reject before mutation. Native MPP is not implemented.
+- Current verification: 84 logic checks (67 latest-main regressions + 17 Project XML checks), build freshness and privacy scans pass. XML parsing tests use Python's independent standard-library parser; cancellation, isolation, concurrent writes, failed persistence and bilingual shared preview configuration are covered. Fictional full/blank/unknown-date outputs pass an assembled subset of Microsoft-published mapped-field schema definitions; this is not full-schema or native application certification.
+- Pending: native Microsoft Project open/save/MPP conversion and live 1024/1440 px English/Chinese browser acceptance. Browser file access is restricted here; the existing CI smoke remains the remote browser regression gate. No new live visual acceptance is claimed.
+
+## Previous change: project conventions aligned with merged updates
 
 - Baseline: `c0f73fa` on main, including the data-safety/source restructuring and workflow/interface changes merged through pull requests #2 and #3.
 - Expanded `docs/PUBLIC.md` in English and Chinese with source ownership, generated build rules, task editing, session history boundaries, archive/deletion behavior, compact storage, save failures, interaction/accessibility and validation gates. README links to these rules.
@@ -74,9 +82,15 @@ Updated: 2026-10-25 (Asia/Shanghai).
 
 ## 简体中文
 
-更新：2026-10-25（Asia/Shanghai）。
+更新：2026-10-27（Asia/Shanghai）。
 
-### 本次变更：按已合并更新补齐项目规范
+### 本次变更：Project XML 导入与导出
+
+- 基于远端最新 main 移植，保留模块化源码、统一对话框、紧凑存储和现有流程；新增文案全部进入中英文词典，不增加样式覆盖或独立页面。
+- 导入先预览，再以独立项目保存；导出当前字段并另存新文件。支持三级任务、整自然日、单一 FS 前置及 Lag、进度、优先级和 10 个组，不直接读写 MPP。
+- 本次验证：84 项逻辑检查（现有 67 项 + XML 17 项）、构建一致性及隐私扫描通过；完整/空白/未定日期三类输出通过映射字段 Schema 子集校验。Microsoft Project 桌面打开、另存及本次中英文实际布局仍待验收。
+
+### 上次变更：按已合并更新补齐项目规范
 
 - 基于 main 的 `c0f73fa`，包含 PR #2 的数据安全/源码拆分及 PR #3 的流程/界面更新。
 - `docs/PUBLIC.md` 同步补齐中英文源码职责、生成构建、任务编辑、会话历史边界、归档/删除、紧凑存储、保存失败、交互无障碍及验证门禁；README 增加规范入口。

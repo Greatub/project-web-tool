@@ -29,7 +29,7 @@
   <details class="action-menu" id="actionMenu" open>
     <summary id="actionMenuLabel"></summary>
     <div class="header-actions">
-      <input aria-label="Import project file / 导入项目文件" type="file" id="excelFileInput" accept=".xlsx,.json"
+      <input aria-label="Import project file / 导入项目文件" type="file" id="excelFileInput" accept=".xlsx,.json,.xml,.mpp"
              style="display:none" onchange="handleFileImport(event)">
       <details class="sidebar-action-group sidebar-filters" id="taskActions">
         <summary id="taskActionsLabel">Task actions</summary>
@@ -44,6 +44,7 @@
         <div class="group-actions">
           <button class="btn" id="btnImportXls" onclick="document.getElementById('excelFileInput').click()">📥 Import</button>
           <button class="btn" title="Standard .xlsx template / 标准 .xlsx 模板" id="btnExportXls" onclick="exportToExcelXML()">📤 Export Excel</button>
+          <button class="btn" id="btnExportProject" onclick="exportProjectXML()">Export Project XML</button>
           <button class="btn btn-primary" id="btnSaveVer" onclick="openVersionModal()">📌 Save Version</button>
           <button class="btn" id="btnHistory" onclick="openHistoryDialog()">🕘 Versions & history</button>
           <button class="btn" id="btnExportJson" onclick="exportVersionBundle()">💾 Export Bundle</button>

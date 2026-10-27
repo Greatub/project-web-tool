@@ -55,7 +55,7 @@ Gantt bars remain keyboard-focusable: arrow keys move by one calendar day, Shift
 
 ### Validation and release acceptance
 
-Use Node.js 22 or newer. The current baseline has 67 logic checks and a 25-check browser smoke suite; record the actual counts and results for each change rather than treating these numbers as fixed requirements.
+Use Node.js 22+ and Python 3 for logic checks (the browser app has no runtime dependencies). The current baseline has 84 logic checks and a 25-check browser smoke suite; record the actual counts and results for each change rather than treating these numbers as fixed requirements.
 
 | Gate | Command and acceptance |
 | --- | --- |
@@ -112,6 +112,19 @@ Keep the full-height sidebar, three views and language switch at the bottom. Ver
 
 Original local designs are reference material only. This public contract excludes source people, organizations, tasks and personal paths.
 
+### Project XML exchange
+
+Microsoft Project XML (MSPDI) is supported for current fields only. Import previews a separate project and commits atomically with a fresh identity; it never updates the current project in place. Export uses a timestamped, random-suffixed filename. Native MPP is not parsed or written.
+
+- Standard WBS, UID, Name and OutlineLevel map an ordered three-level phase/main/subtask tree. No silent flattening or padding.
+- Dates use midnight whole-day boundaries; Finish is exclusive (the midnight after the web finish date). Duration encodes 24 hours per calendar day with DurationFormat=8. Only one local FS predecessor is allowed; LinkLag is signed calendar days × 14400 (tenths of minutes), with LagFormat=8.
+- PercentComplete is an integer 0–100. Priorities High/Medium/Normal export as 900/500/100. Other input values map by >500/=500/<500, with a preview notice.
+- Text1–Text10 field IDs explicitly map group1–group10. UID 0 summary Notes carry the ProjectWorkspaceMSPDI v1 mapping and group names/colors/slots. Task exchange notes preserve inactive Lag without a predecessor. Keep these notes and field definitions. Standard resource assignment names from external files map to Group 1, explicitly disclosed in the preview; work/capacity is not imported.
+- Limits: 2 MB UTF-8, 2000 tasks, 255 characters per project/task name or per group assignment field. Invalid XML, DTDs, duplicate/missing references, working-duration calendars, partial days, milestones, date constraints, task calendars, leveling delays, non-FS/multiple predecessors and inconsistent schedules reject before saving. Summary values are recalculated and previewed.
+- Only current fields are exchanged. Original notes, costs, work, capacity, other custom fields, versions, audit and recovery points are not preserved. Unknown dates/durations remain absent, but Project may fill them on opening.
+
+Implementation follows Microsoft's [Project XML reference](https://learn.microsoft.com/en-us/office-project/xml-data-interchange/project-xml-data-interchange-schema-reference), [elapsed duration units](https://learn.microsoft.com/en-us/office-project/xml-data-interchange/durationformat-element), [LinkLag units](https://learn.microsoft.com/en-us/office-project/xml-data-interchange/linklag-element) and [custom field IDs](https://learn.microsoft.com/en-us/office/vba/api/project.pjcustomfield). Real XML roundtrip checks and mapped-field schema-subset checks are separate from native Project desktop acceptance, which is still pending.
+
 ## 简体中文
 
 公开仓库仅允许 `scripts/privacy-check.cjs` 中 PUBLIC_FILES 列出的文件。忽略规则默认排除所有内容，再逐项开放；新文件需要审核并修改白名单。原始来源、历史证据、Excel 案例、导出包、截图、临时文件、机器配置和个人上下文保留本地。
@@ -161,7 +174,7 @@ Original local designs are reference material only. This public contract exclude
 
 ## 验证与发布验收规范
 
-使用 Node.js 22 或更新版本。目前基线为 67 项逻辑检查和 25 项浏览器冒烟检查；每次记录实际执行的数量和结果，不将数量固定为验收条件。
+逻辑检查使用 Node.js 22+ 和 Python 3，网页无运行依赖。目前基线为 84 项逻辑检查和 25 项浏览器冒烟检查；每次记录实际执行的数量和结果，不将数量固定为验收条件。
 
 | 检查 | 命令与验收要求 |
 | --- | --- |
@@ -211,3 +224,27 @@ v1.0 无项目身份和源版本摘要，只允许明确选择目标后更新既
 全高侧栏、三个视图、底部语言切换；版本与变更记录在侧栏打开的对话框中查看，不另设独立页面；所有提示、确认和报错统一使用应用内对话框（`src/app/js/dialogs.js`），不使用浏览器 alert/confirm/prompt。日期在各语言下均以 YYYY-MM-DD 显示和输入。界面语言是浏览器偏好，不随项目变化。归档项目为只读。标准编辑及弹窗操作至少 44px；甘特行内输入保留 28px；轻量人员跳转操作 32px。宽表在容器内滚动、日期不换行、焦点可见。中英文共享组件，用户数据不翻译。
 
 本地原始设计仅供参考；此公开约定不包含来源人员、组织、任务或个人路径。
+
+## Project XML 交换
+
+当前支持 Microsoft Project XML（MSPDI `.xml`），不直接读写二进制 `.mpp`。通过现有“导入”选择 XML；预览确认后创建独立项目，不覆盖当前项目。使用“数据与版本 → 导出 Project XML”下载带时间及随机后缀的新文件。导出不包含项目版本、审计或恢复点；导入不保留当前字段以外的原始数据。源文件始终只读。
+
+| 当前字段 | Project XML 映射 |
+| --- | --- |
+| 项目名、状态日期 | Project / Name、StatusDate |
+| WBS、三级层级、名称 | Task / WBS、OutlineLevel、Name；UID 用于解析引用 |
+| 开始、完成 | Start 为当天午夜；Finish 为网页完成日期次日午夜（区间右端不含） |
+| 工期 | Duration 按每天 24 小时编码；DurationFormat=8（elapsed days） |
+| 完成百分比 | PercentComplete，整数 0–100 |
+| 高 / 中 / 普通优先级 | Priority 900 / 500 / 100；外部其他值按 >500、=500、<500 分类并在预览提示 |
+| 前置、Lag | 单个 PredecessorLink，Type=1（FS）；LinkLag=自然日数×14400，LagFormat=8 |
+| group1–group10 人员 | 任务 Text1–Text10（以实际 FieldID 标识），别名为 PW groupN \| 组名 |
+| 自定义组名称、颜色、启用槽位 | UID=0 项目摘要的 Notes，含 ProjectWorkspaceMSPDI v1 标记和显式字段映射 |
+
+支持阶段→主任务→子任务的三级树，任务按层级顺序排列，不根据 WBS 字符串猜父级。需要唯一 WBS 和 UID。最多 2000 条任务、2 MB XML；名称和单个组人员字段最多 255 字符，超限拒绝导出，不截断。未定日期、工期、优先级可留空，但 Project 桌面程序可能自动补值，重新导入前应核对。
+
+工期必须为正整数经过自然日，子任务开始和完成时刻必须为午夜。拒绝工作日历工期、非整日、里程碑、非 FS 或多前置、跨项目依赖、日期约束、任务日历、资源平衡延迟、循环/缺失引用、超过三级或不足三级的任务树，以及源日期与本工具排程冲突。汇总日期、进度和状态按本工具规则重算并在预览展示。外部标准资源分配名称映射到 Group 1，预览明确提示；这不表示导入工时、资源容量或费用。原备注、成本、工时、其他自定义字段和未支持功能不保留。
+
+未设置前置时仍填写的 Lag 通过任务备注中的 v1 扩展保留，避免丢失暂未生效的输入值。应保留本工具导出的项目/任务交换备注和组字段定义，否则组配置无法完整恢复。不自动猜测其他来源 Text 字段的业务含义。XML 先检查大小、禁止 DTD/实体声明，再用 XML 解析器读取，校验候选数据后复用预览与原子保存；失败和取消不修改现有项目。
+
+依据微软的 [Project XML 规范](https://learn.microsoft.com/en-us/office-project/xml-data-interchange/project-xml-data-interchange-schema-reference)、[DurationFormat](https://learn.microsoft.com/en-us/office-project/xml-data-interchange/durationformat-element)、[LinkLag](https://learn.microsoft.com/en-us/office-project/xml-data-interchange/linklag-element) 和 [自定义字段编号](https://learn.microsoft.com/en-us/office/vba/api/project.pjcustomfield)实现。自动往返测试和完整/空白/未定日期三类输出的映射字段 Schema 子集检查已完成；尚未完成 Microsoft Project 桌面端打开、另存 MPP 后再导出 XML 的实测，也未完成本次中英文桌面布局验收。

@@ -28,6 +28,7 @@ const PUBLIC_FILES = [
   "tests/public/excel.cjs",
   "tests/public/storage.cjs",
   "tests/public/workflow.cjs",
+  "tests/public/project.cjs",
   "tests/e2e/smoke.cjs",
   ".githooks/pre-commit",
   ".githooks/pre-push",

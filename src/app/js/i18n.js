@@ -396,7 +396,7 @@ const I18N = {
     msgEmptyStep1: "新建阶段，例如“设计”或“上线”。",
     msgEmptyStep2: "在侧栏“任务操作”中为阶段添加主任务。",
     msgEmptyStep3: "添加带日期、工期和人员的子任务；主任务和阶段会自动汇总。",
-    msgEmptyImport: "导入 Excel 或 JSON",
+    msgEmptyImport: "导入 Excel、JSON 或 Project XML",
     msgEmptyDemo: "填入虚构示例",
     legTip:
       "提示：拖拽任务条或选中后按方向键改期 · 拖右边缘或 Shift+方向键调整工期 · Ctrl+Z 撤销 · Ctrl+滚轮缩放",
@@ -813,12 +813,157 @@ const I18N = {
     msgEmptyStep2: "Add main tasks to the phase from Task actions in the sidebar.",
     msgEmptyStep3:
       "Add sub-tasks with dates, durations and people. Main tasks and phases roll up automatically.",
-    msgEmptyImport: "Import Excel or JSON",
+    msgEmptyImport: "Import Excel, JSON or Project XML",
     msgEmptyDemo: "Fill with fictional demo",
     legTip:
       "Tip: drag a bar or focus it and use the arrow keys to reschedule · drag the right edge or Shift+Arrow to change duration · Ctrl+Z undoes · Ctrl+wheel zooms",
   },
 };
+
+// Microsoft Project XML labels and validation messages.
+Object.assign(I18N.en, {
+  mspUseElapsedDurationsWorkingCalendarsCannotBeSilently:
+    "Use elapsed durations; working calendars cannot be silently converted.",
+  mspDurationMustBePositiveWholeCalendarDaysMilestones:
+    "Duration must be positive whole calendar days; milestones and partial days are unsupported.",
+  mspXmlExceeds2MbOrContainsAForbidden: "XML exceeds 2 MB or contains a forbidden DTD/entity.",
+  mspSelectAMicrosoftProjectXmlFile: "Select a Microsoft Project XML file.",
+  mspFinishScheduledProjectsAreUnsupported: "Finish-scheduled projects are unsupported.",
+  mspUseThreeLevelsPhaseMainTaskSubtaskHierarchy:
+    "Use three levels: phase → main task → subtask; hierarchy is not silently flattened or padded.",
+  mspTaskCalendarsDateConstraintsAndLevelingDelaysAre:
+    "Task calendars, date constraints and leveling delays are unsupported.",
+  mspSubtasksRequireMidnightWholeDayBoundariesTimesCannot:
+    "Subtasks require midnight whole-day boundaries; times cannot be silently truncated: {0}",
+  mspFileDatesDoNotMatchCalendarDayScheduling: "File dates do not match calendar-day scheduling: {0}",
+  mspPredecessorAndStartDateDisagree0: "Predecessor and start date disagree: {0}",
+  mspCreatesAnIndependentCopyOnlyCurrentFieldsAre:
+    "Creates an independent copy. Only current fields are imported; costs, work, capacity, original notes and other Project features are not retained. Summaries are recalculated.",
+  mspStandardResourceAssignmentNamesMapToGroup1:
+    "Standard resource assignment names map to Group 1; review before applying.",
+  mspProjectPrioritiesWereMappedToHighMediumNormal:
+    "Project priorities were mapped to High/Medium/Normal; review before applying.",
+  mspAnImportIsAlreadyInProgress: "An import is already in progress",
+  mspDuplicateProjectXmlElement0: "Duplicate Project XML element: {0}",
+  mspExpectedATextField0: "Expected a text field: {0}",
+  mspInvalidInteger0: "Invalid integer: {0}",
+  mspInvalidUnsupportedProjectDate0: "Invalid/unsupported Project date: {0}",
+  mspUnsupportedProjectDuration0: "Unsupported Project duration: {0}",
+  mspForeignXmlNamespace: "Foreign XML namespace",
+  mspProjectXmlSupportsAtMost2000Tasks: "Project XML supports at most 2000 tasks",
+  mspMissingDuplicateTaskUid: "Missing/duplicate task UID",
+  mspUid0MustBeTheProjectSummaryNot: "UID 0 must be the project summary, not a user task",
+  mspUnsupportedProjectXmlContractMapping: "Unsupported Project XML contract/mapping",
+  mspDuplicateCustomFieldDefinition: "Duplicate custom field definition",
+  mspInvalidDuplicateResourceUid: "Invalid/duplicate resource UID",
+  mspUnresolvedResourceAssignment: "Unresolved resource assignment",
+  mspNullTaskRowsAreUnsupported: "Null task rows are unsupported",
+  mspUnsupportedTaskFeature0: "Unsupported task feature: {0}",
+  mspMultiplePredecessorsAreUnsupported0: "Multiple predecessors are unsupported: {0}",
+  mspOnlyLocalSubtaskFsLinksAreSupported: "Only local subtask FS links are supported",
+  mspLagMustUseElapsedUnits: "Lag must use elapsed units",
+  mspLagMustBeWholeCalendarDays: "Lag must be whole calendar days",
+  mspInvalidInactiveLagMapping: "Invalid inactive Lag mapping",
+  mspPriorityIsOutside01000: "Priority is outside 0–1000",
+  mspDuplicateTaskCustomField: "Duplicate task custom field",
+  mspCustomFieldLookupValuesRequireExplicitTextValues:
+    "Custom field lookup values require explicit text values",
+  mspSummaryGroupAssignmentsAreUnsupported: "Summary group assignments are unsupported",
+  mspResourceAssignmentsConflictWithTheDeclaredGroupMapping:
+    "Resource assignments conflict with the declared group mapping",
+  mspSummaryResourceAssignmentsAreUnsupported: "Summary resource assignments are unsupported",
+  mspDuplicateTaskUid: "Duplicate task UID",
+  mspMainTaskHasNoPhase: "Main task has no phase",
+  mspSubtaskHasNoMainTask: "Subtask has no main task",
+  mspPredecessorMustResolveToASubtask: "Predecessor must resolve to a subtask",
+  mspProjectNamesTaskNamesSupportAtMost255: "Project names/task names support at most 255 characters",
+  mspProjectPercentcompleteRequiresWholePercentages0:
+    "Project PercentComplete requires whole percentages: {0}",
+  mspProjectDurationExceeds365000Days0: "Project duration exceeds 365000 days: {0}",
+  mspGroupAssignmentsSupportAtMost255CharactersPer:
+    "Group assignments support at most 255 characters per field: {0}",
+  mspInvalidXmlCharactersOrXmlExceeds2Mb: "Invalid XML characters or XML exceeds 2 MB",
+  mspProjectXmlExceeds2Mb: "Project XML exceeds 2 MB",
+  btnExportProject: "Export Project XML",
+  mspExportTitle: "Export Project XML",
+  mspExportDescription:
+    "Export current fields: three task levels, dates, elapsed durations, FS links and Lag, progress, priorities and 10 groups. This writes Project XML, not native MPP.",
+  mspExportDetail:
+    "Group assignments use Text1–Text10; retain the project/task exchange notes containing configuration and mappings. Unknown dates/durations stay blank; Project may fill them. Current data only, without versions, audit or recovery points.",
+  mspSaveXml: "Save new XML",
+  mspPreviewTitle: "Project XML import preview",
+  mspReadOnlyCopy:
+    "The source XML is read-only. Confirm to create a separate project without overwriting existing data.",
+  mspUseXml: "Save as XML in Microsoft Project before importing; direct MPP is unsupported.",
+  mspUseJsonXlsxXml: "Use JSON, XLSX or Project XML",
+});
+Object.assign(I18N.zh, {
+  mspUseElapsedDurationsWorkingCalendarsCannotBeSilently:
+    "工期必须使用经过时间（elapsed），不能静默转换工作日历。",
+  mspDurationMustBePositiveWholeCalendarDaysMilestones:
+    "工期需为正整数自然日；暂不支持里程碑和不足一天的任务。",
+  mspXmlExceeds2MbOrContainsAForbidden: "XML 超过 2 MB 或包含不允许的文档类型/实体。",
+  mspSelectAMicrosoftProjectXmlFile: "请选择 Microsoft Project XML 文件。",
+  mspFinishScheduledProjectsAreUnsupported: "暂不支持按完成日期倒排的项目。",
+  mspUseThreeLevelsPhaseMainTaskSubtaskHierarchy:
+    "需要三级任务结构：阶段 → 主任务 → 子任务；不自动压平或补齐。",
+  mspTaskCalendarsDateConstraintsAndLevelingDelaysAre: "不支持任务日历、日期约束或资源平衡延迟。",
+  mspSubtasksRequireMidnightWholeDayBoundariesTimesCannot: "子任务需使用午夜整日边界，不能静默截去时刻：{0}",
+  mspFileDatesDoNotMatchCalendarDayScheduling: "文件日期与自然日排程不一致：{0}",
+  mspPredecessorAndStartDateDisagree0: "前置关系与开始日期不一致：{0}",
+  mspCreatesAnIndependentCopyOnlyCurrentFieldsAre:
+    "仅创建独立副本。只导入当前字段；费用、工时、资源容量、原备注及其他 Project 功能不会保留。汇总值按本工具规则重算。",
+  mspStandardResourceAssignmentNamesMapToGroup1: "标准资源分配的人员名称映射到 Group 1，请核对。",
+  mspProjectPrioritiesWereMappedToHighMediumNormal: "Project 优先级已映射到高/中/普通，请核对。",
+  mspAnImportIsAlreadyInProgress: "已有导入正在处理",
+  mspDuplicateProjectXmlElement0: "Project XML 元素重复：{0}",
+  mspExpectedATextField0: "字段必须为文本：{0}",
+  mspInvalidInteger0: "整数无效：{0}",
+  mspInvalidUnsupportedProjectDate0: "Project 日期无效或格式不支持：{0}",
+  mspUnsupportedProjectDuration0: "不支持的 Project 工期：{0}",
+  mspForeignXmlNamespace: "不支持其他 XML 命名空间",
+  mspProjectXmlSupportsAtMost2000Tasks: "Project XML 最多支持 2000 条任务",
+  mspMissingDuplicateTaskUid: "任务 UID 缺失或重复",
+  mspUid0MustBeTheProjectSummaryNot: "UID 0 必须为项目摘要，不能用于普通任务",
+  mspUnsupportedProjectXmlContractMapping: "不支持该 Project XML 版本或字段映射",
+  mspDuplicateCustomFieldDefinition: "自定义字段定义重复",
+  mspInvalidDuplicateResourceUid: "资源 UID 无效或重复",
+  mspUnresolvedResourceAssignment: "资源分配引用无法解析",
+  mspNullTaskRowsAreUnsupported: "不支持空任务行",
+  mspUnsupportedTaskFeature0: "不支持的任务功能：{0}",
+  mspMultiplePredecessorsAreUnsupported0: "不支持多个前置任务：{0}",
+  mspOnlyLocalSubtaskFsLinksAreSupported: "仅支持本项目子任务之间的 FS 关系",
+  mspLagMustUseElapsedUnits: "Lag 必须使用经过时间单位",
+  mspLagMustBeWholeCalendarDays: "Lag 必须为整数自然日",
+  mspInvalidInactiveLagMapping: "未生效 Lag 的映射无效",
+  mspPriorityIsOutside01000: "优先级必须在 0–1000 之间",
+  mspDuplicateTaskCustomField: "任务自定义字段重复",
+  mspCustomFieldLookupValuesRequireExplicitTextValues: "自定义字段查找值必须提供明确文本",
+  mspSummaryGroupAssignmentsAreUnsupported: "不支持在汇总任务上填写组人员",
+  mspResourceAssignmentsConflictWithTheDeclaredGroupMapping: "资源分配与已声明的组映射冲突",
+  mspSummaryResourceAssignmentsAreUnsupported: "不支持在汇总任务上分配资源",
+  mspDuplicateTaskUid: "任务 UID 重复",
+  mspMainTaskHasNoPhase: "主任务缺少所属阶段",
+  mspSubtaskHasNoMainTask: "子任务缺少所属主任务",
+  mspPredecessorMustResolveToASubtask: "前置必须指向存在的子任务",
+  mspProjectNamesTaskNamesSupportAtMost255: "项目名称和任务名称最多 255 个字符",
+  mspProjectPercentcompleteRequiresWholePercentages0: "Project 完成进度必须为整数百分比：{0}",
+  mspProjectDurationExceeds365000Days0: "Project 工期超过 365000 天：{0}",
+  mspGroupAssignmentsSupportAtMost255CharactersPer: "单个组人员字段最多 255 个字符：{0}",
+  mspInvalidXmlCharactersOrXmlExceeds2Mb: "包含非法 XML 字符或文件超过 2 MB",
+  mspProjectXmlExceeds2Mb: "Project XML 超过 2 MB",
+  btnExportProject: "导出 Project XML",
+  mspExportTitle: "导出 Project XML",
+  mspExportDescription:
+    "导出当前字段：三级任务、日期、自然日工期、FS 前置与 Lag、进度、优先级及 10 个组。文件用于 Microsoft Project XML 交换，不直接生成 MPP。",
+  mspExportDetail:
+    "组分配使用 Text1–Text10；项目/任务交换备注保存组配置和映射，请保留。未定日期/工期留空，Project 可能自动补值。仅导出当前数据，不含版本、审计或恢复点。",
+  mspSaveXml: "另存 XML",
+  mspPreviewTitle: "Project XML 导入预览",
+  mspReadOnlyCopy: "源 XML 只读。确认后创建独立项目，不覆盖现有数据。",
+  mspUseXml: "请在 Microsoft Project 中另存为 XML 后导入；不直接读取 MPP。",
+  mspUseJsonXlsxXml: "请导入 JSON、XLSX 或 Project XML 文件",
+});
 
 // Single translation entry point for labels and messages. Placeholders {0}, {1}… take the extra arguments.
 function t(key, ...args) {

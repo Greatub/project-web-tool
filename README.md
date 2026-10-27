@@ -38,9 +38,15 @@ Legacy v1/v2 workbooks retain their original 14-column meaning and map the three
 
 See the [Excel v3.0 contract](docs/PUBLIC.md#excel-v30-controlled-exchange) for field rules and compatibility.
 
+### Microsoft Project XML exchange
+
+Use **Import** to read a Microsoft Project XML (`.xml`) file, preview the mapped fields and create an independent project. Use **Data & versions → Export Project XML** to download a new file; source files are never overwritten. Native `.mpp` requires conversion to XML in Microsoft Project first.
+
+The limited mapping supports three task levels, calendar dates, positive whole elapsed-day durations, single FS links, signed whole-day Lag, integer progress, priorities and ten custom groups. Group assignments use Text1–Text10; retain project/task exchange notes for configuration and inactive Lag. Unsupported hierarchy, working calendars, milestones, date constraints, multi-predecessor/non-FS links and schedule conflicts are rejected. Other Project data is not retained. Native Project open/save compatibility still needs desktop acceptance. See the [Project XML contract](docs/PUBLIC.md#project-xml-exchange).
+
 ### Development and validation
 
-Node.js 22 or newer is required. The app has no third-party dependencies.
+Development checks require Node.js 22+ and Python 3 (standard-library XML parsing in tests only). The app itself has no third-party dependencies.
 
 `src/index.html` is a generated single file. Edit the readable sources in `src/app/` and rebuild:
 
@@ -60,7 +66,7 @@ Node.js 22 or newer is required. The app has no third-party dependencies.
 
 ```sh
 npm run build        # regenerate src/index.html from src/app/
-npm test             # build freshness check + 67 logic checks (no dependencies)
+npm test             # build freshness check + 84 logic checks (Node.js + Python 3)
 npm run test:e2e     # browser smoke test; needs: npm install --no-save playwright && npx playwright install chromium
 npm run format       # optional: Prettier formatting for sources and tests
 npm run privacy
@@ -100,15 +106,19 @@ Project 表填写名称与状态日期；Plan 修改已有任务；NewTasks 新�
 
 Excel 数据表和 Instructions 固定为英文、Arial 9 号；新增 Instructions_zh 中文翻译说明表，使用等线 9 号。用户输入原文保留。按唯一 WBS 一一对应网页任务，字段与单位映射写在说明表；计算结果只读。空白 Plan 不输出空的数据验证节点，避免 Excel 修复提示。
 
+## Project XML 导入与导出
+
+在“导入”中选择 XML，预览后创建独立项目；通过“数据与版本 → 导出 Project XML”另存当前字段。源文件只读；不直接读写 MPP。支持三级结构、整自然日、单一 FS 前置、Lag、进度、优先级及 10 个组，不支持的排程规则会拒绝，不静默转换。Microsoft Project 桌面打开/另存仍待实测。详见 [Project XML 交换规范](docs/PUBLIC.md#project-xml-交换)。
+
 ## 开发与验证
 
-需要 Node.js 22 或更新版本，应用本身无第三方依赖。
+开发检查需要 Node.js 22+ 和 Python 3（仅用于标准库 XML 测试），应用本身无第三方依赖。
 
 `src/index.html` 是生成的单文件。请修改 `src/app/` 下的源码（页面结构、样式、`js/` 下按职责拆分的脚本），再运行构建：
 
 ```sh
 npm run build        # 由 src/app/ 重新生成 src/index.html
-npm test             # 构建一致性检查 + 67 项逻辑检查（无依赖）
+npm test             # 构建一致性检查 + 84 项逻辑检查（Node.js + Python 3）
 npm run test:e2e     # 浏览器冒烟测试；需先 npm install --no-save playwright && npx playwright install chromium
 npm run privacy
 npm run release

@@ -718,6 +718,7 @@ const ACTION_ICONS = {
   btnAddSub: '<path d="M5 4v8h7M12 9v6M9 12h6M5 19h14"/>',
   btnAddMain: '<rect x="4" y="4" width="16" height="16" rx="1"/><path d="M8 12h8M12 8v8"/>',
   btnImportXls: '<path d="M12 3v12M8 11l4 4 4-4M4 15v6h16v-6"/>',
+  btnExportProject: '<path d="M12 16V4M8 8l4-4 4 4M4 15v6h16v-6"/>',
   btnExportXls: '<path d="M12 16V4M8 8l4-4 4 4M4 15v6h16v-6"/>',
   btnExportJson: '<path d="m3 7 9-4 9 4v10l-9 4-9-4V7Zm0 0 9 4 9-4M12 11v10M7 5l9 4"/>',
   btnHistory: '<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>',
@@ -754,6 +755,7 @@ function applyStaticI18n() {
   renderActionButton("btnAddMain", "btnAddMain");
   renderActionButton("btnImportXls", "btnImportXls");
   renderActionButton("btnExportXls", "btnExportXls");
+  renderActionButton("btnExportProject", "btnExportProject");
   renderActionButton("btnExportJson", "btnExportJson");
 
   document.getElementById("tab-gantt").textContent = t("tab1");
