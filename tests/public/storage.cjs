@@ -219,6 +219,10 @@ function bigProject(families, mains, subs) {
     run("loadState(); recalculateSchedule();");
     await run("updateDataSafetyStatus()");
     assert.match(nodes.get("dataSafetyStatus").textContent, /matches current data/);
+    const originalRevision = await run("backupRevision(currentBundle())");
+    run("projectSettings.personAliases.collapsed = 'Example alias';");
+    assert.notEqual(await run("backupRevision(currentBundle())"), originalRevision);
+    run("delete projectSettings.personAliases.collapsed;");
     run("projectData[0].collapsed = true; curLang = 'zh'; saveState();");
     await run("updateDataSafetyStatus()");
     assert.match(nodes.get("dataSafetyStatus").textContent, /与当前数据一致/);

@@ -4589,7 +4589,9 @@ function backupContent(bundle) {
   b.currentData = compactData(b.currentData);
   b.versionHistory = b.versionHistory.map(compactVersion);
   b.recoveryPoints = (b.recoveryPoints || []).map(compactRecoveryPoint);
-  return stableJSON(b);
+  // compactData already removes task display state. Preserve similarly named user keys in aliases.
+  return JSON.stringify(b, (key, value) => value && typeof value === "object" && !Array.isArray(value)
+    ? Object.fromEntries(Object.keys(value).sort().map((name) => [name, value[name]])) : value);
 }
 
 async function backupRevision(bundle) {

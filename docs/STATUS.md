@@ -15,7 +15,7 @@ Updated: 2026-10-27 (Asia/Shanghai).
 - Added persistent Import / Edit / Export guidance using shared buttons, captions and dialogs. The empty state explains the complete file-to-edit-to-download flow; import guidance distinguishes controlled Excel templates, Project XML and full JSON backups. Export guidance explains which formats include history.
 - Import failures retain the filename and available sheet/cell/row/WBS details, explain that the source is unchanged, offer repair steps and a corrected-file picker. Stale revisions, wrong-project workbooks and formulas have specific advice. Plan validation now reports the original worksheet row after summary rows are filtered.
 - Browser save time and per-project JSON download status are separate. SHA-256 receipts store only a timestamp and revision; reopening checks current data against the receipt, later edits request a new backup, and failed saves override the backup message. Language/view-only changes do not invalidate a backup. Downloads use unique filenames; a receipt records a download request, never confirmed disk persistence. Excel/XML exports do not count as full backups.
-- This change: 95 logic checks, generated-build freshness and privacy scanning passed. Added browser scenarios for guided failed/corrected import → edit → JSON download → reload, changed-since-backup detection, and repeated-control typography/geometry in English/Chinese at 1024/1440 px. These new browser checks and live visual acceptance are pending; previous browser results below belong to their original changes.
+- This change: 95 logic checks, generated-build freshness and privacy scanning passed. Added browser scenarios for guided failed/corrected import → edit → JSON download → reload, changed-since-backup detection, and repeated-control typography/geometry in English/Chinese at 1024/1440 px. Commit `9905670` passed GitHub Actions verify and all 30 browser checks, including these new scenarios. Final review also checked that a personnel-alias key named collapsed changes the backup revision (16 storage checks passed). Manual screenshot review is still pending: the CI artifact download was unavailable. Previous browser results below belong to their original changes.
 - No scheduling/calendar change. Microsoft Project desktop compatibility remains separately pending.
 
 ## Previous change: Project XML calendar-day conversion
@@ -109,7 +109,7 @@ Updated: 2026-10-27 (Asia/Shanghai).
 - 增加持续可见的导入、修改、导出入口和完整操作指引，复用按钮、说明文字及统一对话框；导出说明区分 Excel/XML 字段交换与完整 JSON 备份。
 - 导入失败保留文件名及可用的表、单元格、行号或 WBS 定位，提供修正建议及重选文件入口；过期版本、项目不匹配、公式分别提示。修复过滤汇总行后 Plan 报错行号偏移的问题。
 - 分开显示浏览器保存时间和项目 JSON 下载记录。重新打开后校验当前内容是否匹配；修改后提示重新备份，保存失败优先显示风险。下载记录仅保存时间与 SHA-256 摘要，不含任务或人员信息，不代表磁盘保存成功。Excel/XML 不算完整备份。
-- 本次验证：95 项逻辑检查、构建一致性与隐私扫描通过。已新增导入失败→修正导入→编辑→下载→重开，以及 1024/1440 px 中英文控件样式与边界的浏览器检查，尚待运行及实际视觉验收。下方历史测试不作为本次验收。
+- 本次验证：95 项逻辑检查、构建一致性与隐私扫描通过。已新增导入失败→修正导入→编辑→下载→重开，以及 1024/1440 px 中英文控件样式与边界的浏览器检查，提交 `9905670` 的 GitHub CI 校验及全部 30 项浏览器检查通过。最后复核补充了名为 collapsed 的人员别名仍须影响摘要的检查，16 项存储检查通过。CI 截图下载不可用，人工截图验收仍待完成；下方历史测试不作为本次验收。
 - 未改变排程和日历逻辑；Microsoft Project 桌面兼容性仍待实测。
 
 ### 上次变更：Project XML 换算为日历日
