@@ -55,7 +55,7 @@ function exchangeRows(data = projectData) {
   return rows;
 }
 
-function applyImportedRows(rows, data) {
+function applyImportedRows(rows, data, rowNumbers = null) {
   if (!Array.isArray(rows) || !rows.length) throw inputError("msgThePlanWorksheetIsEmpty");
   const header = rows[0].map((c) => String(c ?? "").trim());
   while (header.length && header[header.length - 1] === "") header.pop();
@@ -72,7 +72,10 @@ function applyImportedRows(rows, data) {
   const seen = new Set();
   let count = 0;
   const fail = (r, field, key, ...args) => {
-    throw inputError("msgRowField", r, field, t(key, ...args));
+    const error = inputError("msgRowField", r, field, t(key, ...args));
+    error.location = "Plan · " + r + " · " + field;
+    error.causeCode = key;
+    throw error;
   };
   const blank = (v) => v == null || String(v).trim() === "" || /^TBC$/i.test(String(v).trim());
   const number = (v, r, field, fallback) => {
@@ -81,7 +84,7 @@ function applyImportedRows(rows, data) {
     return Number(v);
   };
   rows.slice(1).forEach((row, i) => {
-    const r = i + 2;
+    const r = rowNumbers?.[i] ?? i + 2;
     if (!row.some((v) => v != null && String(v).trim() !== "")) return;
     if (row.slice(14).some((v) => v != null && String(v).trim() !== ""))
       fail(r, "", "msgDataOutsideTheTemplateColumnsIs");
@@ -138,6 +141,15 @@ function xmlDocument(text, label) {
 }
 
 function xlsxSheetRows(files, sheetName = "Plan") {
+  try {
+    return xlsxSheetRowsRaw(files, sheetName);
+  } catch (error) {
+    error.location = sheetName;
+    throw error;
+  }
+}
+
+function xlsxSheetRowsRaw(files, sheetName = "Plan") {
   const book = xmlDocument(files["xl/workbook.xml"], "workbook"),
     rel = xmlDocument(files["xl/_rels/workbook.xml.rels"], "relationships");
   const sheets = [...book.getElementsByTagNameNS("*", "sheet")].filter(
@@ -363,7 +375,7 @@ async function handleFileImport(event) {
       );
       if (!confirmed) return;
       // Complete backup download is initiated before applying any migration.
-      exportVersionBundle();
+      if (!(await exportVersionBundle())) return;
       b = copy(b);
       assignProjectIdentity(b, crypto.randomUUID());
       addProject(b);
@@ -375,10 +387,87 @@ async function handleFileImport(event) {
       throw inputError("mspUseXml");
     } else throw inputError("mspUseJsonXlsxXml");
   } catch (e) {
-    showError(t("msgImportNotApplied") + e.message);
+    event.target.value = "";
+    await showImportFailure(file, e);
   } finally {
     event.target.value = "";
   }
+}
+
+function guideList(keys) {
+  return '<ol class="guide-list">' + keys.map((key) => '<li>' + escapeHtml(t(key)) + '</li>').join('') + '</ol>';
+}
+
+function openImportGuide() {
+  closeMenus();
+  return showDialog({
+    title: t("guideImportTitle"),
+    bodyHtml: '<p class="app-dialog-message">' + escapeHtml(t("guideImportIntro")) + '</p>' +
+      guideList(["guideImportExcel", "guideImportXML", "guideImportJSON"]),
+    actions: [
+      { label: t("msgCancel"), value: null },
+      { label: t("guideGetTemplate"), value: "template" },
+      { label: t("guideChooseFile"), kind: "primary", value: "file",
+        onClick() { document.getElementById("excelFileInput").click(); } },
+    ],
+  }).then((value) => { if (value === "template") exportToExcelXML(); });
+}
+
+function openEditingGuide() {
+  return showDialog({
+    title: t("guideEditTitle"),
+    bodyHtml: guideList(["guideEditIntro", "guideEditDetails", "guideEditSave"]),
+    actions: [
+      { label: t("msgOk"), value: null },
+      { label: t("guideShowGantt"), kind: "primary", value: "gantt" },
+    ],
+  }).then((value) => { if (value === "gantt") switchView("gantt"); });
+}
+
+function openExportGuide() {
+  closeMenus();
+  return showDialog({
+    title: t("guideExportTitle"),
+    bodyHtml: '<p class="app-dialog-message">' + escapeHtml(t("guideExportIntro")) + '</p>' +
+      guideList(["guideExportJSON", "guideExportExcel", "guideExportXML"]),
+    actions: [
+      { label: t("msgCancel"), value: null },
+      { label: t("btnExportXls"), value: "excel" },
+      { label: t("btnExportProject"), value: "xml" },
+      { label: t("guideBackup"), value: "json", kind: "primary" },
+    ],
+  }).then((value) => {
+    if (value === "json") return exportVersionBundle();
+    if (value === "excel") return exportToExcelXML();
+    if (value === "xml") return exportProjectXML();
+  });
+}
+
+function importRepairKey(file, error) {
+  if (error.code === "msgThisWorkbookIsStaleWebData") return "guideFixStale";
+  if (error.code === "msgWorkbookProjectIdDoesNotMatch") return "guideFixProject";
+  if (error.code === "msgCellContainsAFormulaPasteValues") return "guideFixFormula";
+  if (/\.xlsx$/i.test(file.name)) return "guideFixExcel";
+  if (/\.xml$/i.test(file.name)) return "guideFixXML";
+  if (/\.json$/i.test(file.name)) return "guideFixJSON";
+  return "guideFixFormat";
+}
+
+function showImportFailure(file, error) {
+  return showDialog({
+    title: t("guideImportFailed"),
+    bodyHtml: '<p class="ui-caption">' + escapeHtml(t("guideImportFile", file.name)) +
+      '</p><p class="app-dialog-message is-error">' +
+      escapeHtml((error.location ? error.location + ': ' : '') + error.message) +
+      '</p><h3 class="ui-heading">' + escapeHtml(t("guideFixTitle")) +
+      '</h3><p class="app-dialog-message">' + escapeHtml(t(importRepairKey(file, error))) +
+      '</p><p class="ui-caption">' + escapeHtml(t("guideImportUnchanged")) + '</p>',
+    actions: [
+      { label: t("msgCancel"), value: null },
+      { label: t("guideRetry"), kind: "primary", value: true,
+        onClick() { document.getElementById("excelFileInput").click(); } },
+    ],
+  });
 }
 
 // Exchange v2: explicit mapping, protected inputs, optimistic concurrency, atomic recovery.
@@ -579,7 +668,8 @@ function prepareExchangeV2(payload, base, groupUpdate = null) {
     }
   }
   const subRows = payload.plan.filter((r, i) => i === 0 || r[1] === "Sub-task");
-  if (subRows.length > 1) applyImportedRows(subRows, candidate.currentData);
+  if (subRows.length > 1)
+    applyImportedRows(subRows, candidate.currentData, subRows.slice(1).map((row) => payload.plan.indexOf(row) + 1));
   let added = 0;
   if (!legacy) {
     assertHeaders(payload.project, ["Field", "Value"], "Project");

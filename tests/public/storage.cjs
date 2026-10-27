@@ -207,6 +207,109 @@ function bigProject(families, mains, subs) {
     assert.equal(cells, headers);
   });
 
+  await test("JSON download receipts survive reload, ignore view preferences and detect later changes", async () => {
+    run(`addProject(newProject('Backup example', syntheticData())); recalculateSchedule();
+      downloadBlob = (content, filename) => { globalThis.lastDownload = {content, filename}; };`);
+    assert.equal(await run("exportVersionBundle()"), true);
+    assert.match(run("lastDownload.filename"), /\.json$/);
+    assert.equal(run("JSON.parse(lastDownload.content).projectId"), run("projectId"));
+    const receipt = JSON.parse(storage.get(run("BACKUP_RECEIPT_PREFIX + projectId")));
+    assert.match(receipt.revision, /^[a-f0-9]{64}$/);
+    assert.deepEqual(Object.keys(receipt).sort(), ["at", "revision"]);
+    run("loadState(); recalculateSchedule();");
+    await run("updateDataSafetyStatus()");
+    assert.match(nodes.get("dataSafetyStatus").textContent, /matches current data/);
+    run("projectData[0].collapsed = true; curLang = 'zh'; saveState();");
+    await run("updateDataSafetyStatus()");
+    assert.match(nodes.get("dataSafetyStatus").textContent, /与当前数据一致/);
+    run("curLang = 'en'; projectData[0].name = 'Changed phase'; saveState();");
+    await run("updateDataSafetyStatus()");
+    assert.match(nodes.get("dataSafetyStatus").textContent, /Changed since/);
+    run("loadState();");
+    await run("updateDataSafetyStatus()");
+    assert.match(nodes.get("dataSafetyStatus").textContent, /Changed since/);
+  });
+
+  await test("save timestamps stay stable for redraws and update only with meaningful project changes", () => {
+    run("workspace.savedAt[projectId] = '2030-01-01T00:00:00.000Z'; saveState();");
+    assert.equal(run("workspace.savedAt[projectId]"), "2030-01-01T00:00:00.000Z");
+    run("projectData[0].name = 'Updated phase'; saveState();");
+    assert.notEqual(run("workspace.savedAt[projectId]"), "2030-01-01T00:00:00.000Z");
+  });
+
+  await test("backup receipts are project-scoped and partial exports never mark a full backup", async () => {
+    run("globalThis.backedUpId = projectId; addProject(newProject('Another example', syntheticData())); recalculateSchedule();");
+    await run("updateDataSafetyStatus()");
+    assert.match(nodes.get("dataSafetyStatus").textContent, /No JSON backup/);
+    run("buildProjectXML();");
+    assert.equal(storage.has(run("BACKUP_RECEIPT_PREFIX + projectId")), false);
+    run("switchProject(backedUpId);");
+    await run("updateDataSafetyStatus()");
+    assert.match(nodes.get("dataSafetyStatus").textContent, /Changed since/);
+  });
+
+  await test("failed downloads do not record a receipt; backup remains available without hashing or receipt storage", async () => {
+    run(`addProject(newProject('Download example')); downloadBlob = () => { throw new Error('Download blocked'); };
+      showError = (message) => { globalThis.exportError = message; };`);
+    assert.equal(await run("exportVersionBundle()"), false);
+    assert.match(run("exportError"), /Download blocked/);
+    assert.equal(storage.has(run("BACKUP_RECEIPT_PREFIX + projectId")), false);
+    run("downloadBlob = () => {}; globalThis.realBackupRevision = backupRevision; backupRevision = async () => { throw new Error('No crypto'); };");
+    assert.equal(await run("exportVersionBundle()"), true);
+    assert.equal(storage.has(run("BACKUP_RECEIPT_PREFIX + projectId")), false);
+    run("backupRevision = realBackupRevision;");
+    failWrites = true;
+    assert.equal(await run("exportVersionBundle()"), true);
+    failWrites = false;
+    assert.equal(storage.has(run("BACKUP_RECEIPT_PREFIX + projectId")), false);
+  });
+
+  await test("async backup uses captured content and cannot mark another project or newer edits as backed up", async () => {
+    run(`globalThis.capturedId = projectId;
+      backupRevision = (bundle) => new Promise(resolve => { globalThis.releaseDigest = async () => resolve(await realBackupRevision(bundle)); });
+      globalThis.pendingBackup = exportVersionBundle();
+      projectData = syntheticData(); saveState();
+      addProject(newProject('Switched project'));`);
+    await run("releaseDigest()");
+    assert.equal(await run("pendingBackup"), true);
+    assert.equal(storage.has(run("BACKUP_RECEIPT_PREFIX + projectId")), false);
+    assert.equal(storage.has(run("BACKUP_RECEIPT_PREFIX + capturedId")), true);
+    run("backupRevision = realBackupRevision; switchProject(capturedId);");
+    await run("updateDataSafetyStatus()");
+    assert.match(nodes.get("dataSafetyStatus").textContent, /Changed since/);
+  });
+
+  await test("failed saves override backup status and malformed receipts never claim backup success", async () => {
+    storage.set(run("BACKUP_RECEIPT_PREFIX + projectId"), "broken");
+    await run("updateDataSafetyStatus()");
+    assert.match(nodes.get("dataSafetyStatus").textContent, /Backup status unavailable/);
+    failWrites = true;
+    run("saveState()");
+    await run("updateDataSafetyStatus()");
+    assert.match(nodes.get("dataSafetyStatus").textContent, /not safely saved/);
+    failWrites = false;
+    run("saveState()");
+  });
+
+  await test("import failures retain file and location, escape content and offer targeted repair and retry", async () => {
+    run("showDialog = async options => { globalThis.capturedDialog = options; return null; };");
+    await run(`showImportFailure({name:'<example>.xlsx'}, Object.assign(inputError('msgCellContainsAFormulaPasteValues', 'H9'), {location:'Plan'}))`);
+    const body = run("capturedDialog.bodyHtml");
+    assert.match(body, /&lt;example&gt;\.xlsx/);
+    assert.match(body, /Plan/);
+    assert.match(body, /H9/);
+    assert.match(body, /replace the formula with its value/);
+    assert.match(body, /not applied/);
+    assert.equal(run("capturedDialog.actions[1].label"), "Choose corrected file");
+    assert.equal(run(`importRepairKey({name:'plan.xlsx'}, inputError('msgThisWorkbookIsStaleWebData'))`), "guideFixStale");
+    assert.equal(run(`importRepairKey({name:'plan.xlsx'}, inputError('msgWorkbookProjectIdDoesNotMatch'))`), "guideFixProject");
+    assert.equal(run(`importRepairKey({name:'plan.mpp'}, inputError('mspUseXml'))`), "guideFixFormat");
+    const before = storage.get(run("WORKSPACE_KEY"));
+    await run(`handleFileImport({target:{files:[{name:'bad.json',text:async()=>'{invalid'}],value:'bad.json'}})`);
+    assert.equal(storage.get(run("WORKSPACE_KEY")), before);
+    assert.match(run("capturedDialog.bodyHtml"), /intact JSON bundle/);
+  });
+
   await test("every translation key used in the app exists in English and Chinese", () => {
     const sources = path.join(__dirname, "../../src/app/js");
     const code = fs

@@ -2061,8 +2061,7 @@ dialog.app-dialog::backdrop {
   border: 1px solid var(--border);
 }
 .empty-card .ui-heading {
-  font-size: 16px;
-  margin: 0 0 6px;
+  margin: 0 0 8px;
 }
 .empty-steps {
   margin: 12px 0 18px 20px;
@@ -2072,6 +2071,45 @@ dialog.app-dialog::backdrop {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+/* Workflow guidance uses the same control and caption roles as the toolbar. */
+.btn-touch {
+  min-height: 44px;
+}
+.workflow-guide {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--card-bg);
+}
+.workflow-actions,
+.workflow-safety {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.workflow-safety {
+  flex: 1 1 320px;
+  justify-content: flex-end;
+}
+#dataSafetyStatus {
+  flex: 1 1 240px;
+  max-width: 520px;
+  white-space: pre-line;
+}
+.guide-list {
+  margin: 12px 0;
+  padding-left: 20px;
+}
+.guide-list li + li {
+  margin-top: 8px;
 }
 
 /* ---- Archived (read-only) state ---- */
@@ -2292,7 +2330,7 @@ tr.is-delayed td:first-child {
       <details class="sidebar-action-group sidebar-filters" id="dataActions">
         <summary id="dataActionsLabel">Data & versions</summary>
         <div class="group-actions">
-          <button class="btn" id="btnImportXls" onclick="document.getElementById('excelFileInput').click()">📥 Import</button>
+          <button class="btn" id="btnImportXls" onclick="openImportGuide()">📥 Import</button>
           <button class="btn" title="Standard .xlsx template / 标准 .xlsx 模板" id="btnExportXls" onclick="exportToExcelXML()">📤 Export Excel</button>
           <button class="btn" id="btnExportProject" onclick="exportProjectXML()">Export Project XML</button>
           <button class="btn btn-primary" id="btnSaveVer" onclick="openVersionModal()">📌 Save Version</button>
@@ -2386,6 +2424,17 @@ tr.is-delayed td:first-child {
     </div>
   </div>
 </header>
+<section class="workflow-guide" aria-label="Workflow" id="workflowGuide">
+  <div class="workflow-actions">
+    <button type="button" class="btn btn-touch" id="guideImport" onclick="openImportGuide()">1. Import</button>
+    <button type="button" class="btn btn-touch" id="guideEdit" onclick="openEditingGuide()">2. Edit</button>
+    <button type="button" class="btn btn-touch" id="guideExport" onclick="openExportGuide()">3. Export</button>
+  </div>
+  <div class="workflow-safety">
+    <span class="ui-caption" id="dataSafetyStatus" role="status"></span>
+    <button type="button" class="btn btn-touch" id="guideBackup" onclick="exportVersionBundle()">Download JSON backup</button>
+  </div>
+</section>
 <div id="archivedNotice" class="save-banner save-banner-info" role="status" hidden></div><div class="app-layout"><div class="workspace">
   <section id="emptyState" class="empty-state" hidden aria-labelledby="emptyTitle">
     <div class="empty-card">
@@ -2398,7 +2447,7 @@ tr.is-delayed td:first-child {
       </ol>
       <div class="empty-actions">
         <button type="button" class="btn btn-primary" id="emptyAddPhase" onclick="addPhase()">Add phase</button>
-        <button type="button" class="btn" id="emptyImport" onclick="document.getElementById('excelFileInput').click()">Import</button>
+        <button type="button" class="btn" id="emptyImport" onclick="openImportGuide()">Import</button>
         <button type="button" class="btn" id="emptyDemo" onclick="loadDemoIntoProject()">Fill with fictional demo</button>
       </div>
     </div>
@@ -3556,6 +3605,101 @@ Object.assign(I18N.zh, {
   mspMilestonesConverted: "{0} 个里程碑已转为 1 天的任务。",
 });
 
+Object.assign(I18N.en, {
+  guideWorkflow: "Import, edit and export",
+  guideImport: "1. Import",
+  guideEdit: "2. Edit",
+  guideExport: "3. Export",
+  guideBackup: "Download JSON backup",
+  guideImportTitle: "Start from a file",
+  guideImportIntro: "Choose a supported file, review the preview, then apply. Your source file is read-only.",
+  guideImportExcel: "Excel (.xlsx): use this tool’s template. Edit pale orange cells only. Update templates apply to their original project and revision; blank creation templates create a new project.",
+  guideImportXML: "Project (.xml): save your MPP as XML in Microsoft Project first. Import creates a separate project; review calendar-day conversions before applying.",
+  guideImportJSON: "JSON: restore a full project bundle as an independent copy, including its saved versions and history.",
+  guideChooseFile: "Choose file",
+  guideGetTemplate: "Get Excel template",
+  guideEditTitle: "Change your plan",
+  guideEditIntro: "In Gantt, edit the table fields directly. Double-click a task name or bar to open its editor. Task cards also have an Edit button.",
+  guideEditDetails: "Set a start date for tasks without a predecessor. A predecessor calculates the start automatically; duration and Lag use calendar days. Summary dates and progress are calculated.",
+  guideEditSave: "Changes save automatically in this browser. Use Undo to reverse a change. A red banner means saving failed: keep this page open and download a JSON backup.",
+  guideShowGantt: "Open Gantt",
+  guideExportTitle: "Choose what to download",
+  guideExportIntro: "Downloads are new files; the imported source is never overwritten. Keep the downloaded file outside this application.",
+  guideExportJSON: "JSON backup: the complete current project, settings, saved versions, change log and recovery points. Recommended before closing or moving to another browser.",
+  guideExportExcel: "Excel: a controlled template for reviewing or updating current fields. It does not contain full project history.",
+  guideExportXML: "Project XML: exchange the supported current fields with Microsoft Project. It does not contain full project history.",
+  guideSavedAt: "Saved in this browser: {0}. No cloud sync.",
+  guideNoBackup: "No JSON backup download recorded for this project.",
+  guideBackupCurrent: "JSON download requested: {0}; matches current data. Check your Downloads folder.",
+  guideBackupChanged: "Changed since the JSON download requested on {0}. Download a fresh backup.",
+  guideBackupUnknown: "Backup status unavailable. Download a JSON backup and check your Downloads folder.",
+  guideCheckingBackup: "Checking JSON backup status…",
+  guideUnsaved: "Current changes are not safely saved in this browser. Keep the page open and download a JSON backup.",
+  guideImportFailed: "Import needs attention",
+  guideImportFile: "File: {0}",
+  guideImportUnchanged: "This import was not applied. Your source file was not changed.",
+  guideFixTitle: "How to fix it",
+  guideFixExcel: "Open the workbook and use the sheet, row, cell, field or WBS shown above to find the problem. Check Instructions, change pale orange input cells only, save a new copy, then choose the corrected file.",
+  guideFixXML: "Find the task UID/WBS or XML field shown above in Microsoft Project. Correct the task or unsupported link, save as a new Project XML file, then retry. Only three levels and one FS predecessor per sub-task are supported.",
+  guideFixJSON: "Use an intact JSON bundle exported by this tool. If the file was edited or truncated, recover another backup; renaming a file to .json does not convert it.",
+  guideFixStale: "Export a fresh current-project Excel copy, transfer your intended edits into its editable cells, then import it. The old workbook no longer matches the project revision.",
+  guideFixProject: "Switch to the project that exported this workbook, then retry. To create a project instead, use a blank creation template; do not edit the hidden identity fields.",
+  guideFixFormula: "At the cell shown above, replace the formula with its value. Imported workbooks must contain values only; save a new copy and retry.",
+  guideFixFormat: "Choose this tool’s Excel template, a JSON bundle or Microsoft Project XML. For MPP, use Save As → XML in Microsoft Project first.",
+  guideRetry: "Choose corrected file",
+  msgEmptyIntro: "Bring in an existing plan, or start with a phase. Your next steps are always available above the workspace.",
+  msgEmptyStep1: "Import Excel, Project XML or a JSON backup. Without a file, add a phase, then main tasks and sub-tasks from Task actions.",
+  msgEmptyStep2: "Edit table fields or double-click a task. Dates and summary values update automatically.",
+  msgEmptyStep3: "Export a new Excel/XML copy to exchange data; download JSON to back up the full project.",
+});
+Object.assign(I18N.zh, {
+  guideWorkflow: "导入、修改与导出",
+  guideImport: "1. 导入",
+  guideEdit: "2. 修改",
+  guideExport: "3. 导出",
+  guideBackup: "下载 JSON 备份",
+  guideImportTitle: "从文件开始",
+  guideImportIntro: "选择支持的文件，查看预览后确认应用。源文件始终只读。",
+  guideImportExcel: "Excel（.xlsx）：使用本工具的模板，只修改浅橙色输入格。更新模板只能更新原项目及对应版本；空白创建模板会新建项目。",
+  guideImportXML: "Project（.xml）：先在 Microsoft Project 中将 MPP 另存为 XML。导入会创建独立项目；确认前请检查日历日换算。",
+  guideImportJSON: "JSON：将完整项目包恢复为独立副本，包含已保存版本及记录。",
+  guideChooseFile: "选择文件",
+  guideGetTemplate: "获取 Excel 模板",
+  guideEditTitle: "修改项目计划",
+  guideEditIntro: "在甘特图视图直接修改表格字段，双击任务名称或任务条打开编辑窗口；任务卡片也提供编辑按钮。",
+  guideEditDetails: "无前置任务时填写开始日期；有前置任务时开始日期自动计算。工期和 Lag 按自然日计算，汇总日期和进度由系统计算。",
+  guideEditSave: "修改会自动保存到此浏览器，可用撤销恢复上一步。红色横幅表示保存失败：请保持页面打开，并下载 JSON 备份。",
+  guideShowGantt: "打开甘特图",
+  guideExportTitle: "选择下载内容",
+  guideExportIntro: "导出生成新文件，不覆盖导入源文件。请将下载文件保存在本工具之外。",
+  guideExportJSON: "JSON 备份：完整的当前项目、设置、已保存版本、变更记录和恢复点。关闭页面或换浏览器前建议下载。",
+  guideExportExcel: "Excel：用于查看或修改当前字段的受控模板，不包含完整项目历史。",
+  guideExportXML: "Project XML：与 Microsoft Project 交换受支持的当前字段，不包含完整项目历史。",
+  guideSavedAt: "已保存到此浏览器：{0}。无云端同步。",
+  guideNoBackup: "此项目尚无 JSON 备份下载记录。",
+  guideBackupCurrent: "已于 {0} 发起 JSON 下载，与当前数据一致；请检查下载文件夹。",
+  guideBackupChanged: "数据已在 {0} 发起 JSON 下载后变更，请重新下载备份。",
+  guideBackupUnknown: "无法确认备份状态，请下载 JSON 备份并检查下载文件夹。",
+  guideCheckingBackup: "正在检查 JSON 备份状态…",
+  guideUnsaved: "当前修改尚未安全保存到此浏览器，请保持页面打开并下载 JSON 备份。",
+  guideImportFailed: "导入需要修正",
+  guideImportFile: "文件：{0}",
+  guideImportUnchanged: "本次导入未应用，源文件未被修改。",
+  guideFixTitle: "修正方法",
+  guideFixExcel: "打开工作簿，按上方提示的表名、行号、单元格、字段或 WBS 定位问题。参照 Instructions，仅修改浅橙色输入格，另存副本后重新选择文件。",
+  guideFixXML: "在 Microsoft Project 中按上方任务 UID/WBS 或 XML 字段定位问题，修正任务或不支持的关系，再另存为新的 Project XML 重试。仅支持三级结构，且每个子任务只有一个 FS 前置。",
+  guideFixJSON: "请选择本工具导出的完整 JSON 项目包。如果文件被修改或截断，请换用其他备份；改为 .json 后缀不能转换文件格式。",
+  guideFixStale: "重新导出当前项目的最新 Excel 副本，将需要的修改转填到可编辑格后再导入。旧工作簿已不匹配当前项目版本。",
+  guideFixProject: "切换到导出此工作簿的项目后重试。如需新建项目，请使用空白创建模板，不要修改隐藏的身份字段。",
+  guideFixFormula: "将上方提示单元格中的公式替换为数值。导入工作簿只接受值，请另存副本后重试。",
+  guideFixFormat: "请选择本工具的 Excel 模板、JSON 项目包或 Microsoft Project XML。MPP 请先在 Microsoft Project 中使用“另存为 → XML”。",
+  guideRetry: "选择修正后的文件",
+  msgEmptyIntro: "可导入已有计划，或从阶段开始创建。工作区上方始终提供下一步入口。",
+  msgEmptyStep1: "导入 Excel、Project XML 或 JSON 备份。没有文件时先新建阶段，再从任务操作添加主任务和子任务。",
+  msgEmptyStep2: "修改表格字段，或双击任务编辑；日期及汇总值自动更新。",
+  msgEmptyStep3: "导出新的 Excel/XML 副本交换数据；下载 JSON 备份完整项目。",
+});
+
 // Single translation entry point for labels and messages. Placeholders {0}, {1}… take the extra arguments.
 function t(key, ...args) {
   const value = I18N[curLang][key] ?? I18N.en[key] ?? key;
@@ -3573,7 +3717,10 @@ function toggleLanguage() {
 }
 
 function inputError(key, ...args) {
-  return new Error(t(key, ...args));
+  const error = new Error(t(key, ...args));
+  error.code = key;
+  error.args = args;
+  return error;
 }
 
 // ---- src/app/js/model.js ----
@@ -4203,6 +4350,16 @@ function currentBundle() {
 }
 
 function commitWorkspace(next) {
+  // Track meaningful project saves, rather than redraws or language preferences.
+  const id = next.activeProjectId;
+  if (id && next.projects[id]) {
+    next.savedAt = { ...(next.savedAt || {}) };
+    if (!next.savedAt[id] || !workspace.projects[id] ||
+        backupContent(next.projects[id]) !== backupContent(workspace.projects[id]))
+      next.savedAt[id] = new Date().toISOString();
+    for (const savedId of Object.keys(next.savedAt))
+      if (!next.projects[savedId]) delete next.savedAt[savedId];
+  }
   const serialized = JSON.stringify(next);
   localStorage.setItem(WORKSPACE_KEY, serialized);
   workspace = next;
@@ -4244,6 +4401,7 @@ function formatStorageSize(chars) {
 
 // A persistent banner replaces one-off alerts: it stays until data is saved again.
 function updateSaveBanner() {
+  updateDataSafetyStatus();
   const banner = document.getElementById("saveBanner");
   if (!banner) return;
   const usage = storageUsage();
@@ -4421,12 +4579,84 @@ function addProject(b) {
   renderAll();
 }
 
-function exportVersionBundle() {
-  downloadBlob(
-    JSON.stringify(currentBundle(), null, 2),
-    "Project_" + projectId + "_" + today() + ".json",
-    "application/json",
-  );
+// Receipts contain only a timestamp and a SHA-256 revision, never task/personnel data.
+const BACKUP_RECEIPT_PREFIX = "project-web-tool:json-download:";
+let dataSafetySequence = 0;
+
+function backupContent(bundle) {
+  const b = copy(bundle);
+  delete b.settings.language;
+  b.currentData = compactData(b.currentData);
+  b.versionHistory = b.versionHistory.map(compactVersion);
+  b.recoveryPoints = (b.recoveryPoints || []).map(compactRecoveryPoint);
+  return stableJSON(b);
+}
+
+async function backupRevision(bundle) {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(backupContent(bundle)));
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function readableSaveTime(value) {
+  const date = new Date(value);
+  return Number.isFinite(date.getTime())
+    ? date.toLocaleString(curLang === "zh" ? "zh-CN" : "en-GB", { hour12: false })
+    : "";
+}
+
+async function updateDataSafetyStatus() {
+  const node = document.getElementById("dataSafetyStatus");
+  if (!node) return;
+  const sequence = ++dataSafetySequence;
+  if (storageReadBlocked || lastSaveError) {
+    node.textContent = t("guideUnsaved");
+    return;
+  }
+  const saved = readableSaveTime(workspace.savedAt?.[projectId]);
+  const savedText = saved ? t("guideSavedAt", saved) : t("msgDataStoredInThisBrowser");
+  node.textContent = savedText + "\n" + t("guideCheckingBackup");
+  try {
+    const raw = localStorage.getItem(BACKUP_RECEIPT_PREFIX + projectId);
+    let backupText = t("guideNoBackup");
+    if (raw) {
+      const receipt = JSON.parse(raw);
+      if (!/^[a-f0-9]{64}$/.test(receipt.revision) || !readableSaveTime(receipt.at))
+        throw new Error("Invalid download receipt");
+      const revision = await backupRevision(currentBundle());
+      backupText = t(revision === receipt.revision ? "guideBackupCurrent" : "guideBackupChanged", readableSaveTime(receipt.at));
+    }
+    if (sequence === dataSafetySequence) node.textContent = savedText + "\n" + backupText;
+  } catch (error) {
+    if (sequence === dataSafetySequence) node.textContent = savedText + "\n" + t("guideBackupUnknown");
+  }
+}
+
+async function exportVersionBundle() {
+  // Capture identity and content before hashing: switching/editing during hashing cannot mark
+  // another project, or a newer revision, as backed up.
+  const bundle = currentBundle();
+  try {
+    let revision = null;
+    try { revision = await backupRevision(bundle); } catch (error) { /* Download still works without Web Crypto. */ }
+    downloadBlob(
+      JSON.stringify(bundle, null, 2),
+      "Project_" + bundle.projectId + "_" + new Date().toISOString().replace(/[:.]/g, "-") +
+        "_" + crypto.randomUUID().slice(0, 8) + ".json",
+      "application/json",
+    );
+    try {
+      if (revision) localStorage.setItem(BACKUP_RECEIPT_PREFIX + bundle.projectId,
+          JSON.stringify({ at: new Date().toISOString(), revision }));
+      otherStorageChars = null;
+    } catch (error) {
+      // A failed receipt must not prevent the actual backup download.
+    }
+    updateDataSafetyStatus();
+    return true;
+  } catch (error) {
+    showError(t("msgExportFailed") + error.message);
+    return false;
+  }
 }
 
 // ---- src/app/js/dialogs.js ----
@@ -4731,7 +4961,7 @@ function exchangeRows(data = projectData) {
   return rows;
 }
 
-function applyImportedRows(rows, data) {
+function applyImportedRows(rows, data, rowNumbers = null) {
   if (!Array.isArray(rows) || !rows.length) throw inputError("msgThePlanWorksheetIsEmpty");
   const header = rows[0].map((c) => String(c ?? "").trim());
   while (header.length && header[header.length - 1] === "") header.pop();
@@ -4748,7 +4978,10 @@ function applyImportedRows(rows, data) {
   const seen = new Set();
   let count = 0;
   const fail = (r, field, key, ...args) => {
-    throw inputError("msgRowField", r, field, t(key, ...args));
+    const error = inputError("msgRowField", r, field, t(key, ...args));
+    error.location = "Plan · " + r + " · " + field;
+    error.causeCode = key;
+    throw error;
   };
   const blank = (v) => v == null || String(v).trim() === "" || /^TBC$/i.test(String(v).trim());
   const number = (v, r, field, fallback) => {
@@ -4757,7 +4990,7 @@ function applyImportedRows(rows, data) {
     return Number(v);
   };
   rows.slice(1).forEach((row, i) => {
-    const r = i + 2;
+    const r = rowNumbers?.[i] ?? i + 2;
     if (!row.some((v) => v != null && String(v).trim() !== "")) return;
     if (row.slice(14).some((v) => v != null && String(v).trim() !== ""))
       fail(r, "", "msgDataOutsideTheTemplateColumnsIs");
@@ -4814,6 +5047,15 @@ function xmlDocument(text, label) {
 }
 
 function xlsxSheetRows(files, sheetName = "Plan") {
+  try {
+    return xlsxSheetRowsRaw(files, sheetName);
+  } catch (error) {
+    error.location = sheetName;
+    throw error;
+  }
+}
+
+function xlsxSheetRowsRaw(files, sheetName = "Plan") {
   const book = xmlDocument(files["xl/workbook.xml"], "workbook"),
     rel = xmlDocument(files["xl/_rels/workbook.xml.rels"], "relationships");
   const sheets = [...book.getElementsByTagNameNS("*", "sheet")].filter(
@@ -5039,7 +5281,7 @@ async function handleFileImport(event) {
       );
       if (!confirmed) return;
       // Complete backup download is initiated before applying any migration.
-      exportVersionBundle();
+      if (!(await exportVersionBundle())) return;
       b = copy(b);
       assignProjectIdentity(b, crypto.randomUUID());
       addProject(b);
@@ -5051,10 +5293,87 @@ async function handleFileImport(event) {
       throw inputError("mspUseXml");
     } else throw inputError("mspUseJsonXlsxXml");
   } catch (e) {
-    showError(t("msgImportNotApplied") + e.message);
+    event.target.value = "";
+    await showImportFailure(file, e);
   } finally {
     event.target.value = "";
   }
+}
+
+function guideList(keys) {
+  return '<ol class="guide-list">' + keys.map((key) => '<li>' + escapeHtml(t(key)) + '</li>').join('') + '</ol>';
+}
+
+function openImportGuide() {
+  closeMenus();
+  return showDialog({
+    title: t("guideImportTitle"),
+    bodyHtml: '<p class="app-dialog-message">' + escapeHtml(t("guideImportIntro")) + '</p>' +
+      guideList(["guideImportExcel", "guideImportXML", "guideImportJSON"]),
+    actions: [
+      { label: t("msgCancel"), value: null },
+      { label: t("guideGetTemplate"), value: "template" },
+      { label: t("guideChooseFile"), kind: "primary", value: "file",
+        onClick() { document.getElementById("excelFileInput").click(); } },
+    ],
+  }).then((value) => { if (value === "template") exportToExcelXML(); });
+}
+
+function openEditingGuide() {
+  return showDialog({
+    title: t("guideEditTitle"),
+    bodyHtml: guideList(["guideEditIntro", "guideEditDetails", "guideEditSave"]),
+    actions: [
+      { label: t("msgOk"), value: null },
+      { label: t("guideShowGantt"), kind: "primary", value: "gantt" },
+    ],
+  }).then((value) => { if (value === "gantt") switchView("gantt"); });
+}
+
+function openExportGuide() {
+  closeMenus();
+  return showDialog({
+    title: t("guideExportTitle"),
+    bodyHtml: '<p class="app-dialog-message">' + escapeHtml(t("guideExportIntro")) + '</p>' +
+      guideList(["guideExportJSON", "guideExportExcel", "guideExportXML"]),
+    actions: [
+      { label: t("msgCancel"), value: null },
+      { label: t("btnExportXls"), value: "excel" },
+      { label: t("btnExportProject"), value: "xml" },
+      { label: t("guideBackup"), value: "json", kind: "primary" },
+    ],
+  }).then((value) => {
+    if (value === "json") return exportVersionBundle();
+    if (value === "excel") return exportToExcelXML();
+    if (value === "xml") return exportProjectXML();
+  });
+}
+
+function importRepairKey(file, error) {
+  if (error.code === "msgThisWorkbookIsStaleWebData") return "guideFixStale";
+  if (error.code === "msgWorkbookProjectIdDoesNotMatch") return "guideFixProject";
+  if (error.code === "msgCellContainsAFormulaPasteValues") return "guideFixFormula";
+  if (/\.xlsx$/i.test(file.name)) return "guideFixExcel";
+  if (/\.xml$/i.test(file.name)) return "guideFixXML";
+  if (/\.json$/i.test(file.name)) return "guideFixJSON";
+  return "guideFixFormat";
+}
+
+function showImportFailure(file, error) {
+  return showDialog({
+    title: t("guideImportFailed"),
+    bodyHtml: '<p class="ui-caption">' + escapeHtml(t("guideImportFile", file.name)) +
+      '</p><p class="app-dialog-message is-error">' +
+      escapeHtml((error.location ? error.location + ': ' : '') + error.message) +
+      '</p><h3 class="ui-heading">' + escapeHtml(t("guideFixTitle")) +
+      '</h3><p class="app-dialog-message">' + escapeHtml(t(importRepairKey(file, error))) +
+      '</p><p class="ui-caption">' + escapeHtml(t("guideImportUnchanged")) + '</p>',
+    actions: [
+      { label: t("msgCancel"), value: null },
+      { label: t("guideRetry"), kind: "primary", value: true,
+        onClick() { document.getElementById("excelFileInput").click(); } },
+    ],
+  });
 }
 
 // Exchange v2: explicit mapping, protected inputs, optimistic concurrency, atomic recovery.
@@ -5255,7 +5574,8 @@ function prepareExchangeV2(payload, base, groupUpdate = null) {
     }
   }
   const subRows = payload.plan.filter((r, i) => i === 0 || r[1] === "Sub-task");
-  if (subRows.length > 1) applyImportedRows(subRows, candidate.currentData);
+  if (subRows.length > 1)
+    applyImportedRows(subRows, candidate.currentData, subRows.slice(1).map((row) => payload.plan.indexOf(row) + 1));
   let added = 0;
   if (!legacy) {
     assertHeaders(payload.project, ["Field", "Value"], "Project");
@@ -7508,6 +7828,7 @@ function renderActionButton(id, key) {
 }
 
 function applyStaticI18n() {
+  document.getElementById("workflowGuide").setAttribute("aria-label", t("guideWorkflow"));
   renderActionButton("btnLangToggle", "langBtn");
   document.getElementById("actionMenuLabel").innerHTML =
     '<svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg><span class="action-label">' +
@@ -7564,6 +7885,10 @@ function applyStaticI18n() {
   renderTableHeader();
   document.getElementById("lblColumns").textContent = t("lblColumns");
   for (const [id, key] of [
+    ["guideImport", "guideImport"],
+    ["guideEdit", "guideEdit"],
+    ["guideExport", "guideExport"],
+    ["guideBackup", "guideBackup"],
     ["emptyTitle", "msgEmptyTitle"],
     ["emptyIntro", "msgEmptyIntro"],
     ["emptyStep1", "msgEmptyStep1"],
@@ -8924,6 +9249,7 @@ function toggleArchive() {
 }
 
 async function deleteCurrentProject() {
+  const deletingId = projectId;
   const values = await askForm({
     title: t("msgDeleteProjectTitle"),
     intro: t("msgDeleteProjectIntro", projectMeta.name),
@@ -8931,8 +9257,9 @@ async function deleteCurrentProject() {
     submitLabel: t("msgDeleteProjectAction"),
   });
   if (!values) return;
-  if (values.backup) exportVersionBundle();
-  removeProject(projectId);
+  if (values.backup && !(await exportVersionBundle())) return;
+  if (deletingId !== projectId) return;
+  removeProject(deletingId);
 }
 
 // Fills the current empty project with the fictional example (from the empty-state guide).

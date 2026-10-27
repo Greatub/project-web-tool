@@ -48,6 +48,16 @@ function currentBundle() {
 }
 
 function commitWorkspace(next) {
+  // Track meaningful project saves, rather than redraws or language preferences.
+  const id = next.activeProjectId;
+  if (id && next.projects[id]) {
+    next.savedAt = { ...(next.savedAt || {}) };
+    if (!next.savedAt[id] || !workspace.projects[id] ||
+        backupContent(next.projects[id]) !== backupContent(workspace.projects[id]))
+      next.savedAt[id] = new Date().toISOString();
+    for (const savedId of Object.keys(next.savedAt))
+      if (!next.projects[savedId]) delete next.savedAt[savedId];
+  }
   const serialized = JSON.stringify(next);
   localStorage.setItem(WORKSPACE_KEY, serialized);
   workspace = next;
@@ -89,6 +99,7 @@ function formatStorageSize(chars) {
 
 // A persistent banner replaces one-off alerts: it stays until data is saved again.
 function updateSaveBanner() {
+  updateDataSafetyStatus();
   const banner = document.getElementById("saveBanner");
   if (!banner) return;
   const usage = storageUsage();
@@ -266,10 +277,82 @@ function addProject(b) {
   renderAll();
 }
 
-function exportVersionBundle() {
-  downloadBlob(
-    JSON.stringify(currentBundle(), null, 2),
-    "Project_" + projectId + "_" + today() + ".json",
-    "application/json",
-  );
+// Receipts contain only a timestamp and a SHA-256 revision, never task/personnel data.
+const BACKUP_RECEIPT_PREFIX = "project-web-tool:json-download:";
+let dataSafetySequence = 0;
+
+function backupContent(bundle) {
+  const b = copy(bundle);
+  delete b.settings.language;
+  b.currentData = compactData(b.currentData);
+  b.versionHistory = b.versionHistory.map(compactVersion);
+  b.recoveryPoints = (b.recoveryPoints || []).map(compactRecoveryPoint);
+  return stableJSON(b);
+}
+
+async function backupRevision(bundle) {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(backupContent(bundle)));
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function readableSaveTime(value) {
+  const date = new Date(value);
+  return Number.isFinite(date.getTime())
+    ? date.toLocaleString(curLang === "zh" ? "zh-CN" : "en-GB", { hour12: false })
+    : "";
+}
+
+async function updateDataSafetyStatus() {
+  const node = document.getElementById("dataSafetyStatus");
+  if (!node) return;
+  const sequence = ++dataSafetySequence;
+  if (storageReadBlocked || lastSaveError) {
+    node.textContent = t("guideUnsaved");
+    return;
+  }
+  const saved = readableSaveTime(workspace.savedAt?.[projectId]);
+  const savedText = saved ? t("guideSavedAt", saved) : t("msgDataStoredInThisBrowser");
+  node.textContent = savedText + "\n" + t("guideCheckingBackup");
+  try {
+    const raw = localStorage.getItem(BACKUP_RECEIPT_PREFIX + projectId);
+    let backupText = t("guideNoBackup");
+    if (raw) {
+      const receipt = JSON.parse(raw);
+      if (!/^[a-f0-9]{64}$/.test(receipt.revision) || !readableSaveTime(receipt.at))
+        throw new Error("Invalid download receipt");
+      const revision = await backupRevision(currentBundle());
+      backupText = t(revision === receipt.revision ? "guideBackupCurrent" : "guideBackupChanged", readableSaveTime(receipt.at));
+    }
+    if (sequence === dataSafetySequence) node.textContent = savedText + "\n" + backupText;
+  } catch (error) {
+    if (sequence === dataSafetySequence) node.textContent = savedText + "\n" + t("guideBackupUnknown");
+  }
+}
+
+async function exportVersionBundle() {
+  // Capture identity and content before hashing: switching/editing during hashing cannot mark
+  // another project, or a newer revision, as backed up.
+  const bundle = currentBundle();
+  try {
+    let revision = null;
+    try { revision = await backupRevision(bundle); } catch (error) { /* Download still works without Web Crypto. */ }
+    downloadBlob(
+      JSON.stringify(bundle, null, 2),
+      "Project_" + bundle.projectId + "_" + new Date().toISOString().replace(/[:.]/g, "-") +
+        "_" + crypto.randomUUID().slice(0, 8) + ".json",
+      "application/json",
+    );
+    try {
+      if (revision) localStorage.setItem(BACKUP_RECEIPT_PREFIX + bundle.projectId,
+          JSON.stringify({ at: new Date().toISOString(), revision }));
+      otherStorageChars = null;
+    } catch (error) {
+      // A failed receipt must not prevent the actual backup download.
+    }
+    updateDataSafetyStatus();
+    return true;
+  } catch (error) {
+    showError(t("msgExportFailed") + error.message);
+    return false;
+  }
 }

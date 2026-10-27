@@ -42,7 +42,7 @@
       <details class="sidebar-action-group sidebar-filters" id="dataActions">
         <summary id="dataActionsLabel">Data & versions</summary>
         <div class="group-actions">
-          <button class="btn" id="btnImportXls" onclick="document.getElementById('excelFileInput').click()">📥 Import</button>
+          <button class="btn" id="btnImportXls" onclick="openImportGuide()">📥 Import</button>
           <button class="btn" title="Standard .xlsx template / 标准 .xlsx 模板" id="btnExportXls" onclick="exportToExcelXML()">📤 Export Excel</button>
           <button class="btn" id="btnExportProject" onclick="exportProjectXML()">Export Project XML</button>
           <button class="btn btn-primary" id="btnSaveVer" onclick="openVersionModal()">📌 Save Version</button>
@@ -136,6 +136,17 @@
     </div>
   </div>
 </header>
+<section class="workflow-guide" aria-label="Workflow" id="workflowGuide">
+  <div class="workflow-actions">
+    <button type="button" class="btn btn-touch" id="guideImport" onclick="openImportGuide()">1. Import</button>
+    <button type="button" class="btn btn-touch" id="guideEdit" onclick="openEditingGuide()">2. Edit</button>
+    <button type="button" class="btn btn-touch" id="guideExport" onclick="openExportGuide()">3. Export</button>
+  </div>
+  <div class="workflow-safety">
+    <span class="ui-caption" id="dataSafetyStatus" role="status"></span>
+    <button type="button" class="btn btn-touch" id="guideBackup" onclick="exportVersionBundle()">Download JSON backup</button>
+  </div>
+</section>
 <div id="archivedNotice" class="save-banner save-banner-info" role="status" hidden></div><div class="app-layout"><div class="workspace">
   <section id="emptyState" class="empty-state" hidden aria-labelledby="emptyTitle">
     <div class="empty-card">
@@ -148,7 +159,7 @@
       </ol>
       <div class="empty-actions">
         <button type="button" class="btn btn-primary" id="emptyAddPhase" onclick="addPhase()">Add phase</button>
-        <button type="button" class="btn" id="emptyImport" onclick="document.getElementById('excelFileInput').click()">Import</button>
+        <button type="button" class="btn" id="emptyImport" onclick="openImportGuide()">Import</button>
         <button type="button" class="btn" id="emptyDemo" onclick="loadDemoIntoProject()">Fill with fictional demo</button>
       </div>
     </div>

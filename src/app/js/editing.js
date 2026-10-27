@@ -711,6 +711,7 @@ function toggleArchive() {
 }
 
 async function deleteCurrentProject() {
+  const deletingId = projectId;
   const values = await askForm({
     title: t("msgDeleteProjectTitle"),
     intro: t("msgDeleteProjectIntro", projectMeta.name),
@@ -718,8 +719,9 @@ async function deleteCurrentProject() {
     submitLabel: t("msgDeleteProjectAction"),
   });
   if (!values) return;
-  if (values.backup) exportVersionBundle();
-  removeProject(projectId);
+  if (values.backup && !(await exportVersionBundle())) return;
+  if (deletingId !== projectId) return;
+  removeProject(deletingId);
 }
 
 // Fills the current empty project with the fictional example (from the empty-state guide).

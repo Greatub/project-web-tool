@@ -14,6 +14,8 @@ English is the primary language; Simplified Chinese is available from the langua
 
 Data stays in the current browser. Copying the HTML does not copy your projects: export a JSON bundle regularly for backup. The header shows how much browser storage is used. A red banner appears when a save fails and stays until data is saved again; a yellow banner warns when storage is more than 80% full. There is no login, server sync, collaboration or access isolation.
 
+The workflow strip above the plan provides **1. Import → 2. Edit → 3. Export** help. It also shows when this project was saved in this browser and whether the current data matches the last JSON download request. A download request is not proof that the file reached disk: check your Downloads folder. Later edits require a fresh backup; Excel/XML exchanges are not full backups. Import failures include available location details, repair advice and a corrected-file picker.
+
 ### Features and workflow
 
 - Use the **Project** menu next to the project switcher to create, duplicate, configure, archive or delete projects. Archived projects are read-only, listed under "Archived" in the switcher, and can be restored. Deleting offers a JSON backup first; the workspace always keeps at least one project.
@@ -66,7 +68,7 @@ Development checks require Node.js 22+ and Python 3 (standard-library XML parsin
 
 ```sh
 npm run build        # regenerate src/index.html from src/app/
-npm test             # build freshness check + 87 logic checks (Node.js + Python 3)
+npm test             # build freshness check + 95 logic checks (Node.js + Python 3)
 npm run test:e2e     # browser smoke test; needs: npm install --no-save playwright && npx playwright install chromium
 npm run format       # optional: Prettier formatting for sources and tests
 npm run privacy
@@ -88,6 +90,8 @@ See [Current status](docs/STATUS.md) for scope and verification and [Public rele
 公开源码：[Greatub/project-web-tool](https://github.com/Greatub/project-web-tool)。
 
 通用项目管理 Web 工具。用现代 Edge / Chrome 打开 `src/index.html` 即可离线使用，无需安装依赖。也可将 `src/` 作为静态网站根目录。数据保存在当前浏览器；复制 HTML 不包含用户数据，请定期导出 JSON 版本包。
+
+工作区上方提供“1. 导入 → 2. 修改 → 3. 导出”指引，并分开显示浏览器保存时间和 JSON 下载备份状态。重开后会检查当前数据是否匹配上次下载；有修改时提示重新备份。下载记录不代表文件已保存到磁盘，请检查下载文件夹；Excel/XML 仅用于字段交换。导入失败会提供可用的问题定位、修正建议和重选文件入口。
 
 支持空白项目、虚构示例、复制、切换、归档、删除、项目配置、三级任务、FS 自然日排程、正负 Lag、加权进度、甘特图、任务卡片、人员参与统计、中英文、版本快照及基线比较。
 
@@ -118,7 +122,7 @@ Excel 数据表和 Instructions 固定为英文、Arial 9 号；新增 Instructi
 
 ```sh
 npm run build        # 由 src/app/ 重新生成 src/index.html
-npm test             # 构建一致性检查 + 87 项逻辑检查（Node.js + Python 3）
+npm test             # 构建一致性检查 + 95 项逻辑检查（Node.js + Python 3）
 npm run test:e2e     # 浏览器冒烟测试；需先 npm install --no-save playwright && npx playwright install chromium
 npm run privacy
 npm run release

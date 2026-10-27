@@ -117,6 +117,32 @@ const headerHeight = (page) =>
         assert.ok(overflow <= 0, "page scrolls horizontally by " + overflow + "px");
       });
 
+      await check(`${width}px: bilingual workflow controls share typography and remain inside the workspace`, async () => {
+        for (const language of ["en", "zh"]) {
+          if ((await page.evaluate(() => curLang)) !== language) await page.evaluate(() => toggleLanguage());
+          await page.mouse.move(width - 4, 4);
+          const styles = await page.evaluate(() => {
+            const props = ["fontFamily", "fontSize", "fontWeight", "lineHeight", "margin", "padding", "border", "color", "backgroundColor"];
+            return ["guideImport", "guideEdit", "guideExport"].map((id) => {
+              const el = document.getElementById(id), css = getComputedStyle(el), rect = el.getBoundingClientRect();
+              return { role: props.map((p) => css[p]), left: rect.left, right: rect.right, height: rect.height };
+            });
+          });
+          for (const style of styles) {
+            assert.deepEqual(style.role, styles[0].role);
+            assert.ok(style.height >= 44);
+            assert.ok(style.left >= 0 && style.right <= width);
+          }
+          assert.ok(await page.locator("#guideBackup").isVisible());
+          assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+          await page.click("#guideEdit");
+          assert.ok(await openDialog(page).isVisible());
+          await page.screenshot({ path: path.join(shots, `workflow-${language}-${width}.png`) });
+          await page.keyboard.press("Escape");
+        }
+        await page.evaluate(() => toggleLanguage());
+      });
+
       await check(`${width}px: cards and people views render; matrix columns line up`, async () => {
         await page.evaluate(() => switchView("cards"));
         assert.equal(await page.locator(".mt-card").count(), 1);
@@ -432,6 +458,51 @@ const headerHeight = (page) =>
       },
     );
 
+    await check("guided import identifies a failed file and a corrected import can be edited and exported", async () => {
+      await page.click("#guideImport");
+      assert.match(await openDialog(page).textContent(), /source file is read-only/);
+      const [chooser] = await Promise.all([
+        page.waitForEvent("filechooser"),
+        openDialog(page).getByRole("button", { name: "Choose file", exact: true }).click(),
+      ]);
+      const before = await page.evaluate(() => localStorage.getItem(WORKSPACE_KEY));
+      await chooser.setFiles({name:"invalid.json", mimeType:"application/json", buffer:Buffer.from("{invalid")});
+      await openDialog(page).getByRole("button", { name: "Choose corrected file" }).waitFor();
+      assert.match(await openDialog(page).textContent(), /invalid.json/);
+      assert.match(await openDialog(page).textContent(), /intact JSON bundle/);
+      assert.equal(await page.evaluate(() => localStorage.getItem(WORKSPACE_KEY)), before);
+      const corrected = await page.evaluate(() => JSON.stringify(currentBundle()));
+      const [retry] = await Promise.all([
+        page.waitForEvent("filechooser"),
+        openDialog(page).getByRole("button", { name: "Choose corrected file" }).click(),
+      ]);
+      await retry.setFiles({name:"corrected.json", mimeType:"application/json", buffer:Buffer.from(corrected)});
+      const [automaticBackup] = await Promise.all([
+        page.waitForEvent("download"),
+        openDialog(page).getByRole("button", { name: "Import as new project" }).click(),
+      ]);
+      assert.match(automaticBackup.suggestedFilename(), /\.json$/);
+      await page.waitForFunction(() => document.querySelector("#dataSafetyStatus").textContent.includes("No JSON backup"));
+      await page.click("#guideEdit");
+      await openDialog(page).getByRole("button", { name:"Open Gantt" }).click();
+      await page.fill('input[data-focus-key="1.1.1:pct"]', "55");
+      await page.keyboard.press("Tab");
+      await page.waitForFunction(() => findSubtaskByWbs("1.1.1").pct === 55);
+      await page.click("#guideExport");
+      assert.match(await openDialog(page).textContent(), /complete current project/);
+      const [backup] = await Promise.all([
+        page.waitForEvent("download"),
+        openDialog(page).getByRole("button", { name:"Download JSON backup" }).click(),
+      ]);
+      const downloaded = JSON.parse(fs.readFileSync(await backup.path(), "utf8"));
+      assert.equal(downloaded.currentData[0].mainTasks[0].subtasks[0].pct, 55);
+      await page.waitForFunction(() => document.querySelector("#dataSafetyStatus").textContent.includes("matches current data"));
+      await page.reload();
+      await page.waitForFunction(() => document.querySelector("#dataSafetyStatus").textContent.includes("matches current data"));
+      assert.match(await page.locator("#dataSafetyStatus").textContent(), /Saved in this browser/);
+      assert.equal(await page.evaluate(() => findSubtaskByWbs("1.1.1").pct), 55);
+    });
+
     await check("a failed save shows a persistent banner and recovers after retry", async () => {
       await page.evaluate(() => {
         window.__realSetItem = Storage.prototype.setItem;
@@ -455,6 +526,7 @@ const headerHeight = (page) =>
     await check("data survives a reload", async () => {
       await page.reload();
       assert.equal(await page.evaluate(() => findSubtaskByWbs("1.1.1").pct), 60);
+      await page.waitForFunction(() => document.querySelector("#dataSafetyStatus").textContent.includes("Changed since"));
     });
 
     await context.close();

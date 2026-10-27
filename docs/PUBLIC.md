@@ -249,3 +249,16 @@ v1.0 无项目身份和源版本摘要，只允许明确选择目标后更新既
 未设置前置时仍填写的 Lag 通过任务备注中的 v1 扩展保留，避免丢失暂未生效的输入值。应保留本工具导出的项目/任务交换备注和组字段定义，否则组配置无法完整恢复。不自动猜测其他来源 Text 字段的业务含义。XML 先检查大小、禁止 DTD/实体声明，再用 XML 解析器读取，校验候选数据后复用预览与原子保存；失败和取消不修改现有项目。
 
 依据微软的 [Project XML 规范](https://learn.microsoft.com/en-us/office-project/xml-data-interchange/project-xml-data-interchange-schema-reference)、[DurationFormat](https://learn.microsoft.com/en-us/office-project/xml-data-interchange/durationformat-element)、[LinkLag](https://learn.microsoft.com/en-us/office-project/xml-data-interchange/linklag-element) 和 [自定义字段编号](https://learn.microsoft.com/en-us/office/vba/api/project.pjcustomfield)实现。自动往返测试和完整/空白/未定日期三类输出的映射字段 Schema 子集检查已完成；尚未完成 Microsoft Project 桌面端打开、另存 MPP 后再导出 XML 的实测，也未完成本次中英文桌面布局验收。
+
+
+## Guided workflow and backup status
+
+Keep Import / Edit / Export guidance in the shared component system and both UI languages. Import errors must preserve available location details and offer actionable repair guidance without modifying the source. Validation against filtered rows must retain original worksheet row numbers.
+
+Save timestamps are optional project-scoped workspace metadata, outside the exchange bundle. JSON download receipts are browser-local and project-scoped, containing only the request timestamp and SHA-256 revision of canonical full-backup content. Recalculate/compact derived fields consistently; language and collapsed state do not invalidate a receipt. Versions, audit and recovery changes do. Receipts must not claim confirmed disk persistence; spreadsheet/XML exchanges never mark a full backup. Hash/receipt storage failure must not block emergency JSON downloads. Failed saves take precedence over normal backup status, and async hashing must retain the captured project identity and revision.
+
+## 操作引导与备份状态
+
+导入、修改、导出指引沿用统一组件，提供中英文。导入错误保留可用定位，提供修正建议且不修改源文件；过滤汇总行后仍使用原始 Excel 行号。
+
+保存时间作为按项目隔离的可选工作区信息，不进入交换包。JSON 下载记录仅在本浏览器按项目保存时间和完整内容的 SHA-256 摘要；计算字段须一致压缩，语言和折叠状态不影响匹配，版本、记录及恢复点变更影响匹配。仅记录下载请求，不宣称磁盘保存成功；Excel/XML 不算完整备份。摘要或记录存储失败不得阻止应急下载。保存失败优先显示，异步摘要须绑定发起时的项目和内容。

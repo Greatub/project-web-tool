@@ -64,6 +64,15 @@ function payload(mode = "update") {
   );
 }
 (async () => {
+  await test("validation reports the original Plan row after filtering out summary rows", () => {
+    payload();
+    run("fixture.plan[3][8] = -1;");
+    assert.throws(() => run("prepareExchangeCandidate(fixture, exchangeBase())"), (error) => {
+      assert.equal(error.location, "Plan · 4 · Days");
+      assert.match(error.message, /4/);
+      return true;
+    });
+  });
   await test("v2 creation supports out-of-order explicit parents and FS scheduling", () => {
     payload("create");
     run(

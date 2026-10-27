@@ -740,6 +740,7 @@ function renderActionButton(id, key) {
 }
 
 function applyStaticI18n() {
+  document.getElementById("workflowGuide").setAttribute("aria-label", t("guideWorkflow"));
   renderActionButton("btnLangToggle", "langBtn");
   document.getElementById("actionMenuLabel").innerHTML =
     '<svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg><span class="action-label">' +
@@ -796,6 +797,10 @@ function applyStaticI18n() {
   renderTableHeader();
   document.getElementById("lblColumns").textContent = t("lblColumns");
   for (const [id, key] of [
+    ["guideImport", "guideImport"],
+    ["guideEdit", "guideEdit"],
+    ["guideExport", "guideExport"],
+    ["guideBackup", "guideBackup"],
     ["emptyTitle", "msgEmptyTitle"],
     ["emptyIntro", "msgEmptyIntro"],
     ["emptyStep1", "msgEmptyStep1"],
