@@ -1773,6 +1773,16 @@ function prepareProjectXML(model) {
   candidate.currentData = data;
   validateBundle(candidate);
   recalculateSchedule(data, candidate.settings.statusDate);
+  // Preview: one "New" row per task (as for Excel creation templates) plus summary values the
+  // schedule recalculated differently from the file. Values are shown as the app displays them.
+  const fieldLabel = {
+    start: EXCEL_HEADERS[6],
+    days: EXCEL_HEADERS[8],
+    pct: EXCEL_HEADERS[9],
+    prio: EXCEL_HEADERS[5],
+  };
+  const shown = (key, value) =>
+    value === null || value === undefined || value === "" ? "" : key === "pct" ? value + "%" : String(value);
   const recalculations = [];
   for (const r of model.rows) {
     const actual = byUID.get(r.uid);
@@ -1782,22 +1792,15 @@ function prepareProjectXML(model) {
       if (r.start && actual.start !== r.start) mspReject("mspPredecessorAndStartDateDisagree0", r.wbs);
     } else
       for (const key of ["start", "days", "pct", "prio"])
-        if (r[key] !== actual[key])
-          recalculations.push({ wbs: r.wbs, field: key, before: r[key] ?? "", after: actual[key] ?? "" });
+        if ((r[key] ?? "") !== "" && r[key] !== actual[key])
+          recalculations.push({
+            wbs: r.wbs,
+            field: fieldLabel[key],
+            before: shown(key, r[key]),
+            after: shown(key, actual[key]),
+          });
   }
-  const changes = groupExchangeRows(data, candidate.settings)
-    .slice(1)
-    .flatMap((row) =>
-      row
-        .slice(2)
-        .map((value, i) => ({
-          wbs: row[0],
-          field: groupExcelHeaders(candidate.settings)[i + 2],
-          before: "",
-          after: value ?? "",
-        })),
-    )
-    .concat(recalculations);
+  const changes = exchangeChanges([], data).concat(recalculations);
   return {
     candidate,
     create: true,

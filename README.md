@@ -66,7 +66,7 @@ Development checks require Node.js 22+ and Python 3 (standard-library XML parsin
 
 ```sh
 npm run build        # regenerate src/index.html from src/app/
-npm test             # build freshness check + 84 logic checks (Node.js + Python 3)
+npm test             # build freshness check + 86 logic checks (Node.js + Python 3)
 npm run test:e2e     # browser smoke test; needs: npm install --no-save playwright && npx playwright install chromium
 npm run format       # optional: Prettier formatting for sources and tests
 npm run privacy
@@ -118,7 +118,7 @@ Excel 数据表和 Instructions 固定为英文、Arial 9 号；新增 Instructi
 
 ```sh
 npm run build        # 由 src/app/ 重新生成 src/index.html
-npm test             # 构建一致性检查 + 84 项逻辑检查（Node.js + Python 3）
+npm test             # 构建一致性检查 + 86 项逻辑检查（Node.js + Python 3）
 npm run test:e2e     # 浏览器冒烟测试；需先 npm install --no-save playwright && npx playwright install chromium
 npm run privacy
 npm run release

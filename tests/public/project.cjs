@@ -98,6 +98,26 @@ test("Project XML roundtrip preserves fields, groups, escaped text and negative 
   assert.notEqual(run("plan.candidate.projectId"), run("projectId"));
   assert.equal(run("stableJSON(currentBundle())"), run("original"));
 });
+test("import preview lists each new task once with readable values", () => {
+  const changes = run("plan.changes");
+  assert.equal(
+    changes.length,
+    run("plan.added"),
+    "one row per task, no recalculation noise for an own export",
+  );
+  assert.ok(changes.every((c) => /^New /.test(c.field)));
+  assert.ok(!changes.some((c) => /^\d{5}$/.test(String(c.after))), "no Excel date serials");
+});
+test("recalculated summary values are shown as dates and percentages", () => {
+  run(
+    "globalThis.edited=xml.replace(/(<WBS>1<\\/WBS>[\\s\\S]*?<PercentComplete>)\\d+(<\\/PercentComplete>)/,'$199$2');globalThis.recalc=prepareProjectXML(readProjectXML(edited)).changes.filter((c)=>!/^New /.test(c.field))",
+  );
+  assert.deepEqual(
+    JSON.parse(run("JSON.stringify(recalc)")).map((c) => [c.wbs, c.field, c.before]),
+    [["1", "% Complete", "99%"]],
+  );
+  assert.match(run("recalc[0].after"), /^\d+%$/);
+});
 test("XML has standard namespace, elapsed units, unique UIDs and exclusive finish dates", () => {
   assert.ok(run('xml.includes("<DurationFormat>8</DurationFormat>")'));
   assert.ok(run('xml.includes("<LinkLag>-14400</LinkLag>")'));

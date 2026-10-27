@@ -329,6 +329,40 @@ const headerHeight = (page) =>
       await page.selectOption("#projectSelect", { index: 1 });
     });
 
+    await check(
+      "Project XML export and import create a separate project with a readable preview",
+      async () => {
+        await page.evaluate(() => void exportProjectXML());
+        const [download] = await Promise.all([
+          page.waitForEvent("download"),
+          openDialog(page).getByRole("button", { name: /XML/ }).click(),
+        ]);
+        const file = path.join(shots, "roundtrip.xml");
+        await download.saveAs(file);
+        const projects = await page.evaluate(() => Object.keys(workspace.projects).length);
+        const source = await page.evaluate(() =>
+          stableJSON(groupExchangeRows(projectData, projectSettings).slice(1)),
+        );
+        await page.setInputFiles("#excelFileInput", file);
+        const preview = openDialog(page);
+        await preview.getByRole("button", { name: "Apply changes" }).waitFor();
+        const cells = await preview.locator("tbody td").allTextContents();
+        assert.ok(!cells.some((c) => /^\d{5}$/.test(c.trim())), "dates must not show as serial numbers");
+        assert.equal(
+          await preview.locator("tbody tr").count(),
+          await page.evaluate(() => allItems(projectData).length),
+        );
+        await page.screenshot({ path: path.join(shots, "project-xml-preview.png") });
+        await preview.getByRole("button", { name: "Apply changes" }).click();
+        assert.equal(await page.evaluate(() => Object.keys(workspace.projects).length), projects + 1);
+        assert.equal(
+          await page.evaluate(() => stableJSON(groupExchangeRows(projectData, projectSettings).slice(1))),
+          source,
+        );
+        fs.rmSync(file);
+      },
+    );
+
     await check("a failed save shows a persistent banner and recovers after retry", async () => {
       await page.evaluate(() => {
         window.__realSetItem = Storage.prototype.setItem;

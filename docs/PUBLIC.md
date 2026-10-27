@@ -55,7 +55,7 @@ Gantt bars remain keyboard-focusable: arrow keys move by one calendar day, Shift
 
 ### Validation and release acceptance
 
-Use Node.js 22+ and Python 3 for logic checks (the browser app has no runtime dependencies). The current baseline has 84 logic checks and a 25-check browser smoke suite; record the actual counts and results for each change rather than treating these numbers as fixed requirements.
+Use Node.js 22+ and Python 3 for logic checks (the browser app has no runtime dependencies). The current baseline has 86 logic checks and a 26-check browser smoke suite; record the actual counts and results for each change rather than treating these numbers as fixed requirements.
 
 | Gate | Command and acceptance |
 | --- | --- |
@@ -174,7 +174,7 @@ Implementation follows Microsoft's [Project XML reference](https://learn.microso
 
 ## 验证与发布验收规范
 
-逻辑检查使用 Node.js 22+ 和 Python 3，网页无运行依赖。目前基线为 84 项逻辑检查和 25 项浏览器冒烟检查；每次记录实际执行的数量和结果，不将数量固定为验收条件。
+逻辑检查使用 Node.js 22+ 和 Python 3，网页无运行依赖。目前基线为 86 项逻辑检查和 26 项浏览器冒烟检查；每次记录实际执行的数量和结果，不将数量固定为验收条件。
 
 | 检查 | 命令与验收要求 |
 | --- | --- |
