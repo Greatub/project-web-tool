@@ -10,7 +10,12 @@ Updated: 2026-10-27 (Asia/Shanghai).
 - Controlled Excel v3, protected calculated cells, explicit 21/22-field mappings, group configuration, preview, source revision checks and downloads as new files. Legacy 14-column spreadsheet import remains positionally compatible; source-specific aliases have been removed. Legacy JSON requires a declared three-slot mapping.
 - Public source allowlist and irreversible identifier fingerprints with submission/push hooks. Historical source files, old templates, development images, raw audit records and old Git backups have been removed under explicit user authorization. The public repository was deleted and recreated under the same name, with a new repository identity and clean Git history; only the 13 reviewed files were uploaded.
 
-## Current change: Microsoft Project XML
+## Current change: Project XML import preview
+
+- The preview listed every exported field of every task, with dates as Excel serial numbers and progress as fractions (for example 46322 and 0.19). It now shows one "New" row per task, like Excel creation templates, plus summary values the schedule recalculated differently from the file, shown as YYYY-MM-DD dates and percentages.
+- Tests: 86 logic checks (2 new Project XML preview checks) and a 26-check browser smoke test with a new Project XML export → import → preview → apply round trip.
+
+## Previous change: Microsoft Project XML
 
 - Ported onto latest main (`1ae5106`) without overwriting the merged source split, English-first UI, compact storage, undo/history and shared dialogs. XML implementation lives in `src/app/js/exchange.js`; all 59 new messages use the shared bilingual dictionary. Generated `src/index.html` is rebuilt from sources.
 - Import XML via the existing action, review mapped fields and create an independent project. Export Project XML under Data & versions, using the shared dialog/inline errors, SVG button and typography. No new CSS or standalone page. Source files stay read-only and downloads have unique filenames.
@@ -85,7 +90,12 @@ Updated: 2026-10-27 (Asia/Shanghai).
 
 更新：2026-10-27（Asia/Shanghai）。
 
-### 本次变更：Project XML 导入与导出
+### 本次变更：Project XML 导入预览
+
+- 预览原先列出每个任务的全部字段，日期显示为 Excel 序列号、进度显示为小数（如 46322、0.19）。现改为每个任务一行“新增”，与 Excel 创建模板一致；另列出排程重算后与文件不同的汇总值，日期为 YYYY-MM-DD，进度为百分比。
+- 测试：86 项逻辑检查（新增 2 项预览检查），浏览器冒烟测试 26 项，新增 Project XML 导出 → 导入 → 预览 → 应用往返检查。
+
+### 上次变更：Project XML 导入与导出
 
 - 基于远端最新 main 移植，保留模块化源码、统一对话框、紧凑存储和现有流程；新增文案全部进入中英文词典，不增加样式覆盖或独立页面。
 - 导入先预览，再以独立项目保存；导出当前字段并另存新文件。支持三级任务、整自然日、单一 FS 前置及 Lag、进度、优先级和 10 个组，不直接读写 MPP。
