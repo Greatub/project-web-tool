@@ -10,7 +10,13 @@ Updated: 2026-10-27 (Asia/Shanghai).
 - Controlled Excel v3, protected calculated cells, explicit 21/22-field mappings, group configuration, preview, source revision checks and downloads as new files. Legacy 14-column spreadsheet import remains positionally compatible; source-specific aliases have been removed. Legacy JSON requires a declared three-slot mapping.
 - Public source allowlist and irreversible identifier fingerprints with submission/push hooks. Historical source files, old templates, development images, raw audit records and old Git backups have been removed under explicit user authorization. The public repository was deleted and recreated under the same name, with a new repository identity and clean Git history; only the 13 reviewed files were uploaded.
 
-## Current change: Project XML import preview
+## Current change: Project XML calendar-day conversion
+
+- Working calendars are disrupted by irregular holidays, so imports now convert instead of rejecting. Sub-tasks with working-time durations, times of day, milestones, date constraints, task calendars or leveling delays keep the file's start and finish dates; duration becomes the inclusive calendar-day span, milestones become 1-day tasks, and Lag on converted links is derived from the dates. Each conversion is a preview row ("Converted to calendar days") with original and converted values, plus a notice. Own exports import exactly, without conversion.
+- Still rejected: non-FS/multiple predecessors, finish-scheduled projects, hierarchy outside three levels and malformed files.
+- Tests: 87 logic checks (20 Project XML, including a fictional working-calendar file and an own-export no-conversion check) and a 27-check browser smoke test with a working-time import.
+
+## Previous change: Project XML import preview
 
 - The preview listed every exported field of every task, with dates as Excel serial numbers and progress as fractions (for example 46322 and 0.19). It now shows one "New" row per task, like Excel creation templates, plus summary values the schedule recalculated differently from the file, shown as YYYY-MM-DD dates and percentages.
 - Tests: 86 logic checks (2 new Project XML preview checks) and a 26-check browser smoke test with a new Project XML export → import → preview → apply round trip.
@@ -90,7 +96,13 @@ Updated: 2026-10-27 (Asia/Shanghai).
 
 更新：2026-10-27（Asia/Shanghai）。
 
-### 本次变更：Project XML 导入预览
+### 本次变更：Project XML 换算为日历日
+
+- 工作日历会因不规则节假日被打乱，导入改为换算而不是拒绝。使用工作日历工期、非午夜时刻、里程碑、日期约束、任务日历或资源平衡延迟的子任务保留文件中的开始/完成日期，工期取日历天数（含首尾），里程碑转为 1 天任务，相关链接的 Lag 由日期推算。每项换算在预览中单列一行（“换算为日历日”），显示原值和换算值，并附提示。本工具导出的文件原样导入。
+- 仍拒绝：非 FS/多前置、按完成日期排程、非三级结构和格式错误的文件。
+- 测试：87 项逻辑检查（Project XML 20 项，含虚构工作日历文件和自导出不换算检查），浏览器冒烟测试 27 项，新增工作日历文件导入检查。
+
+### 上次变更：Project XML 导入预览
 
 - 预览原先列出每个任务的全部字段，日期显示为 Excel 序列号、进度显示为小数（如 46322、0.19）。现改为每个任务一行“新增”，与 Excel 创建模板一致；另列出排程重算后与文件不同的汇总值，日期为 YYYY-MM-DD，进度为百分比。
 - 测试：86 项逻辑检查（新增 2 项预览检查），浏览器冒烟测试 26 项，新增 Project XML 导出 → 导入 → 预览 → 应用往返检查。

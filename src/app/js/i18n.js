@@ -831,10 +831,6 @@ Object.assign(I18N.en, {
   mspFinishScheduledProjectsAreUnsupported: "Finish-scheduled projects are unsupported.",
   mspUseThreeLevelsPhaseMainTaskSubtaskHierarchy:
     "Use three levels: phase → main task → subtask; hierarchy is not silently flattened or padded.",
-  mspTaskCalendarsDateConstraintsAndLevelingDelaysAre:
-    "Task calendars, date constraints and leveling delays are unsupported.",
-  mspSubtasksRequireMidnightWholeDayBoundariesTimesCannot:
-    "Subtasks require midnight whole-day boundaries; times cannot be silently truncated: {0}",
   mspFileDatesDoNotMatchCalendarDayScheduling: "File dates do not match calendar-day scheduling: {0}",
   mspPredecessorAndStartDateDisagree0: "Predecessor and start date disagree: {0}",
   mspCreatesAnIndependentCopyOnlyCurrentFieldsAre:
@@ -896,6 +892,10 @@ Object.assign(I18N.en, {
     "The source XML is read-only. Confirm to create a separate project without overwriting existing data.",
   mspUseXml: "Save as XML in Microsoft Project before importing; direct MPP is unsupported.",
   mspUseJsonXlsxXml: "Use JSON, XLSX or Project XML",
+  mspCalendarConversion: "Converted to calendar days",
+  mspConvertedToCalendarDays:
+    "{0} sub-tasks used working time, times of day, date constraints or task calendars. Their start and finish dates from the file were kept; durations and Lag are now in calendar days, so weekends and holidays count.",
+  mspMilestonesConverted: "{0} milestones became 1-day tasks.",
 });
 Object.assign(I18N.zh, {
   mspUseElapsedDurationsWorkingCalendarsCannotBeSilently:
@@ -907,8 +907,6 @@ Object.assign(I18N.zh, {
   mspFinishScheduledProjectsAreUnsupported: "暂不支持按完成日期倒排的项目。",
   mspUseThreeLevelsPhaseMainTaskSubtaskHierarchy:
     "需要三级任务结构：阶段 → 主任务 → 子任务；不自动压平或补齐。",
-  mspTaskCalendarsDateConstraintsAndLevelingDelaysAre: "不支持任务日历、日期约束或资源平衡延迟。",
-  mspSubtasksRequireMidnightWholeDayBoundariesTimesCannot: "子任务需使用午夜整日边界，不能静默截去时刻：{0}",
   mspFileDatesDoNotMatchCalendarDayScheduling: "文件日期与自然日排程不一致：{0}",
   mspPredecessorAndStartDateDisagree0: "前置关系与开始日期不一致：{0}",
   mspCreatesAnIndependentCopyOnlyCurrentFieldsAre:
@@ -963,6 +961,10 @@ Object.assign(I18N.zh, {
   mspReadOnlyCopy: "源 XML 只读。确认后创建独立项目，不覆盖现有数据。",
   mspUseXml: "请在 Microsoft Project 中另存为 XML 后导入；不直接读取 MPP。",
   mspUseJsonXlsxXml: "请导入 JSON、XLSX 或 Project XML 文件",
+  mspCalendarConversion: "换算为日历日",
+  mspConvertedToCalendarDays:
+    "{0} 个子任务使用了工作时间、具体时刻、日期限制或任务日历。已保留文件中的开始和完成日期，工期和 Lag 改为日历日，周末和节假日计入工期。",
+  mspMilestonesConverted: "{0} 个里程碑已转为 1 天的任务。",
 });
 
 // Single translation entry point for labels and messages. Placeholders {0}, {1}… take the extra arguments.

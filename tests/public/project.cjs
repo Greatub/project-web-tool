@@ -133,15 +133,94 @@ test("unknown dates/duration/priority and empty projects roundtrip", () => {
   assert.equal(run("unknownResult.candidate.currentData[0].mainTasks[0].subtasks[0].prio"), null);
   assert.equal(run("prepareProjectXML(readProjectXML(buildProjectXML(newProject()))).added"), 0);
 });
-test("working durations, partial days, milestones, constraints and task calendars reject", () => {
-  for (const expression of [
-    `xml.replaceAll('<DurationFormat>8','<DurationFormat>7')`,
-    `xml.replace('PT72H0M0S','PT8H0M0S')`,
-    `xml.replace('<Milestone>0','<Milestone>1')`,
-    `xml.replace('</Name><Type>','</Name><ConstraintType>4</ConstraintType><Type>')`,
-    `xml.replace('</Name><Type>','</Name><CalendarUID>1</CalendarUID><Type>')`,
-  ])
-    assert.throws(() => run("prepareProjectXML(readProjectXML(" + expression + "))"));
+// A fictional file as Microsoft Project saves it: standard working calendar (08:00–17:00), durations and
+// Lag in working days, a weekend between linked tasks, a date constraint, a task calendar, a half-day task
+// and a milestone.
+const typicalTask = (uid, wbs, level, name, start, finish, extra = "") =>
+  `<Task><UID>${uid}</UID><ID>${uid}</ID><Name>${name}</Name><WBS>${wbs}</WBS><OutlineLevel>${level}</OutlineLevel><Summary>${level < 3 ? 1 : 0}</Summary><Start>${start}</Start><Finish>${finish}</Finish><DurationFormat>7</DurationFormat><ConstraintType>0</ConstraintType><CalendarUID>-1</CalendarUID>${extra}</Task>`;
+const typicalXML =
+  '<?xml version="1.0" encoding="UTF-8"?><Project xmlns="http://schemas.microsoft.com/project"><Name>Fictional.xml</Name><Title>Fictional rollout</Title><ScheduleFromStart>1</ScheduleFromStart><MinutesPerDay>480</MinutesPerDay><DurationFormat>7</DurationFormat><StatusDate>2030-01-07T08:00:00</StatusDate><Tasks>' +
+  "<Task><UID>0</UID><ID>0</ID><Name>Fictional rollout</Name><OutlineLevel>0</OutlineLevel><Summary>1</Summary></Task>" +
+  typicalTask(1, "1", 1, "Phase", "2030-01-02T08:00:00", "2030-01-15T12:00:00") +
+  typicalTask(2, "1.1", 2, "Build", "2030-01-02T08:00:00", "2030-01-15T12:00:00") +
+  typicalTask(
+    3,
+    "1.1.1",
+    3,
+    "Draft",
+    "2030-01-02T08:00:00",
+    "2030-01-04T17:00:00",
+    "<Duration>PT24H0M0S</Duration><PercentComplete>50</PercentComplete><Priority>900</Priority>",
+  ).replace(
+    "<ConstraintType>0</ConstraintType>",
+    "<ConstraintType>4</ConstraintType><ConstraintDate>2030-01-02T08:00:00</ConstraintDate>",
+  ) +
+  typicalTask(
+    4,
+    "1.1.2",
+    3,
+    "Review",
+    "2030-01-07T08:00:00",
+    "2030-01-08T17:00:00",
+    "<Duration>PT16H0M0S</Duration><PredecessorLink><PredecessorUID>3</PredecessorUID><Type>1</Type><LinkLag>0</LinkLag><LagFormat>7</LagFormat></PredecessorLink>",
+  ) +
+  typicalTask(
+    5,
+    "1.1.3",
+    3,
+    "Sign-off",
+    "2030-01-14T08:00:00",
+    "2030-01-15T12:00:00",
+    "<Duration>PT12H0M0S</Duration><PredecessorLink><PredecessorUID>4</PredecessorUID><Type>1</Type><LinkLag>14400</LinkLag><LagFormat>7</LagFormat></PredecessorLink>",
+  ).replace("<CalendarUID>-1</CalendarUID>", "<CalendarUID>3</CalendarUID>") +
+  typicalTask(
+    6,
+    "1.1.4",
+    3,
+    "Go-live",
+    "2030-01-15T12:00:00",
+    "2030-01-15T12:00:00",
+    "<Duration>PT0H0M0S</Duration><Milestone>1</Milestone>",
+  ) +
+  "</Tasks></Project>";
+test("Microsoft Project working-time files convert to calendar days and keep the file's dates", () => {
+  ctx.typicalXML = typicalXML;
+  run("globalThis.typical=prepareProjectXML(readProjectXML(typicalXML))");
+  assert.equal(run("typical.candidate.metadata.name"), "Fictional rollout", "Title is the project name");
+  const tasks = JSON.parse(
+    run(
+      "JSON.stringify(typical.candidate.currentData[0].mainTasks[0].subtasks.map((s)=>[s.wbs,s.start,s.finish,s.days,s.pred,s.lag]))",
+    ),
+  );
+  assert.deepEqual(tasks, [
+    ["1.1.1", "2030-01-02", "2030-01-04", 3, "", 0],
+    ["1.1.2", "2030-01-07", "2030-01-08", 2, "1.1.1", 2],
+    ["1.1.3", "2030-01-14", "2030-01-15", 2, "1.1.2", 5],
+    ["1.1.4", "2030-01-15", "2030-01-15", 1, "", 0],
+  ]);
+  assert.equal(run("typical.candidate.currentData[0].mainTasks[0].subtasks[0].pct"), 50);
+  assert.equal(run("typical.candidate.currentData[0].mainTasks[0].subtasks[0].prio"), 1);
+  const converted = JSON.parse(
+    run("JSON.stringify(typical.changes.filter((c)=>c.field===t('mspCalendarConversion')))"),
+  );
+  assert.equal(converted.length, 4, "every converted task is listed in the preview");
+  assert.deepEqual(converted[1], {
+    wbs: "1.1.2",
+    field: "Converted to calendar days",
+    before: "2030-01-07 08:00 – 2030-01-08 17:00",
+    after: "2030-01-07 – 2030-01-08 (2d)",
+  });
+  assert.ok(run("typical.notices.some((n)=>n.startsWith('4 sub-tasks'))"));
+  assert.ok(run("typical.notices.some((n)=>n.startsWith('1 milestones'))"));
+});
+test("files saved by this tool still import exactly, with no conversions", () => {
+  assert.equal(
+    run(
+      "prepareProjectXML(readProjectXML(xml)).changes.filter((c)=>c.field===t('mspCalendarConversion')).length",
+    ),
+    0,
+  );
+  assert.equal(run("prepareProjectXML(readProjectXML(xml)).notices.length"), 1);
 });
 test("multiple, non-FS, summary, unresolved and cyclic predecessors reject", () => {
   for (const expression of [
@@ -150,7 +229,6 @@ test("multiple, non-FS, summary, unresolved and cyclic predecessors reject", () 
     `xml.replace('<PredecessorUID>3','<PredecessorUID>999')`,
     `xml.replace('<PredecessorUID>3','<PredecessorUID>2')`,
     `xml.replace('<PredecessorUID>3','<PredecessorUID>4')`,
-    `xml.replace('<LagFormat>8','<LagFormat>7')`,
   ])
     assert.throws(() => run("prepareProjectXML(readProjectXML(" + expression + "))"));
 });
@@ -246,7 +324,10 @@ test("new export button and both languages reuse existing component classes", ()
   console.log("PASS localized Project XML preview uses the shared wide dialog and confirm/cancel actions");
   const before = run("stableJSON(workspace)"),
     saved = storage.get(run("WORKSPACE_KEY"));
-  ctx.file = { size: Buffer.byteLength(run("xml")), text: async () => run("xml") };
+  ctx.file = {
+    size: Buffer.byteLength(run("xml")),
+    text: async () => run("xml"),
+  };
   run("previewExcel=async()=>false");
   await run("importProjectXML(file)");
   assert.equal(run("stableJSON(workspace)"), before);
