@@ -16,6 +16,7 @@ Updated: 2026-10-27 (Asia/Shanghai).
 - Import XML via the existing action, review mapped fields and create an independent project. Export Project XML under Data & versions, using the shared dialog/inline errors, SVG button and typography. No new CSS or standalone page. Source files stay read-only and downloads have unique filenames.
 - Explicit v1 mappings cover current fields, elapsed 24-hour durations, one FS predecessor, signed calendar Lag and Text1–Text10 groups. Exchange notes retain group configuration and inactive Lag. Unsupported rules, conflicting schedules, malformed XML/DTDs and truncation reject before mutation. Native MPP is not implemented.
 - Current verification: 84 logic checks (67 latest-main regressions + 17 Project XML checks), build freshness and privacy scans pass. XML parsing tests use Python's independent standard-library parser; cancellation, isolation, concurrent writes, failed persistence and bilingual shared preview configuration are covered. Fictional full/blank/unknown-date outputs pass an assembled subset of Microsoft-published mapped-field schema definitions; this is not full-schema or native application certification.
+- GitHub Actions `verify` and the existing 25-check `browser-smoke` job passed for implementation commit `e80b4a9`; this is a browser regression result, not native Project certification.
 - Pending: native Microsoft Project open/save/MPP conversion and live 1024/1440 px English/Chinese browser acceptance. Browser file access is restricted here; the existing CI smoke remains the remote browser regression gate. No new live visual acceptance is claimed.
 
 ## Previous change: project conventions aligned with merged updates
@@ -88,7 +89,7 @@ Updated: 2026-10-27 (Asia/Shanghai).
 
 - 基于远端最新 main 移植，保留模块化源码、统一对话框、紧凑存储和现有流程；新增文案全部进入中英文词典，不增加样式覆盖或独立页面。
 - 导入先预览，再以独立项目保存；导出当前字段并另存新文件。支持三级任务、整自然日、单一 FS 前置及 Lag、进度、优先级和 10 个组，不直接读写 MPP。
-- 本次验证：84 项逻辑检查（现有 67 项 + XML 17 项）、构建一致性及隐私扫描通过；完整/空白/未定日期三类输出通过映射字段 Schema 子集校验。Microsoft Project 桌面打开、另存及本次中英文实际布局仍待验收。
+- 本次验证：84 项逻辑检查（现有 67 项 + XML 17 项）、构建一致性及隐私扫描通过；完整/空白/未定日期三类输出通过映射字段 Schema 子集校验。提交 `e80b4a9` 的 GitHub CI 校验和现有 25 项浏览器冒烟通过；Microsoft Project 桌面打开、另存及新增 XML 流程的实际布局仍待验收。
 
 ### 上次变更：按已合并更新补齐项目规范
 
